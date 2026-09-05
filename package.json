@@ -14,5 +14,7 @@
   },
   "devDependencies": {
     "vite": "^7.0.0"
-  }
+  },
+  "license": "MIT",
+  "description": "星流 Starflow：一片会流动的星空，基于 three.js 的星星粒子系统"
 }
