@@ -362,7 +362,7 @@ export const STAR_VERTEX_SHADER = /* glsl */ `
       animatedPosition = astraRotate(animatedPosition, vec3(spin.x, spin.y, 0.0));
     }
 
-    // 沿轮廓游走的光带（复刻版扩展，默认关闭）。
+    // 沿轮廓游走的光带（本项目的扩展，默认关闭）。
     float distanceBehind = uHeadProgress - pathPhase;
     if (distanceBehind < 0.0) distanceBehind += 1.0;
     float trail = 1.0 - smoothstep(0.0, max(uTrailLength, 0.0001), distanceBehind);

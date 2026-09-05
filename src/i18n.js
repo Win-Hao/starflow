@@ -5,8 +5,8 @@
  */
 export const LOCALES = {
   zh: {
-    'meta.title': 'Astra · 一片会流动的星空',
-    'hero.eyebrow': 'GPT-6 Astra',
+    'meta.title': '星流 Starflow · 一片会流动的星空',
+    'hero.eyebrow': '星流 Starflow',
     'hero.title': '新一代智能，正在成形',
     'hero.lede': '四千颗星，一座星系。向下滚动，看它散开、聚拢，变成你手边的工具。拖动可以旋转，划过会推开星尘。',
     'intro.title': '先让位，再出场',
@@ -66,8 +66,8 @@ export const LOCALES = {
     'tuner.stats': (count, layers) => `${count.toLocaleString('zh-CN')} 颗星 · ${layers} 条星臂`,
   },
   en: {
-    'meta.title': 'Astra · A sky that flows',
-    'hero.eyebrow': 'GPT-6 Astra',
+    'meta.title': 'Starflow · A sky that flows',
+    'hero.eyebrow': 'Starflow',
     'hero.title': 'A new generation of intelligence, taking shape',
     'hero.lede': 'Four thousand stars, one galaxy. Scroll to watch it scatter, gather, and become a tool at your fingertips. Drag to rotate; sweep across to push the stardust away.',
     'intro.title': 'It steps aside before it steps in',

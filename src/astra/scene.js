@@ -63,7 +63,7 @@ export const DEFAULT_CONFIG = {
   coreSpin: true,
   // 拖拽时各层的旋转滞后（原站 0.68）。0 = 整体刚性旋转
   rotationLag: 0.68,
-  // 沿轮廓游走的光带（复刻版扩展）。0 = 关闭
+  // 沿轮廓游走的光带（本项目的扩展）。0 = 关闭
   trailLength: 0,
   trailBrightness: 0.9,
   trailSpeed: 0.09,
