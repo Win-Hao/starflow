@@ -1,6 +1,9 @@
 import { detectWebGL, renderStaticFallback } from './astra/fallback.js'
 import { createAstraScene } from './astra/scene.js'
 import { DEFAULT_SHAPE_SETTINGS, ICON_PRESETS, PATH_PRESETS, TEXT_PRESETS } from './presets.js'
+import { applyLocale, detectLocale, getLocale, t } from './i18n.js'
+
+applyLocale(detectLocale())
 
 const $ = (id) => document.getElementById(id)
 const canvas = $('astra')
@@ -27,6 +30,13 @@ const fieldOptions = {
 
 let source = { type: 'galaxy' }
 let rebuildTimer = 0
+let lastStats = null
+
+function renderStats() {
+  if (!lastStats) return
+  const kind = t(source.type === 'galaxy' ? 'lab.kind.galaxy' : source.type === 'paths' ? 'lab.kind.paths' : 'lab.kind.contours')
+  $('stats').textContent = t('lab.stats', lastStats.count, lastStats.layers, kind)
+}
 
 /**
  * 路径形状（光标 / OpenAI 结）和星系用的是两套参数：星带宽度、暗星尺寸、亮星压暗、
@@ -47,12 +57,11 @@ function rebuild() {
   try {
     if (!astra) {
       renderStaticFallback(canvas, source, fieldOptions)
-      $('stats').textContent = '静态回退模式（无 WebGL）'
+      $('stats').textContent = t('lab.fallback')
       return
     }
-    const stats = astra.setSource(source, fieldOptions)
-    const unit = source.type === 'galaxy' ? '星臂' : source.type === 'paths' ? '路径' : '轮廓'
-    $('stats').textContent = `${stats.count.toLocaleString()} 颗星 · ${stats.layers} 条${unit}`
+    lastStats = astra.setSource(source, fieldOptions)
+    renderStats()
   } catch (error) {
     $('stats').textContent = `⚠︎ ${error.message}`
     console.error(error)
@@ -114,9 +123,16 @@ const iconSelect = $('icon')
 for (const [id, preset] of Object.entries({ ...PATH_PRESETS, ...ICON_PRESETS })) {
   const option = document.createElement('option')
   option.value = id
-  option.textContent = preset.label
+  option.dataset.i18n = `lab.preset.${id}`
+  option.textContent = t(`lab.preset.${id}`) === `lab.preset.${id}` ? preset.label : t(`lab.preset.${id}`)
   iconSelect.append(option)
 }
+$('lang').textContent = getLocale() === 'zh' ? 'EN' : '中文'
+$('lang').addEventListener('click', () => {
+  applyLocale(getLocale() === 'zh' ? 'en' : 'zh')
+  $('lang').textContent = getLocale() === 'zh' ? 'EN' : '中文'
+  renderStats()
+})
 function applyIcon() {
   const pathPreset = PATH_PRESETS[iconSelect.value]
   if (pathPreset) {

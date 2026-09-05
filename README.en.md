@@ -64,10 +64,11 @@ The panel has four groups: star field (count, size, band width, background stars
 field), optics (bloom, brightness, lens flare, ambient color, vignette), motion (flow, twinkle, shape band width,
 pointer repel, core spin), and performance (post-processing tier, auto-degrade).
 
-Copy comes in Chinese and English (`src/i18n.js`); mark an element with `data-i18n="key"`. The default follows the
-browser language, and the choice is remembered in `localStorage`.
+Both the home page and the lab ship with Chinese and English copy (`src/i18n.js`); mark an element with
+`data-i18n="key"`. The default follows the browser language, and the choice is remembered in `localStorage`.
+The screenshots above show the English UI; here is the Chinese one:
 
-![English version](docs/screenshots/07-english.jpeg)
+![Chinese version](docs/screenshots/07-chinese.jpeg)
 
 ## Lab: any text or icon
 
