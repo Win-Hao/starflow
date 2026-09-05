@@ -1,0 +1,165 @@
+/**
+ * 主页的中 / 英文案。
+ * 标记方式：元素上写 data-i18n="键"（写 textContent），
+ * data-i18n-aria="键"（写 aria-label），data-i18n-title="键"（写 title）。
+ */
+export const LOCALES = {
+  zh: {
+    'meta.title': 'Astra · 一片会流动的星空',
+    'hero.eyebrow': 'GPT-6 Astra',
+    'hero.title': '新一代智能，正在成形',
+    'hero.lede': '四千颗星，一座星系。向下滚动，看它散开、聚拢，变成你手边的工具。拖动可以旋转，划过会推开星尘。',
+    'intro.title': '先让位，再出场',
+    'intro.p1': '真正有用的智能不抢镜头。你开始写、开始想的时候，它退到两侧，把中间留给你的工作。',
+    'intro.p2': '它并没有离开。每一颗星都记得自己在星臂上的位置——你需要的时候，一句话就能把它叫回来。',
+    'shapes.title': '一个模型，很多种形状',
+    'shapes.p1': '读懂长文档、看懂截图、写出能跑的代码、在对话里追问细节——这些不是几个拼起来的功能，是同一批星星在不同的时刻站成不同的形状。',
+    'shapes.p2': '所以它换形状时不会丢掉自己：语气、判断、边界，从星系一路带到光标。',
+    'cursor.caption': '它会动手',
+    'cursor.note': '不只是回答问题。给它一个目标，它会打开页面、填好表单、跑完流程，再把结果交回你手上。',
+    'memory.title': '记得，也知道该忘什么',
+    'memory.p1': '光标离开，星星回到星轨。散开和聚拢用的是同一组种子，所以每一次都落回同一个地方。上下文也是这样：你上周说过的偏好、这个项目里的约定，它下次仍然记得。',
+    'memory.p2': '而你划掉的、说过不要的，它不会再提。',
+    'knot.caption': '所有能力，一个整体',
+    'knot.note': '看、想、说、做，织在同一个结里。它们不是彼此独立的工具，而是一种智能的不同侧面。',
+    'tail.p': '到底了。往回滚，一切逆序发生。',
+    'tail.link': '想换个形状？去实验室把星星摆成任意文字和图标 →',
+    'lang.switch': 'EN',
+    'lang.switchAria': 'Switch to English',
+    'tuner.open': '调节粒子',
+    'tuner.title': '粒子调节',
+    'tuner.lab': '实验室',
+    'tuner.labTitle': '任意文字 / 图标的实验室',
+    'tuner.close': '关闭面板',
+    'tuner.field': '星场',
+    'tuner.starCount': '星数',
+    'tuner.size': '星星大小',
+    'tuner.scatter': '星带宽度',
+    'tuner.backgroundRatio': '背景星',
+    'tuner.rotationDepth': '厚度',
+    'tuner.palette': '调色板',
+    'tuner.palette.astra': 'Astra（原站）',
+    'tuner.fieldNote': '这一组改动会重建星场，并重播入场。',
+    'tuner.optics': '光学',
+    'tuner.bloomIntensity': 'Bloom 强度',
+    'tuner.bloomThreshold': 'Bloom 阈值',
+    'tuner.intensity': '整体亮度',
+    'tuner.flare': '镜头光晕',
+    'tuner.ambient': '氛围强度',
+    'tuner.ambientColor': '氛围色',
+    'tuner.vignette': '暗角',
+    'tuner.motion': '动态',
+    'tuner.flowSpeed': '流动速度',
+    'tuner.twinkleSpeed': '闪烁速度',
+    'tuner.shapeScatter': '形状星带',
+    'tuner.pointerRepel': '指针推斥',
+    'tuner.coreSpin': '星系核自转',
+    'tuner.shapeAutoRotate': '形状成形时自动摆动',
+    'tuner.performance': '性能',
+    'tuner.quality': '后处理',
+    'tuner.quality.full': '完整（bloom + 光晕）',
+    'tuner.quality.lite': '精简（只 bloom）',
+    'tuner.quality.none': '关闭',
+    'tuner.adaptiveQuality': '掉帧时自动降级',
+    'tuner.replay': '重播入场',
+    'tuner.reset': '恢复默认',
+    'tuner.stats': (count, layers) => `${count.toLocaleString('zh-CN')} 颗星 · ${layers} 条星臂`,
+  },
+  en: {
+    'meta.title': 'Astra · A sky that flows',
+    'hero.eyebrow': 'GPT-6 Astra',
+    'hero.title': 'A new generation of intelligence, taking shape',
+    'hero.lede': 'Four thousand stars, one galaxy. Scroll to watch it scatter, gather, and become a tool at your fingertips. Drag to rotate; sweep across to push the stardust away.',
+    'intro.title': 'It steps aside before it steps in',
+    'intro.p1': "Truly useful intelligence doesn't hog the spotlight. When you start writing, start thinking, it moves to the edges and leaves the middle for your work.",
+    'intro.p2': "It hasn't gone anywhere. Every star remembers its place on the arm — when you need it, a single sentence brings it back.",
+    'shapes.title': 'One model, many shapes',
+    'shapes.p1': "Reading a long document, understanding a screenshot, writing code that runs, asking a follow-up mid-conversation — these aren't separate features bolted together. They're the same stars standing in different formations at different moments.",
+    'shapes.p2': "So when it changes shape it doesn't lose itself: the tone, the judgment, the boundaries all travel from the galaxy to the cursor.",
+    'cursor.caption': 'It gets things done',
+    'cursor.note': 'Not just answers. Give it a goal and it opens the page, fills in the form, runs the whole flow, and hands the result back to you.',
+    'memory.title': 'It remembers, and knows what to forget',
+    'memory.p1': 'When the cursor leaves, the stars return to the rails. Scattering and gathering use the same seeds, so every star lands in the same place each time. Context works the same way: the preference you mentioned last week, the conventions of this project — it still remembers next time.',
+    'memory.p2': "And what you crossed out, what you said you didn't want, it won't bring up again.",
+    'knot.caption': 'Every capability, one whole',
+    'knot.note': 'Seeing, thinking, speaking, doing — woven into a single knot. Not separate tools, but different faces of one intelligence.',
+    'tail.p': "That's the end. Scroll back up and it all happens in reverse.",
+    'tail.link': 'Want a different shape? Head to the lab and arrange the stars into any text or icon →',
+    'lang.switch': '中文',
+    'lang.switchAria': '切换到中文',
+    'tuner.open': 'Tune particles',
+    'tuner.title': 'Particle tuning',
+    'tuner.lab': 'Lab',
+    'tuner.labTitle': 'Lab: arrange the stars into any text or icon',
+    'tuner.close': 'Close panel',
+    'tuner.field': 'Star field',
+    'tuner.starCount': 'Stars',
+    'tuner.size': 'Star size',
+    'tuner.scatter': 'Band width',
+    'tuner.backgroundRatio': 'Background stars',
+    'tuner.rotationDepth': 'Depth',
+    'tuner.palette': 'Palette',
+    'tuner.palette.astra': 'Astra (original)',
+    'tuner.fieldNote': 'These rebuild the star field and replay the intro.',
+    'tuner.optics': 'Optics',
+    'tuner.bloomIntensity': 'Bloom intensity',
+    'tuner.bloomThreshold': 'Bloom threshold',
+    'tuner.intensity': 'Overall brightness',
+    'tuner.flare': 'Lens flare',
+    'tuner.ambient': 'Ambient strength',
+    'tuner.ambientColor': 'Ambient color',
+    'tuner.vignette': 'Vignette',
+    'tuner.motion': 'Motion',
+    'tuner.flowSpeed': 'Flow speed',
+    'tuner.twinkleSpeed': 'Twinkle speed',
+    'tuner.shapeScatter': 'Shape band width',
+    'tuner.pointerRepel': 'Pointer repel',
+    'tuner.coreSpin': 'Core spin',
+    'tuner.shapeAutoRotate': 'Swing when a shape forms',
+    'tuner.performance': 'Performance',
+    'tuner.quality': 'Post-processing',
+    'tuner.quality.full': 'Full (bloom + flare)',
+    'tuner.quality.lite': 'Lite (bloom only)',
+    'tuner.quality.none': 'Off',
+    'tuner.adaptiveQuality': 'Auto-degrade on dropped frames',
+    'tuner.replay': 'Replay intro',
+    'tuner.reset': 'Reset defaults',
+    'tuner.stats': (count, layers) => `${count.toLocaleString('en-US')} stars · ${layers} arms`,
+  },
+}
+
+const STORAGE_KEY = 'astra-locale'
+let current = 'zh'
+
+/** 上次选过的优先；否则看浏览器语言，中文环境用中文，其余用英文。 */
+export function detectLocale() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved && LOCALES[saved]) return saved
+  } catch {}
+  const languages = navigator.languages?.length ? navigator.languages : [navigator.language ?? 'en']
+  return languages.some((code) => /^zh/i.test(code)) ? 'zh' : 'en'
+}
+
+export function getLocale() {
+  return current
+}
+
+export function t(key, ...args) {
+  const entry = LOCALES[current]?.[key] ?? LOCALES.zh[key] ?? key
+  return typeof entry === 'function' ? entry(...args) : entry
+}
+
+/** 把整份字典写进带 data-i18n 标记的元素。 */
+export function applyLocale(locale, root = document) {
+  current = LOCALES[locale] ? locale : 'zh'
+  try {
+    localStorage.setItem(STORAGE_KEY, current)
+  } catch {}
+  document.documentElement.lang = current === 'zh' ? 'zh-CN' : 'en'
+  document.title = t('meta.title')
+  for (const element of root.querySelectorAll('[data-i18n]')) element.textContent = t(element.dataset.i18n)
+  for (const element of root.querySelectorAll('[data-i18n-aria]')) element.setAttribute('aria-label', t(element.dataset.i18nAria))
+  for (const element of root.querySelectorAll('[data-i18n-title]')) element.title = t(element.dataset.i18nTitle)
+  return current
+}

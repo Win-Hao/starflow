@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Astra · 一片会流动的星空</title>
+    <link rel="stylesheet" href="/src/home.css" />
+  </head>
+  <body>
+    <!-- 画布固定在视口里，页面内容从它上面滚过去 -->
+    <div class="stage">
+      <canvas id="astra" aria-hidden="true"></canvas>
+    </div>
+
+    <main class="page" id="page">
+      <!-- 首屏：星系。这一屏没有文案，星星占满 -->
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow" data-i18n="hero.eyebrow">GPT-6 Astra</p>
+          <h1 data-i18n="hero.title">新一代智能，正在成形</h1>
+          <p class="lede" data-i18n="hero.lede">四千颗星，一座星系。向下滚动，看它散开、聚拢，变成你手边的工具。拖动可以旋转，划过会推开星尘。</p>
+        </div>
+        <div class="scroll-hint" aria-hidden="true"><span></span></div>
+      </section>
+
+      <!-- 首屏之后第一段文案：它滚到视口中央时散开完成（原站 introContent） -->
+      <section class="copy" data-astra-intro>
+        <h2 data-i18n="intro.title">先让位，再出场</h2>
+        <p data-i18n="intro.p1">真正有用的智能不抢镜头。你开始写、开始想的时候，它退到两侧，把中间留给你的工作。</p>
+        <p data-i18n="intro.p2">它并没有离开。每一颗星都记得自己在星臂上的位置——你需要的时候，一句话就能把它叫回来。</p>
+      </section>
+
+      <section class="copy">
+        <h2 data-i18n="shapes.title">一个模型，很多种形状</h2>
+        <p data-i18n="shapes.p1">读懂长文档、看懂截图、写出能跑的代码、在对话里追问细节——这些不是几个拼起来的功能，是同一批星星在不同的时刻站成不同的形状。</p>
+        <p data-i18n="shapes.p2">所以它换形状时不会丢掉自己：语气、判断、边界，从星系一路带到光标。</p>
+      </section>
+
+      <!-- 形状 cue：进入视口 36% 处成形，离开时消散 -->
+      <section class="cue" data-astra-shape="cursor">
+        <div class="cue-target">
+          <svg aria-hidden="true" viewBox="0 0 19 19" fill="none"></svg>
+        </div>
+        <p class="caption" data-i18n="cursor.caption">它会动手</p>
+        <p class="cue-note" data-i18n="cursor.note">不只是回答问题。给它一个目标，它会打开页面、填好表单、跑完流程，再把结果交回你手上。</p>
+      </section>
+
+      <section class="copy">
+        <h2 data-i18n="memory.title">记得，也知道该忘什么</h2>
+        <p data-i18n="memory.p1">光标离开，星星回到星轨。散开和聚拢用的是同一组种子，所以每一次都落回同一个地方。上下文也是这样：你上周说过的偏好、这个项目里的约定，它下次仍然记得。</p>
+        <p data-i18n="memory.p2">而你划掉的、说过不要的，它不会再提。</p>
+      </section>
+
+      <!-- 最后一个 cue 常驻 -->
+      <section class="cue" data-astra-shape="openai-knot">
+        <div class="cue-target">
+          <svg aria-hidden="true" viewBox="0 0 1726 1538" fill="none"></svg>
+        </div>
+        <p class="caption" data-i18n="knot.caption">所有能力，一个整体</p>
+        <p class="cue-note" data-i18n="knot.note">看、想、说、做，织在同一个结里。它们不是彼此独立的工具，而是一种智能的不同侧面。</p>
+      </section>
+
+      <section class="copy tail">
+        <p data-i18n="tail.p">到底了。往回滚，一切逆序发生。</p>
+        <p><a href="/lab.html" data-i18n="tail.link">想换个形状？去实验室把星星摆成任意文字和图标 →</a></p>
+      </section>
+    </main>
+
+    <!-- 顶栏：语言切换 + 调节面板开关 -->
+    <div class="topbar">
+      <button type="button" class="lang-toggle" id="langToggle" data-i18n="lang.switch" data-i18n-aria="lang.switchAria">EN</button>
+      <button type="button" class="tuner-toggle" id="tunerToggle" aria-expanded="false" aria-controls="tuner">
+        <svg aria-hidden="true" viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <path d="M3 5.5h8M14 5.5h3M3 10h3M9 10h8M3 14.5h10M16 14.5h1" />
+          <circle cx="12.5" cy="5.5" r="1.8" /><circle cx="7.5" cy="10" r="1.8" /><circle cx="14.5" cy="14.5" r="1.8" />
+        </svg>
+        <span data-i18n="tuner.open">调节粒子</span>
+      </button>
+    </div>
+
+    <aside class="tuner" id="tuner" hidden>
+      <header>
+        <h2 data-i18n="tuner.title">粒子调节</h2>
+        <div class="tuner-links">
+          <a href="/lab.html" data-i18n="tuner.lab" data-i18n-title="tuner.labTitle">实验室</a>
+          <button type="button" id="tunerClose" data-i18n-aria="tuner.close" aria-label="关闭面板">×</button>
+        </div>
+      </header>
+      <div class="tuner-body">
+        <section>
+          <h3 data-i18n="tuner.field">星场</h3>
+          <label class="row"><span><span data-i18n="tuner.starCount">星数</span> <b id="v-starCount"></b></span><input id="starCount" type="range" min="800" max="12000" step="200" value="4000" /></label>
+          <label class="row"><span><span data-i18n="tuner.size">星星大小</span> <b id="v-size"></b></span><input id="size" type="range" min="0.5" max="3" step="0.05" value="2.05" /></label>
+          <label class="row"><span><span data-i18n="tuner.scatter">星带宽度</span> <b id="v-scatter"></b></span><input id="scatter" type="range" min="0" max="0.14" step="0.001" value="0.041" /></label>
+          <label class="row"><span><span data-i18n="tuner.backgroundRatio">背景星</span> <b id="v-backgroundRatio"></b></span><input id="backgroundRatio" type="range" min="0" max="1" step="0.02" value="0.14" /></label>
+          <label class="row"><span><span data-i18n="tuner.rotationDepth">厚度</span> <b id="v-rotationDepth"></b></span><input id="rotationDepth" type="range" min="0" max="2" step="0.05" value="1.4" /></label>
+          <label class="row"><span data-i18n="tuner.palette">调色板</span>
+            <select id="palette">
+              <option value="astra" data-i18n="tuner.palette.astra">Astra（原站）</option>
+              <option value="aurora">Aurora</option>
+              <option value="ember">Ember</option>
+              <option value="ice">Ice</option>
+              <option value="gold">Gold</option>
+            </select>
+          </label>
+          <p class="note" data-i18n="tuner.fieldNote">这一组改动会重建星场，并重播入场。</p>
+        </section>
+
+        <section>
+          <h3 data-i18n="tuner.optics">光学</h3>
+          <label class="row"><span><span data-i18n="tuner.bloomIntensity">Bloom 强度</span> <b id="v-bloomIntensity"></b></span><input id="bloomIntensity" type="range" min="0" max="2" step="0.05" value="0.7" /></label>
+          <label class="row"><span><span data-i18n="tuner.bloomThreshold">Bloom 阈值</span> <b id="v-bloomThreshold"></b></span><input id="bloomThreshold" type="range" min="0" max="0.6" step="0.01" value="0.08" /></label>
+          <label class="row"><span><span data-i18n="tuner.intensity">整体亮度</span> <b id="v-intensity"></b></span><input id="intensity" type="range" min="0.2" max="3" step="0.05" value="1.35" /></label>
+          <label class="row"><span><span data-i18n="tuner.flare">镜头光晕</span> <b id="v-flare"></b></span><input id="flare" type="range" min="0" max="1" step="0.02" value="0.28" /></label>
+          <label class="row"><span><span data-i18n="tuner.ambient">氛围强度</span> <b id="v-ambient"></b></span><input id="ambient" type="range" min="0" max="1" step="0.01" value="0.55" /></label>
+          <label class="row"><span data-i18n="tuner.ambientColor">氛围色</span><input id="ambientColor" type="color" value="#23435f" /></label>
+          <label class="row"><span><span data-i18n="tuner.vignette">暗角</span> <b id="v-vignette"></b></span><input id="vignette" type="range" min="0" max="1" step="0.05" value="1" /></label>
+        </section>
+
+        <section>
+          <h3 data-i18n="tuner.motion">动态</h3>
+          <label class="row"><span><span data-i18n="tuner.flowSpeed">流动速度</span> <b id="v-flowSpeed"></b></span><input id="flowSpeed" type="range" min="0" max="3" step="0.05" value="0.8" /></label>
+          <label class="row"><span><span data-i18n="tuner.twinkleSpeed">闪烁速度</span> <b id="v-twinkleSpeed"></b></span><input id="twinkleSpeed" type="range" min="0" max="2" step="0.02" value="0.62" /></label>
+          <label class="row"><span><span data-i18n="tuner.shapeScatter">形状星带</span> <b id="v-shapeScatter"></b></span><input id="shapeScatter" type="range" min="0" max="3" step="0.05" value="1" /></label>
+          <label class="row check"><input id="pointerRepel" type="checkbox" checked /><span data-i18n="tuner.pointerRepel">指针推斥</span></label>
+          <label class="row check"><input id="coreSpin" type="checkbox" checked /><span data-i18n="tuner.coreSpin">星系核自转</span></label>
+          <label class="row check"><input id="shapeAutoRotate" type="checkbox" checked /><span data-i18n="tuner.shapeAutoRotate">形状成形时自动摆动</span></label>
+        </section>
+
+        <section>
+          <h3 data-i18n="tuner.performance">性能</h3>
+          <label class="row"><span data-i18n="tuner.quality">后处理</span>
+            <select id="quality">
+              <option value="full" data-i18n="tuner.quality.full">完整（bloom + 光晕）</option>
+              <option value="lite" data-i18n="tuner.quality.lite">精简（只 bloom）</option>
+              <option value="none" data-i18n="tuner.quality.none">关闭</option>
+            </select>
+          </label>
+          <label class="row check"><input id="adaptiveQuality" type="checkbox" checked /><span data-i18n="tuner.adaptiveQuality">掉帧时自动降级</span></label>
+        </section>
+
+        <div class="actions">
+          <button type="button" id="replay" data-i18n="tuner.replay">重播入场</button>
+          <button type="button" id="reset" data-i18n="tuner.reset">恢复默认</button>
+        </div>
+        <p class="stats" id="stats"></p>
+      </div>
+    </aside>
+
+    <script type="module" src="/src/home.js"></script>
+  </body>
+</html>

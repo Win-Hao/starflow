@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Astra 粒子 · 嵌入</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+      canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+    </style>
+  </head>
+  <body>
+    <canvas id="astra"></canvas>
+    <script type="module">
+      import { createAstraScene, detectWebGL, renderStaticFallback } from '/src/astra/index.js'
+      import { DEFAULT_SHAPE_SETTINGS, ICON_PRESETS, PATH_PRESETS } from '/src/presets.js'
+
+      // 通过 URL 参数驱动，方便直接 <iframe src="embed.html"> 用。
+      // 不带参数 = 原站星系；?shape=cursor / ?shape=openai-knot 是原站的路径形状；
+      // ?text=6 / ?icon=heart 切到其它形状。
+      const params = new URLSearchParams(location.search)
+      const canvas = document.getElementById('astra')
+
+      const shapePreset = PATH_PRESETS[params.get('shape')]
+      const source = shapePreset
+        ? { type: 'paths', paths: shapePreset.paths, viewBox: shapePreset.viewBox }
+        : params.has('icon')
+          ? { type: 'svg', markup: ICON_PRESETS[params.get('icon')]?.markup ?? ICON_PRESETS.heart.markup }
+          : params.has('text')
+            ? { type: 'text', value: params.get('text') || '6', fontWeight: Number(params.get('weight') ?? 700) }
+            : { type: 'galaxy' }
+      const settings = { ...DEFAULT_SHAPE_SETTINGS, ...(shapePreset?.settings ?? {}) }
+
+      const fieldOptions = {
+        starCount: Number(params.get('stars') ?? settings.starCount),
+        palette: params.get('palette') ?? 'astra',
+        scatter: Number(params.get('scatter') ?? settings.scatter),
+        size: Number(params.get('size') ?? 2.05),
+        brightRetention: settings.brightRetention,
+      }
+
+      const ambientColor = params.get('ambient') ? `#${params.get('ambient').replace('#', '')}` : '#23435f'
+
+      if (detectWebGL()) {
+        const astra = createAstraScene(canvas, {
+          introDuration: Number(params.get('intro') ?? 5.5),
+          flowSpeed: Number(params.get('flow') ?? settings.flowSpeed),
+          quality: params.get('quality') ?? 'full',
+          dimSizeScale: settings.dimSizeScale,
+          fillX: settings.fillX,
+          fillY: settings.fillY,
+          ambientColor,
+          ambientOpacity: settings.ambient,
+        })
+        astra.setSource(source, fieldOptions)
+        window.__astra = astra
+      } else {
+        renderStaticFallback(canvas, source, fieldOptions)
+      }
+    </script>
+  </body>
+</html>

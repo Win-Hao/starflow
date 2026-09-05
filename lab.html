@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Astra 实验室 · 任意数字与图标</title>
+    <link rel="stylesheet" href="/src/lab.css" />
+  </head>
+  <body>
+    <div class="stage">
+      <canvas id="astra" aria-hidden="true"></canvas>
+      <p class="hint">拖动旋转 · 快速划过推开星尘</p>
+    </div>
+
+    <aside class="panel" id="panel">
+      <header>
+        <h1>Astra 实验室 <a class="back" href="/">← 主页</a></h1>
+        <button type="button" id="toggle" aria-label="收起面板">－</button>
+      </header>
+
+      <div class="body">
+        <section>
+          <label class="row">
+            <span>形状来源</span>
+            <select id="mode">
+              <option value="galaxy">原站星系（GPT-6）</option>
+              <option value="text">文字 / 数字</option>
+              <option value="icon">内置图标</option>
+              <option value="svg">粘贴 SVG</option>
+              <option value="file">上传文件</option>
+            </select>
+          </label>
+
+          <div data-mode="galaxy">
+            <p class="note">原站的 5 条手绘螺旋曲线 + 星系核，逐星与 openai.com 一致。</p>
+          </div>
+
+          <div data-mode="text" hidden>
+            <label class="row"><span>内容</span><input id="text" type="text" value="6" maxlength="12" /></label>
+            <div class="chips" id="textChips"></div>
+            <label class="row"><span>字重</span>
+              <select id="weight">
+                <option value="300">300</option>
+                <option value="500">500</option>
+                <option value="700" selected>700</option>
+                <option value="900">900</option>
+              </select>
+            </label>
+          </div>
+
+          <div data-mode="icon" hidden>
+            <label class="row"><span>图标</span><select id="icon"></select></label>
+          </div>
+
+          <div data-mode="svg" hidden>
+            <textarea id="svg" rows="5" placeholder="粘贴完整 &lt;svg&gt;…&lt;/svg&gt; 源码"></textarea>
+            <button type="button" id="applySvg" class="wide">应用 SVG</button>
+          </div>
+
+          <div data-mode="file" hidden>
+            <input id="file" type="file" accept=".svg,image/svg+xml,image/png,image/jpeg,image/webp" />
+            <p class="note">SVG 走矢量轮廓；位图按亮度取形状，建议用黑底白图。</p>
+          </div>
+        </section>
+
+        <section>
+          <h2>星场</h2>
+          <label class="row"><span>星数 <b id="v-starCount"></b></span><input id="starCount" type="range" min="800" max="16000" step="200" value="4000" /></label>
+          <label class="row" data-raster-only hidden><span>填充占比 <b id="v-fillRatio"></b></span><input id="fillRatio" type="range" min="0" max="0.7" step="0.02" value="0" /></label>
+          <label class="row"><span>星带宽度 <b id="v-scatter"></b></span><input id="scatter" type="range" min="0" max="0.14" step="0.001" value="0.041" /></label>
+          <label class="row"><span>背景星 <b id="v-backgroundRatio"></b></span><input id="backgroundRatio" type="range" min="0" max="1.2" step="0.02" value="0.14" /></label>
+          <label class="row"><span>厚度 <b id="v-rotationDepth"></b></span><input id="rotationDepth" type="range" min="0" max="2" step="0.05" value="1.4" /></label>
+          <label class="row"><span>星星大小 <b id="v-size"></b></span><input id="size" type="range" min="0.3" max="3" step="0.05" value="2.05" /></label>
+          <label class="row"><span>端点衰减 <b id="v-sizeFalloff"></b></span><input id="sizeFalloff" type="range" min="0" max="1" step="0.02" value="0.45" /></label>
+          <label class="row"><span>调色板</span>
+            <select id="palette">
+              <option value="astra">Astra（原站）</option>
+              <option value="aurora">Aurora</option>
+              <option value="ember">Ember</option>
+              <option value="ice">Ice</option>
+              <option value="gold">Gold</option>
+            </select>
+          </label>
+        </section>
+
+        <section>
+          <h2>光学</h2>
+          <label class="row"><span>Bloom 强度 <b id="v-bloomIntensity"></b></span><input id="bloomIntensity" type="range" min="0" max="2" step="0.05" value="0.7" /></label>
+          <label class="row"><span>Bloom 阈值 <b id="v-bloomThreshold"></b></span><input id="bloomThreshold" type="range" min="0" max="0.6" step="0.01" value="0.08" /></label>
+          <label class="row"><span>整体亮度 <b id="v-intensity"></b></span><input id="intensity" type="range" min="0.2" max="3" step="0.05" value="1.35" /></label>
+          <label class="row"><span>镜头光晕 <b id="v-flare"></b></span><input id="flare" type="range" min="0" max="1" step="0.02" value="0.28" /></label>
+          <label class="row"><span>氛围色</span><input id="ambientColor" type="color" value="#23435F" /></label>
+        </section>
+
+        <section>
+          <h2>动态</h2>
+          <label class="row"><span>流动速度 <b id="v-flowSpeed"></b></span><input id="flowSpeed" type="range" min="0" max="3" step="0.05" value="0.8" /></label>
+          <label class="row"><span>闪烁速度 <b id="v-twinkleSpeed"></b></span><input id="twinkleSpeed" type="range" min="0" max="2" step="0.02" value="0.62" /></label>
+          <label class="row"><span>光带长度 <b id="v-trailLength"></b></span><input id="trailLength" type="range" min="0" max="0.6" step="0.01" value="0" /></label>
+          <label class="row"><span>光带速度 <b id="v-trailSpeed"></b></span><input id="trailSpeed" type="range" min="0" max="0.5" step="0.01" value="0.09" /></label>
+          <label class="row check"><input id="pointerRepel" type="checkbox" checked /><span>指针推斥（GPGPU）</span></label>
+          <label class="row check"><input id="lensMode" type="checkbox" /><span>指针透镜放大</span></label>
+          <label class="row check"><input id="coreSpin" type="checkbox" checked /><span>星系核自转</span></label>
+          <label class="row check"><input id="autoRotate" type="checkbox" /><span>自动微转</span></label>
+        </section>
+
+        <div class="actions">
+          <button type="button" id="replay">重播入场</button>
+          <button type="button" id="disperse">散开 / 聚合</button>
+        </div>
+        <p class="stats" id="stats"></p>
+      </div>
+    </aside>
+
+    <script type="module" src="/src/lab.js"></script>
+  </body>
+</html>
