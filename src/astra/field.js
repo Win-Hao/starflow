@@ -279,7 +279,9 @@ export function generateStarField(source, userOptions = {}) {
       if (point.y < minY) minY = point.y
       if (point.y > maxY) maxY = point.y
     }
-    layer.flowSpeed = layer.closed ? layer.speed : flowDirection(layer.curve, layer.speed, options.flowInward, layer.flowCenter ?? null)
+    layer.flowSpeed = layer.flowSign != null
+      ? Math.abs(layer.speed) * layer.flowSign * (options.flowInward ? 1 : -1)
+      : layer.closed ? layer.speed : flowDirection(layer.curve, layer.speed, options.flowInward, layer.flowCenter ?? null)
   })
   const shapeWidth = Math.max(maxX - minX, 1e-3)
   const shapeHeight = Math.max(maxY - minY, 1e-3)
