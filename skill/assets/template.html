@@ -49,7 +49,7 @@
 
       /* ── Hero chrome: split labels, scroll hint, replay. Pointer-transparent except the button. ── */
       .chrome { position: fixed; inset: 0; z-index: 2; height: var(--astra-viewport-height); pointer-events: none; opacity: var(--astra-copy-opacity); }
-      .chrome .label { position: absolute; top: 50%; margin: 0; transform: translateY(-50%); font: 500 clamp(32px, 2rem + 2 * ((100vw - 375px) / 1065), var(--text-4xl)) / 1 var(--font-display); letter-spacing: var(--tracking-display); color: var(--fg-2); text-shadow: 0 0 24px #fafafa14; user-select: none; white-space: nowrap; }
+      .chrome .label { position: absolute; top: 50%; margin: 0; transform: translateY(-50%); font: 500 clamp(32px, calc(2rem + (100vw - 375px) * 0.03005), var(--text-4xl)) / 1 var(--font-display); letter-spacing: var(--tracking-display); color: var(--fg-2); text-shadow: 0 0 24px #fafafa14; user-select: none; white-space: nowrap; }
       .chrome .label-left { left: clamp(20px, 4vw, 56px); }
       .chrome .label-right { right: clamp(20px, 4vw, 56px); }
       .chrome .letter { display: inline-block; opacity: 0; transform: translateX(var(--astra-label-shift, 44px)); animation: label-reveal var(--astra-label-duration) var(--astra-label-ease) var(--astra-label-delay, 1s) forwards; }
@@ -71,10 +71,10 @@
 
       /* First block after the hero: its position drives tilt + scatter (data-astra-intro). */
       .copy { max-width: var(--astra-copy-max); margin: 0 auto; padding: 26vh var(--space-6); }
-      .copy h2 { margin: 0 0 var(--space-4); font: 500 clamp(32px, 2rem + 1 * ((100vw - 375px) / 1065), var(--text-3xl)) / 1.16 var(--font-display); letter-spacing: -0.02em; text-wrap: balance; }
+      .copy h2 { margin: 0 0 var(--space-4); font: 500 clamp(32px, calc(2rem + (100vw - 375px) * 0.01502), var(--text-3xl)) / 1.16 var(--font-display); letter-spacing: -0.03em; text-wrap: balance; }
       .copy p { margin: 0 0 1.1em; color: var(--muted); text-wrap: pretty; }
       .copy .lede { font-size: var(--text-lg); color: var(--muted); }
-      .copy.title-stage { padding-top: 18vh; }
+      .copy.title-stage { padding-top: 30vh; }
       .copy.title-stage h2 { translate: 0 var(--astra-title-parallax-y); will-change: translate; }
       .copy.tail { padding-bottom: 50vh; text-align: center; color: var(--meta); }
       .copy.tail p { color: var(--meta); }
@@ -101,10 +101,12 @@
 
       /* ── Site header: fixed, 54px, transparent. Only links and buttons take the pointer; no blur behind it. ── */
       .site-header { position: fixed; top: 0; left: 0; right: 0; z-index: 4; height: 54px; pointer-events: none; }
+      @media (min-width: 1020px) { .site-header { height: 64px; } }
       /* 顶部全透明；滚动后淡入一层纯黑底（原站 bg-secondary-100，400ms curve-out-cubic） */
       .site-header::before { content: ""; position: absolute; inset: 0; background: #000; opacity: 0; transition: opacity 400ms cubic-bezier(0.33, 1, 0.68, 1); }
       .site-header[data-scrolled="true"]::before { opacity: 1; }
-      .site-header .bar { position: relative; display: flex; align-items: center; gap: var(--space-5); height: 100%; max-width: var(--container-max); margin: 0 auto; padding: 0 var(--space-6); }
+      .site-header .bar { position: relative; display: flex; align-items: center; gap: var(--space-5); height: 100%; max-width: 1440px; margin: 0 auto; padding: 0 var(--space-6); }
+      @media (min-width: 768px) { .site-header .bar { padding: 0 var(--space-8); } }
       .site-header a, .site-header button { pointer-events: auto; }
       .site-header .wordmark { display: inline-flex; align-items: center; height: 17px; font: 500 var(--text-lg) / 1 var(--font-display); letter-spacing: -0.02em; color: var(--fg); text-decoration: none; }
       .site-header nav { display: flex; align-items: center; align-self: stretch; flex: 1; min-width: 0; }
@@ -285,7 +287,7 @@
 
       const astra = createAstraScene(canvas, {
         ambientColor: getComputedStyle(root).getPropertyValue('--astra-ambient-color').trim() || '#23435f',
-        ambientOpacity: 0.3, ambientFloor: 0.4, vignette: 0,
+        ambientOpacity: 0.55, vignette: 0.85,
       })
       window.__astra = astra
       astra.setSource({ type: 'galaxy' }, { starCount: 4000, size: 2.05, scatter: 0.041, backgroundRatio: 0.14, rotationDepth: 1.4, palette: 'astra' })
@@ -331,7 +333,7 @@
 
       let scheduled = false
       let lastViewportHeight = 0
-      const ambientBase = 0.3
+      const ambientBase = 0.55
 
       function update() {
         scheduled = false
@@ -399,7 +401,7 @@
         if (title) root.style.setProperty('--astra-title-parallax-y', `${((1 - Math.min(1, progress)) * TITLE_PARALLAX).toFixed(1)}px`)
 
         // Ambient glow recedes once the galaxy scatters; shapes do not need it.
-        astra.config.ambientOpacity = 0.1 + Math.max(ambientBase - 0.1, 0) * (1 - Math.min(1, progress))
+        astra.config.ambientOpacity = 0.12 + Math.max(ambientBase - 0.12, 0) * (1 - Math.min(1, progress))
         astra.setScroll({ progress, tiltProgress, scatterProgress, contentBounds, shape })
       }
 

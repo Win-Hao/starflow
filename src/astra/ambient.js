@@ -1,6 +1,17 @@
 import { BlendFunction, Effect } from 'postprocessing'
 import { Color, Uniform, Vector2 } from 'three'
 
+/** 把 CSS 颜色解析成 0..1 的 sRGB 分量，不经过 three 的色彩管理（setStyle 会把它转成线性值，氛围色会暗到只剩一成）。 */
+function srgbComponents(style) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(String(style).trim())
+  if (m) {
+    const n = parseInt(m[1], 16)
+    return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255]
+  }
+  const c = new Color().setStyle(style, 'srgb-linear')
+  return [c.r, c.g, c.b]
+}
+
 /**
  * 页面原本用两层 CSS 做氛围色（plus-lighter 的径向渐变）和暗角。
  * 在大窗口 / 高刷屏上，带混合模式的全屏图层会让浏览器合成器每帧多画几遍整屏，
@@ -27,7 +38,8 @@ const FRAGMENT_SHADER = /* glsl */ `
   void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
     // farthest-corner：椭圆用视口的半宽半高归一，圆用对角线的一半归一
     vec2 offset = uv - 0.5;
-    float ellipse = length(offset * 2.0);
+    // farthest-corner 的椭圆穿过角点：半径是半宽半高的 √2 倍，所以中边处 t≈0.71、角点处 t=1
+    float ellipse = length(offset * 2.0) / 1.41421356;
     float circle = length(offset * uAspect) / (0.5 * length(uAspect));
     vec3 srgb = astraToSrgb(inputColor.rgb);
     // floor：把一部分氛围色铺满整屏（原站截图里的底色几乎是均匀的深蓝黑，径向部分只在四角略亮）
@@ -44,7 +56,7 @@ export class AstraAmbientEffect extends Effect {
     super('AstraAmbient', FRAGMENT_SHADER, {
       blendFunction: BlendFunction.NORMAL,
       uniforms: new Map([
-        ['uAmbientColor', new Uniform(new Color(color))],
+        ['uAmbientColor', new Uniform(new Color(...srgbComponents(color)))],
         ['uAmbientOpacity', new Uniform(opacity)],
         ['uVignette', new Uniform(vignette)],
         ['uAmbientFloor', new Uniform(floor)],
@@ -54,9 +66,8 @@ export class AstraAmbientEffect extends Effect {
   }
 
   setAmbient(color, opacity, vignette, floor = 0) {
-    // CSS 里的颜色是 sRGB 值，直接用，不走 three 的色彩管理
-    const c = new Color().setStyle(color, 'srgb')
-    this.uniforms.get('uAmbientColor').value.set(c.r, c.g, c.b)
+    const [r, g, b] = srgbComponents(color)
+    this.uniforms.get('uAmbientColor').value.setRGB(r, g, b, 'srgb-linear')
     this.uniforms.get('uAmbientOpacity').value = opacity
     this.uniforms.get('uVignette').value = vignette
     this.uniforms.get('uAmbientFloor').value = floor
