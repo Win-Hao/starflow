@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="icon" href="data:," />
+    <title>星流 Starflow · 一句话，做出 OpenAI 同款发布页</title>
+    <style>
+      :root {
+        --bg: #000000; --surface: #1f1f1f; --surface-warm: #0a0a0a;
+        --fg: #ffffff; --fg-2: #fafafa; --muted: #ffffff99; --meta: #ffffff70;
+        --border: #ffffff33; --border-soft: #ffffff14;
+        --accent: #ffffff; --accent-on: #000000; --accent-hover: #ffffffe6; --accent-active: #ffffffcc;
+        --font-display: "OpenAI Sans", "Inter", -apple-system, "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Microsoft YaHei", system-ui, sans-serif;
+        --font-body: var(--font-display);
+        --font-mono: "SF Mono", Consolas, "Liberation Mono", ui-monospace, monospace;
+        --text-xs: 13px; --text-sm: 14px; --text-base: 17px; --text-lg: 18px; --text-xl: 22px;
+        --text-2xl: 30px; --text-3xl: 48px; --text-4xl: 64px;
+        --leading-body: 1.65; --leading-tight: 1.08; --tracking-display: -0.03em;
+        --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px;
+        --space-6: 24px; --space-8: 32px; --space-12: 48px;
+        --radius-sm: 6px; --radius-md: 10px; --radius-lg: 16px; --radius-pill: 9999px;
+        --motion-fast: 150ms; --motion-base: 300ms; --ease-standard: cubic-bezier(0.6, 0, 0.4, 1);
+        --container-max: 1088px;
+        --astra-ambient-color: #23435f;
+        --astra-glass: #ffffff1f; --astra-glass-hover: #ffffff33;
+        --astra-copy-max: 676px; --astra-shape-max-width: 576px;
+        --astra-viewport-height: 100svh; --astra-copy-opacity: 1; --astra-title-parallax-y: 0px;
+        --astra-label-duration: 1s; --astra-label-ease: cubic-bezier(0.22, 1, 0.36, 1);
+        color-scheme: dark;
+      }
+      * { box-sizing: border-box; }
+      html { scrollbar-width: none; }
+      html::-webkit-scrollbar { display: none; }
+      html, body { margin: 0; background: var(--bg); color: var(--fg); font: 400 var(--text-base) / var(--leading-body) var(--font-body); letter-spacing: -0.01em; -webkit-font-smoothing: antialiased; }
+
+      .stage { position: fixed; inset: 0; z-index: 0; background: var(--bg); }
+      #astra { position: absolute; inset: 0; display: block; width: 100%; height: 100%; touch-action: pan-y pinch-zoom; cursor: grab; }
+      #astra:active { cursor: grabbing; }
+
+      .chrome { position: fixed; inset: 0; z-index: 2; height: var(--astra-viewport-height); pointer-events: none; opacity: var(--astra-copy-opacity); }
+      .chrome .label { position: absolute; top: 50%; margin: 0; transform: translateY(-50%); font: 500 clamp(32px, 2rem + 2 * ((100vw - 375px) / 1065), var(--text-4xl)) / 1 var(--font-display); letter-spacing: var(--tracking-display); color: var(--fg-2); text-shadow: 0 0 24px #fafafa14; user-select: none; white-space: nowrap; }
+      .chrome .label-left { left: clamp(20px, 4vw, 56px); }
+      .chrome .label-right { right: clamp(20px, 4vw, 56px); }
+      .chrome .letter { display: inline-block; opacity: 0; transform: translateX(var(--astra-label-shift, 44px)); animation: label-reveal var(--astra-label-duration) var(--astra-label-ease) var(--astra-label-delay, 1s) forwards; }
+      @keyframes label-reveal { to { opacity: 1; transform: translate(0); } }
+      .chrome .scroll-hint { position: absolute; left: 50%; bottom: var(--space-8); margin: 0; transform: translateX(-50%); color: #fafafa99; font-size: var(--text-sm); letter-spacing: 0.04em; }
+      .chrome .replay { position: absolute; right: var(--space-3); bottom: var(--space-3); width: 36px; height: 36px; padding: 0; border: 0; border-radius: var(--radius-pill); background: #ffffff26; color: #ffffffcc; display: grid; place-items: center; font-size: 16px; cursor: pointer; pointer-events: auto; transition: color var(--motion-fast), background-color var(--motion-fast); }
+      .chrome .replay:hover { background: #ffffff40; color: #ffffffe6; }
+      @media (max-width: 720px) {
+        .chrome .label-left { top: 46%; left: var(--space-4); }
+        .chrome .label-right { top: 54%; right: var(--space-4); }
+      }
+
+      .page { position: relative; z-index: 1; pointer-events: none; }
+      .page a, .page button { pointer-events: auto; }
+      .hero { height: var(--astra-viewport-height); }
+
+      .copy { max-width: var(--astra-copy-max); margin: 0 auto; padding: 26vh var(--space-6); }
+      .copy h2 { margin: 0 0 var(--space-4); font: 500 clamp(30px, 2rem + 1 * ((100vw - 375px) / 1065), var(--text-3xl)) / 1.16 var(--font-display); letter-spacing: -0.02em; text-wrap: balance; }
+      .copy p { margin: 0 0 1.1em; color: var(--muted); text-wrap: pretty; }
+      .copy .lede { font-size: var(--text-lg); }
+      .copy.title-stage { padding-top: 18vh; }
+      .copy.title-stage h2 { translate: 0 var(--astra-title-parallax-y); will-change: translate; }
+      .copy.tail { padding-bottom: 50vh; text-align: center; }
+      .copy.tail p { color: var(--meta); }
+      .copy code { font: 400 0.92em / 1.6 var(--font-mono); letter-spacing: 0; color: var(--fg); background: var(--astra-glass); padding: 2px 8px; border-radius: var(--radius-sm); }
+
+      .actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
+      .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-1); min-height: 40px; padding: var(--space-3) var(--space-4); border: 0; border-radius: var(--radius-pill); font: 500 var(--text-sm) / 1 var(--font-body); letter-spacing: 0; white-space: nowrap; text-decoration: none; cursor: pointer; transition: background-color var(--motion-base) var(--ease-standard), color var(--motion-base) var(--ease-standard); }
+      .btn-primary { background: var(--accent); color: var(--accent-on); }
+      .btn-primary:hover { background: var(--accent-hover); }
+      .btn-glass { background: var(--astra-glass); color: var(--fg); }
+      .btn-glass:hover { background: var(--astra-glass-hover); }
+
+      .cue { display: flex; flex-direction: column; align-items: center; gap: var(--space-4); padding: 18vh var(--space-6); }
+      .cue-target { width: min(var(--astra-shape-max-width), 100%); height: calc(0.8 * var(--astra-viewport-height)); display: flex; align-items: center; justify-content: center; }
+      .cue-target svg { width: 100%; height: 100%; max-width: 100%; max-height: 100%; opacity: 0; }
+      .caption { margin: 0; font: 500 var(--text-sm) / 1.5 var(--font-body); letter-spacing: 0.12em; color: #fafafad9; }
+      .cue-note { max-width: 440px; margin: 0; text-align: center; font-size: var(--text-sm); line-height: 1.7; color: var(--meta); }
+
+      [data-astra-static="true"] .cue-target svg { opacity: 1; color: #fafafa4d; }
+      [data-astra-static="true"] .chrome .letter { opacity: 1; animation: none; transform: none; }
+      @media (max-width: 720px) { .copy { padding: 18vh var(--space-5); } }
+      @media (prefers-reduced-motion: reduce) { .chrome .letter { opacity: 1; animation: none; transform: none; } }
+    </style>
+  </head>
+  <body>
+    <div class="stage" aria-hidden="true"><canvas id="astra"></canvas></div>
+
+    <div class="chrome" id="chrome" aria-hidden="true">
+      <p class="label label-left" data-astra-label="left">星流</p>
+      <p class="label label-right" data-astra-label="right">Starflow</p>
+      <p class="scroll-hint">向下滚动</p>
+      <button class="replay" id="replay" type="button" aria-label="重播入场">↻</button>
+    </div>
+
+    <main class="page" id="page">
+      <h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">星流 Starflow：一句话，做出 OpenAI 同款发布页</h1>
+
+      <section class="hero" aria-hidden="true"></section>
+
+      <section class="copy title-stage" data-astra-intro>
+        <h2 data-astra-title>一句话，做出 OpenAI 同款发布页</h2>
+        <p class="lede">四千颗星，一座星系。它会随你的滚动翻身、让位、聚成形状。引擎开源，配一个 skill，Claude Code 和 Cursor 就能直接产出这一页。</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="https://github.com/Win-Hao/starflow" target="_blank" rel="noopener">GitHub · 星流引擎</a>
+          <a class="btn btn-glass" href="https://github.com/Win-Hao/starflow-skill" target="_blank" rel="noopener">装这个 skill</a>
+        </div>
+      </section>
+
+      <section class="copy">
+        <h2>先让位，再出场</h2>
+        <p>真正好用的效果不抢镜头。你开始读的时候，星星退到两侧，把中间留给文字。</p>
+        <p>它们没有离开。每一颗星都记得自己在星臂上的位置，往回滚，一切逆序发生。</p>
+      </section>
+
+      <section class="cue" data-astra-shape="cursor">
+        <div class="cue-target"><svg aria-hidden="true" fill="none"></svg></div>
+        <p class="caption">同一批星星，另一个形状</p>
+        <p class="cue-note">光标、logo、任何一段 SVG 路径。星星沿着线落下，再顺着线流动。</p>
+      </section>
+
+      <section class="copy">
+        <h2>你只需要说一句话</h2>
+        <p>装上 skill，对 agent 说：<code>用 starflow 做一个发布页</code>。引擎、排版、滚动编排都在包里，它只负责填内容。</p>
+        <p>不用重写粒子系统，不用调 shader。这一页就是这么来的。</p>
+      </section>
+
+      <section class="cue" data-astra-shape="heart" data-astra-paths='["M50 88 C 20 65, 8 50, 8 33 C 8 20, 18 12, 29 12 C 38 12, 45 17, 50 25 C 55 17, 62 12, 71 12 C 82 12, 92 20, 92 33 C 92 50, 80 65, 50 88 Z"]' data-astra-viewbox="0 0 100 100">
+        <div class="cue-target"><svg aria-hidden="true" fill="none"></svg></div>
+        <p class="caption">觉得有用，点个赞</p>
+        <p class="cue-note">开源，MIT。仓库地址在下面。</p>
+      </section>
+
+      <section class="copy tail">
+        <p>github.com/Win-Hao/starflow · github.com/Win-Hao/starflow-skill</p>
+        <p><a class="btn btn-glass" href="https://github.com/Win-Hao/starflow-skill" target="_blank" rel="noopener">去 GitHub 看看</a></p>
+      </section>
+    </main>
+
+    <script type="module">
+      import { createAstraScene, createShapeSamples, detectWebGL, prefersReducedMotion, renderStaticFallback, PATH_PRESETS } from '../../lib/starflow.js'
+
+      const canvas = document.getElementById('astra')
+      const chrome = document.getElementById('chrome')
+      const intro = document.querySelector('[data-astra-intro]')
+      const title = document.querySelector('[data-astra-title]')
+      const copyBlocks = Array.from(document.querySelectorAll('.copy'))
+      const root = document.documentElement
+      const params = new URLSearchParams(location.search)
+      const DISPERSE_DISTANCE = 800
+      const TITLE_PARALLAX = 120
+
+      for (const label of document.querySelectorAll('[data-astra-label]')) {
+        const fromLeft = label.dataset.astraLabel === 'left'
+        const letters = Array.from(label.textContent.trim())
+        label.setAttribute('aria-label', letters.join(''))
+        label.textContent = ''
+        letters.forEach((char, i) => {
+          const span = document.createElement('span')
+          span.className = 'letter'
+          span.textContent = char
+          const order = fromLeft ? letters.length - 1 - i : i
+          span.style.setProperty('--astra-label-delay', `${(0.85 + order * 0.1).toFixed(2)}s`)
+          span.style.setProperty('--astra-label-shift', fromLeft ? '-44px' : '44px')
+          label.appendChild(span)
+        })
+      }
+
+      function cueShape(element) {
+        const id = element.dataset.astraShape
+        if (element.dataset.astraPaths) {
+          return { id, paths: JSON.parse(element.dataset.astraPaths), viewBox: (element.dataset.astraViewbox || '0 0 100 100').split(/\s+/).map(Number) }
+        }
+        const preset = PATH_PRESETS[id]
+        if (!preset) throw new Error(`unknown shape ${id}`)
+        return { id, paths: preset.paths, viewBox: preset.viewBox }
+      }
+      function drawCuePaths() {
+        for (const element of document.querySelectorAll('[data-astra-shape]')) {
+          const { paths, viewBox } = cueShape(element)
+          const svg = element.querySelector('svg')
+          svg.setAttribute('viewBox', viewBox.join(' '))
+          svg.innerHTML = paths.map((d) => `<path d="${d}" stroke="currentColor" stroke-width="${viewBox[3] / 24}"/>`).join('')
+        }
+      }
+      drawCuePaths()
+
+      if (!detectWebGL() || (prefersReducedMotion() && !params.has('force'))) {
+        root.dataset.astraStatic = 'true'
+        renderStaticFallback(canvas, { type: 'galaxy' })
+        throw new Error('static fallback')
+      }
+
+      const astra = createAstraScene(canvas, { ambientColor: '#23435f', ambientOpacity: 0.55, reducedMotion: false })
+      window.__astra = astra
+      astra.setSource({ type: 'galaxy' }, { starCount: 4000, size: 2.05, scatter: 0.041, backgroundRatio: 0.14, rotationDepth: 1.4, palette: 'astra' })
+
+      const cues = Array.from(document.querySelectorAll('[data-astra-shape]')).map((element, index, all) => {
+        const { id, paths, viewBox } = cueShape(element)
+        return { id, element, target: element.querySelector('.cue-target'), samples: createShapeSamples(paths, viewBox), aspectRatio: viewBox[2] / viewBox[3], holdAtRangeEnd: index === all.length - 1 }
+      })
+      const smoothstep = (x, a, b) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t) }
+
+      let scheduled = false
+      let lastViewportHeight = 0
+      function update() {
+        scheduled = false
+        const viewportHeight = window.innerHeight
+        const viewportWidth = window.innerWidth
+        const scrollTop = window.scrollY
+        if (viewportHeight !== lastViewportHeight) {
+          lastViewportHeight = viewportHeight
+          root.style.setProperty('--astra-viewport-height', `${viewportHeight}px`)
+        }
+        const progress = Math.max(scrollTop / DISPERSE_DISTANCE, 0)
+        let scatterProgress = null, tiltProgress = null
+        if (intro) {
+          const rect = intro.getBoundingClientRect()
+          const top = rect.top + scrollTop
+          const start = top - 0.66 * viewportHeight
+          const end = top + 0.5 * rect.height - 0.5 * viewportHeight
+          scatterProgress = Math.min(1, Math.max(0, (scrollTop - start) / Math.max(end - start, 1)))
+          tiltProgress = Math.min(1, scrollTop / Math.max(1, end))
+        }
+        let contentBounds = null
+        if (copyBlocks[0]) {
+          const rect = copyBlocks[0].getBoundingClientRect()
+          contentBounds = { left: rect.left / viewportWidth, right: rect.right / viewportWidth }
+        }
+        let active = null, strength = 0
+        for (const cue of cues) {
+          const rect = cue.element.getBoundingClientRect()
+          const entered = (viewportHeight - rect.top) / Math.max(viewportHeight + rect.height, 1)
+          const leaving = cue.holdAtRangeEnd ? 1 : 1 - smoothstep(entered, 0.5, 0.86)
+          const value = smoothstep(entered, 0, 0.36) * leaving
+          if (value > strength) { strength = value; active = cue }
+        }
+        const shape = { strength }
+        if (active) {
+          const rect = active.target.getBoundingClientRect()
+          const width = rect.width / Math.max(rect.height, 1) > active.aspectRatio ? rect.height * active.aspectRatio : rect.width
+          const height = width / active.aspectRatio
+          shape.id = active.id
+          shape.samples = active.samples
+          shape.centerNdc = [((rect.left + rect.width / 2) / viewportWidth) * 2 - 1, 1 - ((rect.top + rect.height / 2) / viewportHeight) * 2]
+          shape.sizeNdc = [(width / viewportWidth) * 2, (height / viewportHeight) * 2]
+        }
+        const chromeOpacity = 1 - Math.min(1, progress * 2)
+        root.style.setProperty('--astra-copy-opacity', chromeOpacity.toFixed(3))
+        chrome.style.visibility = chromeOpacity <= 0 ? 'hidden' : 'visible'
+        if (title) root.style.setProperty('--astra-title-parallax-y', `${((1 - Math.min(1, progress)) * TITLE_PARALLAX).toFixed(1)}px`)
+        astra.config.ambientOpacity = 0.12 + 0.43 * (1 - Math.min(1, progress))
+        astra.setScroll({ progress, tiltProgress, scatterProgress, contentBounds, shape })
+      }
+      function schedule() { if (scheduled) return; scheduled = true; requestAnimationFrame(update) }
+      window.addEventListener('scroll', schedule, { passive: true })
+      window.addEventListener('resize', schedule, { passive: true })
+      document.getElementById('replay').addEventListener('click', () => astra.replay())
+      schedule()
+
+      // ── 录屏辅助：?autoscroll=110 → 入场结束后以 110px/s 匀速滚到底；?delay=6 改起始等待秒数。
+      //    滚动中按任意键、滚轮或触摸都会停下来；?loop=1 到底后回到顶部重播。
+      if (params.has('autoscroll')) {
+        const speed = Number(params.get('autoscroll')) || 110
+        const delay = (Number(params.get('delay')) || 6) * 1000
+        const loop = params.get('loop') === '1'
+        let running = false, last = 0, y = 0
+        function tick(now) {
+          if (!running) return
+          const dt = Math.min(0.05, (now - last) / 1000)
+          last = now
+          y = Math.min(y + speed * dt, document.body.scrollHeight - innerHeight)
+          window.scrollTo(0, y)
+          if (y >= document.body.scrollHeight - innerHeight - 1) {
+            running = false
+            if (loop) setTimeout(() => { window.scrollTo(0, 0); astra.replay(); start() }, 2500)
+            return
+          }
+          requestAnimationFrame(tick)
+        }
+        function start() { setTimeout(() => { running = true; last = performance.now(); y = window.scrollY; requestAnimationFrame(tick) }, delay) }
+        const stop = () => { running = false }
+        window.addEventListener('wheel', stop, { passive: true })
+        window.addEventListener('touchstart', stop, { passive: true })
+        window.addEventListener('keydown', stop)
+        start()
+      }
+    </script>
+  </body>
+</html>

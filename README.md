@@ -247,6 +247,7 @@ skill/                                    coding agent 用的 skill（SKILL.md�
 design-systems/openai-astra/              openai-astra DESIGN.md 设计系统包
 docs/upstream-prs.md                      往上游目录投稿的步骤与 PR 文案
 scripts/sync-skill.sh                     重建组件页、同步 DESIGN.md 副本
+examples/launch-page/                     中文发布页成品（演示视频用的那页，带录屏自动滚动参数）
 ```
 
 参考页面的抓包文件和分析笔记不在仓库里；星星相关的算法都已按上表在源码里注明出处。

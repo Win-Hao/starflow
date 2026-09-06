@@ -266,6 +266,7 @@ skill/                                    skill for coding agents (SKILL.md, pag
 design-systems/openai-astra/              openai-astra DESIGN.md package
 docs/upstream-prs.md                      steps and PR copy for upstream catalogues
 scripts/sync-skill.sh                     rebuild the component fixture, sync DESIGN.md copies
+examples/launch-page/                     finished Chinese launch page (the demo video page, with auto-scroll recording helpers)
 ```
 
 The captured reference page and the analysis notes are not part of the repository; every star-related algorithm is
