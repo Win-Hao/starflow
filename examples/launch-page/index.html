@@ -81,12 +81,114 @@
 
       [data-astra-static="true"] .cue-target svg { opacity: 1; color: #fafafa4d; }
       [data-astra-static="true"] .chrome .letter { opacity: 1; animation: none; transform: none; }
+      /* ── 站点 header：固定 54px、透明，只有链接和按钮接指针，不用模糊 ── */
+      .site-header { position: fixed; top: 0; left: 0; right: 0; z-index: 4; display: flex; align-items: center; gap: var(--space-5); height: 54px; padding: 0 var(--space-6); pointer-events: none; background: linear-gradient(#000000b3, transparent); }
+      .site-header a, .site-header button { pointer-events: auto; }
+      .site-header .wordmark { display: inline-flex; align-items: center; height: 17px; font: 500 var(--text-lg) / 1 var(--font-display); letter-spacing: -0.02em; color: var(--fg); text-decoration: none; }
+      .site-header nav { display: flex; align-items: center; align-self: stretch; flex: 1; min-width: 0; }
+      .site-header nav a { display: inline-flex; align-items: center; height: 100%; padding: 0 var(--space-4); font: 500 var(--text-xs) / 1.5 var(--font-body); letter-spacing: 0; color: var(--fg); text-decoration: none; transition: color var(--motion-fast); }
+      .site-header nav a:hover { color: var(--muted); }
+      .site-header .nav-actions { display: flex; align-items: center; gap: var(--space-2); }
+      .site-header .search { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--muted); cursor: pointer; transition: background-color 200ms linear; }
+      .site-header .search:hover { background: var(--astra-glass); }
+      .site-header .btn { height: 40px; gap: 0.3em; }
+      .site-header .btn svg { width: 16px; height: 16px; }
+      @media (max-width: 720px) { .site-header nav, .site-header .btn-glass { display: none; } }
+
+      /* ── 宽栏：图表、引言、对比这些超出 676px 文案栏的组件 ── */
+      .wide { max-width: var(--container-max); margin: 0 auto; padding: 10vh var(--space-6); }
+      .wide > h2 { margin: 0 0 var(--space-6); font: 500 var(--text-2xl) / 1.32 var(--font-display); letter-spacing: -0.01em; text-wrap: balance; }
+      .wide > p.lede { max-width: var(--astra-copy-max); margin: 0 0 var(--space-6); color: var(--muted); }
+      .wide-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); margin-bottom: var(--space-6); }
+
+      .segmented { display: inline-flex; align-items: center; gap: var(--space-1); padding: var(--space-1); border: 1px solid var(--border); border-radius: var(--radius-pill); pointer-events: auto; }
+      .segmented button { min-height: 40px; padding: var(--space-3) var(--space-4); border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--fg); font: 500 var(--text-sm) / 1 var(--font-body); letter-spacing: 0; white-space: nowrap; cursor: pointer; transition: background-color var(--motion-base) var(--ease-standard); }
+      .segmented button:hover { background: var(--border-soft); }
+      .segmented button[aria-selected="true"] { background: var(--astra-glass); }
+
+      .chart-card { padding: var(--space-8); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg); }
+      .chart-card .chart-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-4); }
+      .chart-card h3 { margin: 0 0 var(--space-3); font: 500 var(--text-xl) / 1.26 var(--font-display); letter-spacing: -0.01em; }
+      .chart-card .select { height: 40px; gap: 0.3em; }
+      .chart-card .select svg { width: 14px; height: 14px; }
+      .icon-btn { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--muted); cursor: pointer; transition: background-color 200ms linear; }
+      .icon-btn:hover { background: var(--astra-glass); }
+      .legend { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-6); margin: var(--space-5) 0 var(--space-4); font-size: var(--text-base); }
+      .legend span { display: inline-flex; align-items: center; gap: var(--space-2); }
+      .legend svg { width: 22px; height: 22px; }
+      .legend .ref svg { width: 40px; }
+      .plot { display: block; width: 100%; height: auto; font: 400 13px / 1 var(--font-mono); letter-spacing: 0; }
+      .plot .axis { stroke: var(--fg); stroke-width: 1; }
+      .plot .tick { fill: var(--fg); }
+      .plot .label { fill: var(--fg); font: 400 var(--text-base) / 1 var(--font-body); letter-spacing: -0.01em; }
+      .plot .ref { stroke: #ac4f23; stroke-width: 1.5; stroke-dasharray: 8 6; }
+      .chart-card .s1 { fill: #539af8; stroke: #539af8; }
+      .chart-card .s2 { fill: #2c67c5; stroke: #2c67c5; }
+      .chart-card .s3 { fill: #ac4f23; stroke: #ac4f23; }
+      .plot .line { fill: none; stroke-width: 2; }
+      .chart-card figcaption { max-width: 640px; margin: var(--space-6) auto 0; text-align: center; font-style: italic; font-size: var(--text-sm); line-height: 1.64; color: var(--fg); text-wrap: pretty; }
+
+      .quote { max-width: 880px; margin: 0 auto; padding: var(--space-8) var(--space-6); border: 1px solid var(--astra-glass); border-radius: var(--radius-md); background: var(--surface); }
+      .quote .logo { display: flex; align-items: center; gap: var(--space-2); height: 32px; margin-bottom: var(--space-4); font: 500 var(--text-xl) / 1 var(--font-display); letter-spacing: -0.02em; }
+      .quote .logo svg { width: 28px; height: 28px; }
+      .quote blockquote { margin: 0 0 var(--space-5) 0.5em; font: 500 var(--text-lg) / 1.5 var(--font-body); letter-spacing: -0.01em; text-wrap: pretty; }
+      .quote figcaption { margin-left: 0.5em; font: 500 var(--text-sm) / 1.4 var(--font-body); letter-spacing: 0; color: var(--muted); }
+
+      .media-frame { overflow: hidden; border: 1px solid var(--border-soft); border-radius: var(--radius-md); background: var(--surface-warm); }
+      .two-up { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); padding: var(--space-6); }
+      .two-up h4 { margin: 0 0 var(--space-3); text-align: center; font: 500 var(--text-xl) / 1.26 var(--font-display); letter-spacing: -0.01em; }
+      .two-up .screen { min-height: 220px; padding: var(--space-4); border: 1px solid var(--border-soft); border-radius: var(--radius-md); background: var(--surface); font-size: var(--text-sm); color: var(--muted); }
+      .two-up .bubble { width: fit-content; max-width: 84%; margin: 0 0 var(--space-4) auto; padding: var(--space-3) var(--space-4); border-radius: var(--radius-lg); background: var(--astra-glass); color: var(--fg); }
+      .two-up .status { margin: 0 0 var(--space-2); }
+      .two-up .status.done { color: var(--fg); }
+      .two-up code { font-size: 0.9em; }
+      @media (max-width: 720px) { .two-up { grid-template-columns: 1fr; } }
+
+      .compare { width: 100%; border-collapse: collapse; table-layout: fixed; }
+      .compare th, .compare td { padding: var(--space-5) var(--space-6) var(--space-5) 0; border-top: 1px solid var(--border); text-align: left; vertical-align: top; font: 400 var(--text-base) / 1.5 var(--font-body); letter-spacing: -0.01em; color: var(--fg); }
+      .compare thead th { font-weight: 500; }
+      .compare th:first-child { width: 30%; }
+      .compare :is(th, td):last-child { padding-right: 0; }
+      .compare tbody tr:last-child td { border-bottom: 1px solid var(--border); }
+      .compare .dash { color: var(--muted); }
+      .compare code { font-size: 0.9em; }
+
+      /* ── footer：13px/500，画布在后面继续跑 ── */
+      .site-footer { position: relative; max-width: var(--container-max); margin: 120px auto 0; padding: var(--space-12) var(--space-6) var(--space-8); font: 500 var(--text-xs) / 1.5 var(--font-body); letter-spacing: 0; }
+      .footer-columns { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-8); margin-bottom: var(--space-12); }
+      .footer-group h4 { margin: 0 0 var(--space-4); font: inherit; color: var(--muted); }
+      .footer-group ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-5); }
+      .footer-group a { display: inline-flex; align-items: center; gap: 0.3em; color: var(--fg); text-decoration: none; transition: color 250ms linear; }
+      .footer-group a:hover { color: var(--muted); }
+      .footer-group a svg { width: 10px; height: 10px; }
+      .footer-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4); padding-top: var(--space-8); border-top: 1px solid var(--border-soft); }
+      .footer-bar .social { display: flex; gap: var(--space-4); }
+      .footer-bar .social a { display: grid; place-items: center; width: 24px; height: 24px; color: var(--fg); }
+      .footer-bar .social svg { width: 16px; height: 16px; }
+      .footer-bar .legal { display: flex; flex-wrap: wrap; gap: var(--space-2); color: var(--fg); }
+      .footer-bar .legal a { color: var(--fg); text-decoration: underline; text-decoration-color: var(--meta); text-underline-offset: 2px; }
+      .footer-bar .lang { height: 40px; gap: 0.3em; }
+      .footer-bar .lang span { color: var(--muted); }
+      @media (max-width: 720px) { .footer-columns { grid-template-columns: 1fr 1fr; } .wide { padding: 8vh var(--space-5); } }
+
       @media (max-width: 720px) { .copy { padding: 18vh var(--space-5); } }
       @media (prefers-reduced-motion: reduce) { .chrome .letter { opacity: 1; animation: none; transform: none; } }
     </style>
   </head>
   <body>
     <div class="stage" aria-hidden="true"><canvas id="astra"></canvas></div>
+
+    <header class="site-header">
+      <a class="wordmark" href="https://github.com/Win-Hao/starflow" target="_blank" rel="noopener">星流 Starflow</a>
+      <nav aria-label="主导航">
+        <a href="#engine">引擎</a><a href="#skill">Skill</a><a href="#design">设计系统</a><a href="#compare">产物</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="search" type="button" aria-label="搜索"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg></button>
+        <a class="btn btn-glass" href="https://github.com/Win-Hao/starflow/tree/main/skill" target="_blank" rel="noopener">文档 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m4 6 4 4 4-4"/></svg></a>
+        <a class="btn btn-primary" href="https://github.com/Win-Hao/starflow" target="_blank" rel="noopener">GitHub <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 11 11 5M6 5h5v5"/></svg></a>
+      </div>
+    </header>
 
     <div class="chrome" id="chrome" aria-hidden="true">
       <p class="label label-left" data-astra-label="left">星流</p>
@@ -127,6 +229,94 @@
         <p>不用重写粒子系统，不用调 shader。这一页就是这么来的。</p>
       </section>
 
+      <section class="wide" id="engine">
+        <h2>滚动编排：形状什么时候成形</h2>
+        <p class="lede">每个形状 cue 进入视口的过程被归一成 0 到 1。前 36% 成形，50% 到 86% 之间消散；最后一个 cue 常驻。下面是引擎里那两条曲线。</p>
+        <div class="wide-actions">
+          <div class="segmented" role="tablist" aria-label="编排阶段">
+            <button type="button" role="tab" aria-selected="false">翻转</button>
+            <button type="button" role="tab" aria-selected="false">星轨</button>
+            <button type="button" role="tab" aria-selected="true">形状</button>
+          </div>
+        </div>
+        <figure class="chart-card" style="margin: 0">
+          <div class="chart-head">
+            <div>
+              <h3>形状强度 · 随进入视口的进度</h3>
+              <button class="btn btn-glass select" type="button" aria-haspopup="listbox">光标 cue <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m4 6 4 4 4-4"/></svg></button>
+            </div>
+            <button class="icon-btn" type="button" aria-label="下载数据"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v8m-3-3 3 3 3-3M3 13h10"/></svg></button>
+          </div>
+          <div class="legend">
+            <span><svg viewBox="0 0 22 22"><path class="s1" d="m11 2 2.6 6h6.4l-5.2 3.8 2 6.2L11 14.2 5.2 18l2-6.2L2 8h6.4z"/></svg>中间的 cue（光标）</span>
+            <span><svg viewBox="0 0 22 22"><circle class="s2" cx="11" cy="11" r="7"/></svg>最后一个 cue（常驻）</span>
+            <span class="ref"><svg viewBox="0 0 40 22"><path d="M2 11h36" stroke="#ac4f23" stroke-width="1.5" stroke-dasharray="8 6"/></svg>36% 处成形完成</span>
+          </div>
+          <svg class="plot" viewBox="0 0 640 340" role="img" aria-label="形状强度随进入视口进度的变化">
+            <line class="axis" x1="70" y1="20" x2="70" y2="280"/>
+            <line class="axis" x1="70" y1="280" x2="600" y2="280"/>
+            <g class="tick" text-anchor="end"><text x="60" y="24">100%</text><text x="60" y="89">75%</text><text x="60" y="154">50%</text><text x="60" y="219">25%</text><text x="60" y="284">0%</text></g>
+            <g class="tick" text-anchor="middle"><text x="70" y="306">0</text><text x="202" y="306">25%</text><text x="335" y="306">50%</text><text x="467" y="306">75%</text><text x="600" y="306">100%</text></g>
+            <text class="label" x="335" y="332" text-anchor="middle">进入视口的进度</text>
+            <line class="ref" x1="261" y1="20" x2="261" y2="280"/>
+            <polyline class="line s2" points="70,280 118,262 166,180 214,84 261,20 600,20"/>
+            <polyline class="line s1" points="70,280 118,262 166,180 214,84 261,20 335,20 383,68 431,166 479,246 526,280 600,280"/>
+            <g class="s1"><path d="m118 253 2.6 6h6.4l-5.2 3.8 2 6.2-5.8-3.8-5.8 3.8 2-6.2-5.2-3.8h6.4z"/><path d="m214 75 2.6 6h6.4l-5.2 3.8 2 6.2-5.8-3.8-5.8 3.8 2-6.2-5.2-3.8h6.4z"/><path d="m383 59 2.6 6h6.4l-5.2 3.8 2 6.2-5.8-3.8-5.8 3.8 2-6.2-5.2-3.8h6.4z"/><path d="m479 237 2.6 6h6.4l-5.2 3.8 2 6.2-5.8-3.8-5.8 3.8 2-6.2-5.2-3.8h6.4z"/></g>
+            <circle class="s2" cx="335" cy="20" r="5"/><circle class="s2" cx="479" cy="20" r="5"/><circle class="s2" cx="600" cy="20" r="5"/>
+          </svg>
+          <figcaption>成形用 smoothstep(0, 0.36)，消散用 1 − smoothstep(0.5, 0.86)，两者相乘就是强度。同一时刻只有强度最大的 cue 生效，往回滚一切逆序发生。</figcaption>
+        </figure>
+      </section>
+
+      <section class="wide" id="skill">
+        <h2>用 skill 和不用 skill</h2>
+        <p class="lede">左边是自己从零写；右边是装上 starflow-launch 之后对 agent 说一句话。引擎、排版、滚动编排都在包里，它只负责填内容。</p>
+        <div class="media-frame">
+          <div class="two-up">
+            <div>
+              <h4>从零写</h4>
+              <div class="screen">
+                <div class="bubble">做一个 OpenAI 同款的星空发布页</div>
+                <p class="status">正在写粒子着色器…</p>
+                <p class="status">正在调 bloom 参数…</p>
+                <p class="status">正在推导滚动散开的公式…</p>
+                <p class="status done">星星大概是这样，但滚动还没接上。</p>
+              </div>
+            </div>
+            <div>
+              <h4>用 starflow-launch</h4>
+              <div class="screen">
+                <div class="bubble">用 starflow 做一个发布页</div>
+                <p class="status">读取 SKILL.md，复制 <code>starflow.js</code> 和 <code>template.html</code></p>
+                <p class="status">按 DESIGN.md 排版，写文案，换上你的 logo 路径</p>
+                <p class="status done">发布页已生成：首屏星系、两个形状 cue、header 和 footer 都在。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="wide" id="design">
+        <figure class="quote" style="margin: 0">
+          <div class="logo"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3v22M3 14h22M6 6l16 16M22 6 6 22"/></svg>星流 Starflow</div>
+          <blockquote>“四千颗星，一座星系。粒子的分布、流动、辉光和镜头光晕的算法参考了原站，代码是独立实现，MIT 开源。skill 和 openai-astra 设计系统都在同一个仓库里。”</blockquote>
+          <figcaption>Winhao，星流作者</figcaption>
+        </figure>
+      </section>
+
+      <section class="wide" id="compare">
+        <h2>三种产物，一套引擎</h2>
+        <p class="lede"><code>npm run build:lib</code> 一次打出三个文件，按场景取用。数字来自当前版本的构建输出。</p>
+        <table class="compare">
+          <thead><tr><th>文件</th><th>大小</th><th>gzip</th><th>自带 three</th><th>用法</th></tr></thead>
+          <tbody>
+            <tr><td><code>lib/starflow.js</code></td><td>638 KB</td><td>162 KB</td><td>是</td><td>复制到任何页面，<code>&lt;script type="module"&gt;</code> 直接 import</td></tr>
+            <tr><td><code>lib/starflow.iife.js</code></td><td>634 KB</td><td>162 KB</td><td>是</td><td>不用模块的页面，挂成 <code>window.Starflow</code></td></tr>
+            <tr><td><code>lib/starflow.slim.js</code></td><td>81 KB</td><td>29 KB</td><td class="dash">-</td><td><code>npm i starflow</code>，three 由 npm 解析</td></tr>
+          </tbody>
+        </table>
+      </section>
+
       <section class="cue" data-astra-shape="heart" data-astra-paths='["M50 88 C 20 65, 8 50, 8 33 C 8 20, 18 12, 29 12 C 38 12, 45 17, 50 25 C 55 17, 62 12, 71 12 C 82 12, 92 20, 92 33 C 92 50, 80 65, 50 88 Z"]' data-astra-viewbox="0 0 100 100">
         <div class="cue-target"><svg aria-hidden="true" fill="none"></svg></div>
         <p class="caption">觉得有用，点个赞</p>
@@ -137,6 +327,24 @@
         <p>github.com/Win-Hao/starflow · github.com/Win-Hao/starflow-skill</p>
         <p><a class="btn btn-glass" href="https://github.com/Win-Hao/starflow-skill" target="_blank" rel="noopener">去 GitHub 看看</a></p>
       </section>
+
+      <footer class="site-footer">
+        <div class="footer-columns">
+          <div class="footer-group"><h4>引擎</h4><ul><li><a href="https://github.com/Win-Hao/starflow" target="_blank" rel="noopener">GitHub <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 8 8 2M3 2h5v5"/></svg></a></li><li><a href="https://github.com/Win-Hao/starflow#作为库使用" target="_blank" rel="noopener">作为库使用</a></li><li><a href="https://github.com/Win-Hao/starflow/blob/main/lab.html" target="_blank" rel="noopener">实验室</a></li></ul></div>
+          <div class="footer-group"><h4>Skill</h4><ul><li><a href="https://github.com/Win-Hao/starflow/tree/main/skill" target="_blank" rel="noopener">装法</a></li><li><a href="https://github.com/Win-Hao/starflow/blob/main/skill/SKILL.md" target="_blank" rel="noopener">SKILL.md</a></li><li><a href="https://github.com/Win-Hao/starflow/blob/main/skill/references/engine-api.md" target="_blank" rel="noopener">引擎 API</a></li></ul></div>
+          <div class="footer-group"><h4>设计系统</h4><ul><li><a href="https://github.com/Win-Hao/starflow/blob/main/design-systems/openai-astra/DESIGN.md" target="_blank" rel="noopener">DESIGN.md</a></li><li><a href="https://github.com/Win-Hao/starflow/blob/main/design-systems/openai-astra/components.html" target="_blank" rel="noopener">组件页</a></li><li><a href="https://github.com/nexu-io/open-design/pull/7806" target="_blank" rel="noopener">open-design PR <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 8 8 2M3 2h5v5"/></svg></a></li></ul></div>
+          <div class="footer-group"><h4>关于</h4><ul><li><a href="https://github.com/Win-Hao" target="_blank" rel="noopener">作者</a></li><li><a href="https://github.com/Win-Hao/starflow/blob/main/LICENSE" target="_blank" rel="noopener">MIT 协议</a></li><li><a href="https://github.com/Win-Hao/starflow#算法要点参考原站实现" target="_blank" rel="noopener">原站参考说明</a></li></ul></div>
+        </div>
+        <div class="footer-bar">
+          <div class="social" aria-label="社交">
+            <a href="https://github.com/Win-Hao/starflow" target="_blank" rel="noopener" aria-label="GitHub"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="5.5"/><path d="M6 13.5v-2c0-.6.2-1 .5-1.3C5 10 4 9.3 4 7.5c0-.6.2-1.1.6-1.5-.1-.4-.1-1 .1-1.5.6 0 1.2.3 1.6.6a5 5 0 0 1 3.4 0c.4-.3 1-.6 1.6-.6.2.5.2 1.1.1 1.5.4.4.6.9.6 1.5 0 1.8-1 2.5-2.5 2.7.3.3.5.7.5 1.3v2"/></svg></a>
+            <a href="#" aria-label="视频"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 4.5A1.5 1.5 0 0 1 3.5 3h9A1.5 1.5 0 0 1 14 4.5v7a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 11.5zM6.5 6v4L10 8z"/></svg></a>
+            <a href="#" aria-label="X"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3l10 10M13 3 3 13"/></svg></a>
+          </div>
+          <div class="legal"><span>星流 Starflow © 2026 · MIT</span><a href="https://github.com/Win-Hao/starflow/blob/main/LICENSE" target="_blank" rel="noopener">协议全文</a></div>
+          <a class="btn btn-glass lang" href="https://github.com/Win-Hao/starflow/blob/main/README.en.md" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8" cy="8" r="6"/><path d="M2 8h12M8 2c2.5 2.5 2.5 9.5 0 12M8 2c-2.5 2.5-2.5 9.5 0 12"/></svg>中文 <span>English</span></a>
+        </div>
+      </footer>
     </main>
 
     <script type="module">
