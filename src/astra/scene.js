@@ -605,7 +605,8 @@ export function createAstraScene(canvas, initialConfig = {}) {
           shapePoint.y * state.shapeSize.y + acrossY * scatter,
           (contourDepth + hero.depth * 0.75 + (sz - 0.5) * 0.22) * shapeScatter,
         )
-        euler.set(state.shapeRotation.x, state.shapeRotation.y, 0, 'XYZ')
+        // 着色器里形状是先绕 X 再绕 Y（Ry·Rx），对应 three.js 的 'YXZ' 序；用 'XYZ' 会在两个角都非零（拖动）时和星星分叉
+        euler.set(state.shapeRotation.x, state.shapeRotation.y, 0, 'YXZ')
         heroShape.applyEuler(euler)
         const frontness = MathUtils.smoothstep(heroShape.z, -1.15, 1.15)
         heroShape.x += state.shapeCenter.x
