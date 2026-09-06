@@ -193,6 +193,32 @@ astra.dispose()
 - 程序化脏玻璃贴图：原站会运行时生成污渍图做 UV 微畸变，这里只保留胶片颗粒
 - GPU 分级：原站用 detect-gpu 分 4 档，这里换成运行时的自适应降级
 
+## 作为库使用
+
+引擎可以脱离这三个页面单独使用。`npm run build:lib` 产出三个文件：
+
+| 文件 | 内容 | 用法 |
+|---|---|---|
+| `lib/starflow.js` | ES 模块，自带 three + postprocessing（约 640 KB，gzip 162 KB） | 复制到任意页面，`<script type="module">` 里 `import { createAstraScene } from './starflow.js'` |
+| `lib/starflow.iife.js` | 同上，挂成全局 `window.Starflow` | 不用模块的页面 |
+| `lib/starflow.slim.js` | 不带依赖 | `npm i starflow` 后 `import { createAstraScene } from 'starflow'`，three / postprocessing 由 npm 解析 |
+
+```js
+import { createAstraScene, detectWebGL, renderStaticFallback } from './starflow.js'
+
+const canvas = document.querySelector('canvas')
+if (detectWebGL()) {
+  const astra = createAstraScene(canvas, { autoRotate: true })
+  astra.setSource({ type: 'galaxy' })          // 或 { type: 'paths' | 'text' | 'svg' | 'image', … }
+  // 滚动编排：每帧把进度喂进来，见 src/home.js
+  // astra.setScroll({ progress, tiltProgress, scatterProgress, contentBounds, shape })
+} else {
+  renderStaticFallback(canvas, { type: 'galaxy' })
+}
+```
+
+想让 coding agent 直接做出整页的滚动编排，用配套的 skill：[Win-Hao/starflow-skill](https://github.com/Win-Hao/starflow-skill)。里面有接好线的页面骨架、引擎单文件和一份 `openai-astra` 的 DESIGN.md 设计系统。
+
 ## 项目结构
 
 ```
@@ -201,6 +227,7 @@ lab.html   / src/lab.js  / src/lab.css    实验室
 embed.html                                嵌入页
 src/i18n.js                               中英文案
 src/presets.js                            原站路径数据（光标、OpenAI 结）与图标预设
+src/lib.js / vite.lib.config.js          库入口与库构建（lib/starflow*.js）
 src/astra/                                引擎：scene / field / shaders / paths / bloom / lensflare / ambient / motion / …
 docs/screenshots/                         README 用图
 ```

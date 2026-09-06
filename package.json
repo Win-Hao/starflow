@@ -1,20 +1,59 @@
 {
   "name": "starflow",
-  "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
+  "description": "星流 Starflow：一片会流动的星空，基于 three.js 的星星粒子系统 / A flowing starfield particle engine built on three.js",
+  "license": "MIT",
+  "author": "Winhao",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Win-Hao/starflow.git"
+  },
+  "homepage": "https://github.com/Win-Hao/starflow#readme",
+  "keywords": [
+    "three.js",
+    "particles",
+    "starfield",
+    "galaxy",
+    "webgl",
+    "scroll-animation",
+    "landing-page",
+    "hero"
+  ],
+  "main": "./lib/starflow.slim.js",
+  "module": "./lib/starflow.slim.js",
+  "exports": {
+    ".": {
+      "import": "./lib/starflow.slim.js"
+    },
+    "./standalone": {
+      "import": "./lib/starflow.js"
+    },
+    "./iife": "./lib/starflow.iife.js",
+    "./src/*": "./src/*"
+  },
+  "files": [
+    "lib",
+    "src/astra",
+    "src/presets.js",
+    "src/lib.js",
+    "README.md",
+    "README.en.md",
+    "LICENSE"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview --port 4173"
+    "preview": "vite preview --port 4173",
+    "build:lib": "rm -rf lib && vite build --config vite.lib.config.js && STARFLOW_SLIM=1 vite build --config vite.lib.config.js",
+    "prepublishOnly": "npm run build:lib"
   },
   "dependencies": {
     "postprocessing": "^6.39.4",
     "three": "0.180.0"
   },
   "devDependencies": {
+    "terser": "^5.51.2",
     "vite": "^7.0.0"
-  },
-  "license": "MIT",
-  "description": "星流 Starflow：一片会流动的星空，基于 three.js 的星星粒子系统"
+  }
 }

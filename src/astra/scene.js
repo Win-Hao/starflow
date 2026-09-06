@@ -360,7 +360,8 @@ export function createAstraScene(canvas, initialConfig = {}) {
 
     const pixelRatio = resolvePixelRatio(width, height, pixelBudget)
     renderer.setPixelRatio(pixelRatio)
-    composer.setSize(width, height)
+    // 第三个参数 false：不让 three 把尺寸写成 canvas 的内联样式，否则容器再变化时 ResizeObserver 不会触发
+    composer.setSize(width, height, false)
     flare.setViewport(width, height)
     ambient.setViewport(width, height)
 

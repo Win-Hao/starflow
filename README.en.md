@@ -212,6 +212,32 @@ overhead. So the strategy is fewer passes, not fewer stars:
 - Procedural dirty-glass texture: the original generates a smudge map at runtime for UV distortion; only film grain is kept here
 - GPU tiers: the original uses detect-gpu with four tiers; this project uses runtime adaptive degradation instead
 
+## Use as a library
+
+The engine works without the three pages. `npm run build:lib` produces three files:
+
+| File | Contents | Use |
+|---|---|---|
+| `lib/starflow.js` | ES module with three + postprocessing bundled (~640 KB, 162 KB gzip) | Copy next to any page and `import { createAstraScene } from './starflow.js'` in a `<script type="module">` |
+| `lib/starflow.iife.js` | Same, exposed as `window.Starflow` | Pages without modules |
+| `lib/starflow.slim.js` | No dependencies bundled | `npm i starflow`, then `import { createAstraScene } from 'starflow'`; three / postprocessing resolve through npm |
+
+```js
+import { createAstraScene, detectWebGL, renderStaticFallback } from './starflow.js'
+
+const canvas = document.querySelector('canvas')
+if (detectWebGL()) {
+  const astra = createAstraScene(canvas, { autoRotate: true })
+  astra.setSource({ type: 'galaxy' })          // or { type: 'paths' | 'text' | 'svg' | 'image', … }
+  // Scroll choreography: feed progress every frame, see src/home.js
+  // astra.setScroll({ progress, tiltProgress, scatterProgress, contentBounds, shape })
+} else {
+  renderStaticFallback(canvas, { type: 'galaxy' })
+}
+```
+
+To have a coding agent build the whole scroll-choreographed page, use the companion skill: [Win-Hao/starflow-skill](https://github.com/Win-Hao/starflow-skill). It ships a wired page skeleton, the single-file engine and an `openai-astra` DESIGN.md design system.
+
 ## Project layout
 
 ```
@@ -220,6 +246,7 @@ lab.html   / src/lab.js  / src/lab.css    lab
 embed.html                                embed page
 src/i18n.js                               Chinese / English copy
 src/presets.js                            path data (cursor, knot) and icon presets
+src/lib.js / vite.lib.config.js          library entry and build (lib/starflow*.js)
 src/astra/                                engine: scene / field / shaders / paths / bloom / lensflare / ambient / motion / …
 docs/screenshots/                         README images
 ```
