@@ -18,7 +18,7 @@ spec for `assets/template.html`'s `update()`.
 |---|---|---|
 | **Intro** | time | 5.5s. Stars fly in along the arms; ambient glow fades to 0.55; labels reveal from 0.85s. |
 | **Tilt** | `[data-astra-intro]` position | Galaxy rotates to −52° about X. Progress 0 when the block's top is at 66% of the viewport, 1 when its centre reaches the viewport centre; the tilt peaks at 75% of that travel and flattens back at 100%. |
-| **Scatter** | same driver | 72% of stars move to rails outside `contentBounds`; inner rail edge thinned with a sqrt falloff; brightness → 18%, dim stars → 45% size. Rails keep a depth-weighted parallax (`scrollStarDriftSpeed` 3) while scrolling continues. Ambient opacity recedes to 0.12. |
+| **Scatter** | same driver | 72% of stars move to rails outside `contentBounds`; inner rail edge thinned with a sqrt falloff; brightness → 18%, dim stars → 45% size. Rails keep a depth-weighted parallax (`scrollStarDriftSpeed` 3) while scrolling continues. The ambient glow stays constant; the opaque footer ends it. |
 | **Shape** | `[data-astra-shape]` cues | Formation `smoothstep(entry, 0, 0.36)`, dissolve `1 - smoothstep(entry, 0.5, 0.86)`. Each star lands on the path by seed, keeping its own lateral offset and flow speed from the galaxy. On formation the shape swings 0.42 rad. |
 | **Hold** | last cue | `holdAtRangeEnd`: the final cue never dissolves. Put the strongest mark last. |
 

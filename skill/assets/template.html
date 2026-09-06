@@ -121,7 +121,9 @@
       @media (max-width: 720px) { .site-header nav, .site-header .btn-glass { display: none; } }
 
       /* ── Footer: link groups at 13px / 500, bottom bar. The canvas keeps running behind it. ── */
-      .site-footer { position: relative; max-width: var(--container-max); margin: 120px auto 0; padding: var(--space-12) var(--space-6) var(--space-8); font: 500 var(--text-xs) / 1.5 var(--font-body); letter-spacing: 0; }
+      /* footer：整宽不透明纯黑。上面所有段落都透出画布，黑色从最后一段结束处开始，和原站一样是一条随内容滚动的硬边 */
+      .site-footer { position: relative; margin: 0; padding: calc(120px + var(--space-12)) 0 var(--space-8); background: var(--bg); font: 500 var(--text-xs) / 1.5 var(--font-body); letter-spacing: 0; }
+      .footer-inner { max-width: var(--container-max); margin: 0 auto; padding: 0 var(--space-6); }
       .footer-columns { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-8); margin-bottom: var(--space-12); }
       .footer-group h4 { margin: 0 0 var(--space-4); font: inherit; color: var(--muted); }
       .footer-group ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-5); }
@@ -219,6 +221,7 @@
       </section>
 
       <footer class="site-footer">
+      <div class="footer-inner">
         <div class="footer-columns">
           <div class="footer-group"><h4>Research</h4><ul><li><a href="#">Research index</a></li><li><a href="#">Nova 2 system card</a></li><li><a href="#">Safety approach</a></li></ul></div>
           <div class="footer-group"><h4>Product</h4><ul><li><a href="#">Overview</a></li><li><a href="#">API docs <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 8 8 2M3 2h5v5"/></svg></a></li><li><a href="#">Release notes</a></li></ul></div>
@@ -234,6 +237,7 @@
           <div class="legal"><span>Nova © 2026</span><a href="#">Manage cookies</a></div>
           <a class="btn btn-glass lang" href="#"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8" cy="8" r="6"/><path d="M2 8h12M8 2c2.5 2.5 2.5 9.5 0 12M8 2c-2.5 2.5-2.5 9.5 0 12"/></svg>English <span>United States</span></a>
         </div>
+      </div>
       </footer>
     </main>
 
@@ -250,6 +254,8 @@
       const canvas = document.getElementById('astra')
       const chrome = document.getElementById('chrome')
       const siteHeader = document.querySelector('.site-header')
+      const siteFooter = document.querySelector('.site-footer')
+      const stage = document.querySelector('.stage')
       const intro = document.querySelector('[data-astra-intro]')
       const title = document.querySelector('[data-astra-title]')
       const copyBlocks = Array.from(document.querySelectorAll('.copy'))
@@ -333,7 +339,6 @@
 
       let scheduled = false
       let lastViewportHeight = 0
-      const ambientBase = 0.55
 
       function update() {
         scheduled = false
@@ -400,8 +405,8 @@
         // Title parallax: sits 120px low while the hero is on screen and settles to 0 as the title stage arrives.
         if (title) root.style.setProperty('--astra-title-parallax-y', `${((1 - Math.min(1, progress)) * TITLE_PARALLAX).toFixed(1)}px`)
 
-        // Ambient glow recedes once the galaxy scatters; shapes do not need it.
-        astra.config.ambientOpacity = 0.12 + Math.max(ambientBase - 0.12, 0) * (1 - Math.min(1, progress))
+        // 氛围底色全程不变，由不透明的 footer 终止；footer 铺满视口后把画布隐藏掉省 GPU
+        if (siteFooter && stage) stage.style.visibility = siteFooter.getBoundingClientRect().top <= 0 ? 'hidden' : 'visible'
         astra.setScroll({ progress, tiltProgress, scatterProgress, contentBounds, shape })
       }
 
