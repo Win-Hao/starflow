@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OpenAI Astra · components</title>
+    <link rel="stylesheet" href="tokens.css" />
+    <style>
+      /* Astra extension values (DESIGN.md §2 / §7) */
+      :root {
+        --astra-ambient-color: #23435f;
+        --astra-ambient-opacity: 0.55;
+        --astra-glass: #ffffff1f;
+        --astra-glass-hover: #ffffff33;
+        --astra-viewport-height: 100svh;
+        color-scheme: dark;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; background: var(--bg); color: var(--fg); font: 400 var(--text-base) / var(--leading-body) var(--font-body); letter-spacing: -0.01em; }
+      main { max-width: var(--container-max); margin: 0 auto; padding: var(--space-12) var(--container-gutter-desktop); }
+      section { padding: var(--space-12) 0; border-top: 1px solid var(--border-soft); }
+      section:first-of-type { border-top: 0; }
+      h1 { margin: 0 0 var(--space-6); font: 500 var(--text-3xl) / var(--leading-tight) var(--font-display); letter-spacing: var(--tracking-display); text-wrap: balance; }
+      h2.kicker { margin: 0 0 var(--space-6); font: 500 var(--text-xs) / 1.5 var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--meta); }
+      .row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+      .note { color: var(--meta); font-size: var(--text-sm); margin: var(--space-3) 0 0; }
+
+      /* ── Buttons ── */
+      .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-1); min-height: 40px; padding: var(--space-3) var(--space-4); border: 0; border-radius: var(--radius-pill); font: 500 var(--text-sm) / 1 var(--font-body); white-space: nowrap; cursor: pointer; transition: background-color var(--motion-base) var(--ease-standard), color var(--motion-base) var(--ease-standard); }
+      .btn:focus-visible { outline: 2px solid #ffffffb3; outline-offset: 2px; }
+      .btn-primary { background: var(--accent); color: var(--accent-on); }
+      .btn-primary:hover { background: var(--accent-hover); }
+      .btn-primary:active { background: var(--accent-active); }
+      .btn-glass { background: var(--astra-glass); color: var(--fg); }
+      .btn-glass:hover { background: var(--astra-glass-hover); }
+      .btn-ghost { background: transparent; color: var(--fg); }
+      .btn-ghost:hover { background: var(--astra-glass-hover); }
+      .icon-btn { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--fg); cursor: pointer; transition: background-color 200ms linear; }
+      .icon-btn:hover { background: var(--astra-glass); }
+      .replay { width: 36px; height: 36px; background: #ffffff26; color: #ffffffcc; transition: color var(--motion-fast), background-color var(--motion-fast); }
+      .replay:hover { background: #ffffff40; color: #ffffffe6; }
+
+      /* ── Hero chrome ── */
+      .hero { position: relative; height: 420px; overflow: hidden; border-radius: var(--radius-lg); background: var(--bg) radial-gradient(ellipse farthest-corner at center, transparent 0%, color-mix(in srgb, var(--astra-ambient-color) 6.25%, transparent) 25%, color-mix(in srgb, var(--astra-ambient-color) 25%, transparent) 50%, color-mix(in srgb, var(--astra-ambient-color) 55%, transparent) 100%); }
+      .hero .label { position: absolute; top: 50%; margin: 0; transform: translateY(-50%); font: 500 var(--text-4xl) / 1 var(--font-display); letter-spacing: var(--tracking-display); color: var(--fg-2); text-shadow: 0 0 24px #fafafa14; user-select: none; }
+      .hero .label-left { left: clamp(20px, 4vw, 56px); }
+      .hero .label-right { right: clamp(20px, 4vw, 56px); }
+      .hero .letter { display: inline-block; opacity: 0; transform: translateX(var(--shift)); animation: reveal 1s cubic-bezier(0.22, 1, 0.36, 1) var(--delay) forwards; }
+      @keyframes reveal { to { opacity: 1; transform: translate(0); } }
+      .hero .scroll-hint { position: absolute; bottom: var(--space-8); left: 50%; transform: translateX(-50%); margin: 0; color: #fafafa99; font-size: var(--text-sm); }
+      .hero .replay { position: absolute; right: var(--space-3); bottom: var(--space-3); }
+      .hero .star { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: var(--c); box-shadow: 0 0 8px var(--c); }
+      @media (prefers-reduced-motion: reduce) { .hero .letter { opacity: 1; animation: none; transform: none; } }
+
+      /* ── Copy column ── */
+      .copy { max-width: 676px; margin: 0 auto; padding: var(--space-12) var(--space-6); }
+      .copy h2 { margin: 0 0 var(--space-4); font: 500 var(--text-3xl) / 1.16 var(--font-display); letter-spacing: -0.02em; text-wrap: balance; }
+      .copy p { margin: 0 0 1.1em; color: var(--muted); text-wrap: pretty; }
+      .lede { font-size: var(--text-lg); }
+
+      /* ── Shape cue ── */
+      .cue { display: flex; flex-direction: column; align-items: center; gap: var(--space-4); padding: var(--space-8) var(--space-6); }
+      .cue-target { width: min(576px, 100%); height: 320px; display: grid; place-items: center; border: 1px dashed var(--border-soft); border-radius: var(--radius-md); color: #fafafa4d; }
+      .cue-target svg { width: 40%; height: 40%; }
+      .caption { margin: 0; font: 500 var(--text-sm) / 1.5 var(--font-body); letter-spacing: 0.08em; color: #fafafad9; }
+      .cue-note { max-width: 440px; margin: 0; text-align: center; font-size: var(--text-sm); line-height: 1.7; color: var(--meta); }
+
+      /* ── Benchmarks ── */
+      table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+      th { text-align: left; font: 500 var(--text-lg) / 1.32 var(--font-body); letter-spacing: -0.01em; padding: var(--space-3) 0; border-bottom: 1px solid var(--border); }
+      td { padding: var(--space-3) 0; border-bottom: 1px solid var(--border-soft); color: var(--muted); font-size: var(--text-sm); }
+      td:first-child { color: var(--fg); }
+      td.featured { color: var(--fg); }
+      .bar { display: inline-block; height: 6px; border-radius: 3px; background: #ffffff70; vertical-align: middle; margin-right: var(--space-2); }
+      .featured .bar { background: var(--fg); }
+
+      /* ── Panels ── */
+      .panel { background: var(--surface); border-radius: var(--radius-md); padding: var(--space-4); font-family: var(--font-mono); font-size: var(--text-sm); color: var(--muted); }
+      .band { background: var(--surface-warm); border-radius: var(--radius-lg); padding: var(--space-6); }
+      .footnotes h3 { margin: 0 0 var(--space-3); font: 400 var(--text-sm) / 1.6 var(--font-body); color: var(--muted); letter-spacing: 0.02em; }
+      .footnotes p { margin: 0 0 var(--space-2); font-size: var(--text-sm); color: var(--meta); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>OpenAI Astra components</h1>
+
+      <section id="hero">
+        <h2 class="kicker">Hero chrome</h2>
+        <div class="hero">
+          <span class="star" style="--c:#6dcbf4; left: 38%; top: 42%"></span>
+          <span class="star" style="--c:#7ab1fe; left: 52%; top: 55%"></span>
+          <span class="star" style="--c:#f87915; left: 46%; top: 48%; width: 4px; height: 4px"></span>
+          <span class="star" style="--c:#fa994c; left: 58%; top: 40%"></span>
+          <span class="star" style="--c:#f5f6fb; left: 43%; top: 60%"></span>
+          <p class="label label-left" aria-label="GPT"><span class="letter" style="--delay:1.05s;--shift:-44px">G</span><span class="letter" style="--delay:.95s;--shift:-44px">P</span><span class="letter" style="--delay:.85s;--shift:-44px">T</span></p>
+          <p class="label label-right" aria-label="Astra"><span class="letter" style="--delay:.85s;--shift:44px">A</span><span class="letter" style="--delay:.95s;--shift:44px">s</span><span class="letter" style="--delay:1.05s;--shift:44px">t</span><span class="letter" style="--delay:1.15s;--shift:44px">r</span><span class="letter" style="--delay:1.25s;--shift:44px">a</span></p>
+          <p class="scroll-hint">Scroll</p>
+          <button class="icon-btn replay" aria-label="Replay intro">↻</button>
+        </div>
+        <p class="note">Split labels at 64px / 500, letter reveal 1s cubic-bezier(.22,1,.36,1) with 0.85–1.25s stagger, ambient glow #23435f. The canvas sits under this layer.</p>
+      </section>
+
+      <section id="buttons">
+        <h2 class="kicker">Buttons</h2>
+        <div class="row">
+          <button class="btn btn-primary">Try in ChatGPT</button>
+          <button class="btn btn-glass">Read the research</button>
+          <button class="btn btn-ghost">System card →</button>
+          <button class="icon-btn" aria-label="Share">↗</button>
+          <button class="icon-btn replay" aria-label="Replay">↻</button>
+        </div>
+        <p class="note">One white pill per screen. Pills: min-height 40px, padding 12px 16px, 14px / 500, 300ms cubic-bezier(.6,0,.4,1).</p>
+      </section>
+
+      <section id="copy">
+        <h2 class="kicker">Copy column</h2>
+        <div class="copy">
+          <h2>A new generation of intelligence</h2>
+          <p class="lede">We’re introducing a model that brings together years of research across pre-training, reasoning, and alignment.</p>
+          <p>It reads long documents, understands screenshots, writes code that runs, and asks the right follow-up question. These are not features bolted together; they are the same stars standing in different shapes.</p>
+        </div>
+        <p class="note">676px column, h2 48px / 500, p1 17px / 28px in #ffffff99. Nothing on either side: the star rails live there.</p>
+      </section>
+
+      <section id="cue">
+        <h2 class="kicker">Shape cue</h2>
+        <div class="cue">
+          <div class="cue-target" aria-hidden="true">
+            <svg viewBox="0 0 19 19" fill="none" stroke="currentColor" stroke-width="0.8"><path d="M9.60978 17.0223C9.24308 17.739 8.76808 18.189 8.18478 18.3723C7.60148 18.564 7.03478 18.4931 6.48478 18.1598C5.93478 17.8348 5.53061 17.314 5.27228 16.5973L0.672282 3.68478C0.497282 3.19312 0.455612 2.72645 0.547282 2.28478C0.638952 1.83478 0.838952 1.45561 1.14728 1.14728C1.45561 0.838948 1.83478 0.638949 2.28478 0.547279C2.73478 0.455619 3.20561 0.497279 3.69728 0.672279L16.6098 5.27228C17.3265 5.53062 17.8473 5.93478 18.1723 6.48478C18.5056 7.02648 18.5765 7.58898 18.3848 8.17228C18.2015 8.75558 17.7515 9.23058 17.0348 9.59728L12.1098 12.1098L9.60978 17.0223Z"/></svg>
+          </div>
+          <p class="caption">It takes action</p>
+          <p class="cue-note">Give it a goal and it opens the page, fills the form, runs the flow, and hands the result back to you.</p>
+        </div>
+        <p class="note">576px × 80vh frame (shortened here). The SVG is invisible in production; it only reserves the aspect ratio for the stars.</p>
+      </section>
+
+      <section id="benchmarks">
+        <h2 class="kicker">Benchmarks</h2>
+        <table>
+          <thead><tr><th>Terminal-Bench 4.0</th><th>Score</th></tr></thead>
+          <tbody>
+            <tr class="featured"><td>This model</td><td class="featured"><span class="bar" style="width: 180px"></span>91.4%</td></tr>
+            <tr><td>Previous generation</td><td><span class="bar" style="width: 142px"></span>72.1%</td></tr>
+            <tr><td>Comparison A</td><td><span class="bar" style="width: 128px"></span>65.0%</td></tr>
+            <tr><td>Comparison B</td><td><span class="bar" style="width: 96px"></span>48.7%</td></tr>
+          </tbody>
+        </table>
+        <p class="note">h5 labels, tabular figures, white for the featured row, white-at-alpha bars. No colour.</p>
+      </section>
+
+      <section id="panels">
+        <h2 class="kicker">Panels and bands</h2>
+        <div class="row" style="align-items: stretch">
+          <div class="panel" style="flex: 1 1 280px">astra.setScroll({ progress, tiltProgress, scatterProgress, contentBounds, shape })</div>
+          <div class="band footnotes" style="flex: 1 1 280px">
+            <h3>FOOTNOTES</h3>
+            <p>1. Measured on a held-out set; see the system card for methodology.</p>
+            <p>2. Availability varies by region.</p>
+          </div>
+        </div>
+        <p class="note">Solid panel #1f1f1f for code, band #0a0a0a for footnotes. Both are rare; most of the page is bare black.</p>
+      </section>
+    </main>
+  </body>
+</html>

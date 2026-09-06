@@ -1,0 +1,91 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "starflow-launch",
+  "title": "Starflow launch page",
+  "title_i18n": {
+    "en": "Starflow launch page",
+    "zh-CN": "星流发布页"
+  },
+  "version": "0.1.0",
+  "description": "Astra-style dark launch page or hero: a bundled three.js galaxy that tilts, scatters into side rails and re-forms into a cursor, a knot, or your own logo path as the reader scrolls. Ships the Starflow engine, a wired page skeleton, and the openai-astra DESIGN.md.",
+  "description_i18n": {
+    "en": "Astra-style dark launch page or hero: a bundled three.js galaxy that tilts, scatters into side rails and re-forms into a cursor, a knot, or your own logo path as the reader scrolls. Ships the Starflow engine, a wired page skeleton, and the openai-astra DESIGN.md.",
+    "zh-CN": "Astra 风格的暗色发布页或首屏：自带 three.js 星系，随滚动翻转、散成两侧星轨、再聚成光标、结或你自己的 logo 路径。附带星流引擎、接好线的页面骨架和 openai-astra DESIGN.md。"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Win-Hao",
+    "url": "https://github.com/Win-Hao"
+  },
+  "homepage": "https://github.com/Win-Hao/starflow-skill",
+  "tags": [
+    "landing",
+    "launch",
+    "hero",
+    "particles",
+    "starfield",
+    "galaxy",
+    "three.js",
+    "scroll",
+    "dark",
+    "astra",
+    "starflow",
+    "design-system"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "marketing",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./assets/template.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Make a launch page for our new model Nova 2 in the Astra style: galaxy hero, three story sections, the stars should form a cursor and then our logo.",
+        "zh-CN": "用 Astra 风格给我们的新模型 Nova 2 做一个发布页：星系首屏、三段故事，星星先聚成光标，再聚成我们的 logo。"
+      }
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "assets": [
+        "./assets",
+        "./references",
+        "./design-systems"
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "origin": {
+        "name": "Starflow",
+        "kind": "github",
+        "reference": "https://github.com/Win-Hao/starflow (MIT). A three.js re-implementation of the particle choreography on the GPT-6 Astra launch page; the engine bundle in assets/ is built from it."
+      },
+      "via_skill": {
+        "name": "starflow-launch",
+        "author": "Win-Hao",
+        "url": "https://github.com/Win-Hao/starflow-skill",
+        "license": "MIT",
+        "source_file": "SKILL.md"
+      },
+      "transformation": "Original skill. The page skeletons (assets/template.html, assets/hero.html) wire the engine's public API (createAstraScene, setSource, setScroll, createShapeSamples) to DOM measurements; the design system (design-systems/openai-astra) is an independent distillation of the launch page's public CSS. No fonts, logos, images, or scripts from openai.com are included."
+    }
+  }
+}

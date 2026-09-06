@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OpenAI Astra · DESIGN.md preview</title>
+    <style>
+      :root {
+        --bg: #000000; --surface: #1f1f1f; --surface-warm: #0a0a0a;
+        --fg: #ffffff; --fg-2: #fafafa; --muted: #ffffff99; --meta: #ffffff70;
+        --border: #ffffff33; --border-soft: #ffffff14; --glass: #ffffff1f; --glass-hover: #ffffff33;
+        --accent: #ffffff; --accent-on: #000000; --accent-hover: #ffffffe6;
+        --glow: #23435f;
+        --font: "OpenAI Sans", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+        --mono: "SF Mono", Consolas, "Liberation Mono", ui-monospace, monospace;
+        color-scheme: dark;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--fg); font: 400 17px / 1.65 var(--font); letter-spacing: -0.01em; -webkit-font-smoothing: antialiased; }
+      main { max-width: 1088px; margin: 0 auto; padding: 48px 24px 96px; }
+      header { padding: 24px 0 40px; }
+      header h1 { margin: 0 0 8px; font: 500 48px / 1.08 var(--font); letter-spacing: -0.03em; text-wrap: balance; }
+      header p { margin: 0; color: var(--muted); max-width: 676px; }
+      section { padding: 40px 0; border-top: 1px solid var(--border-soft); }
+      .kicker { margin: 0 0 20px; font: 500 13px / 1.5 var(--font); letter-spacing: 0.08em; text-transform: uppercase; color: var(--meta); }
+      .note { margin: 12px 0 0; color: var(--meta); font-size: 14px; }
+
+      /* hero mock */
+      .hero { position: relative; height: 360px; overflow: hidden; border-radius: 16px; background: var(--bg) radial-gradient(ellipse farthest-corner at center, transparent 0%, color-mix(in srgb, var(--glow) 6.25%, transparent) 25%, color-mix(in srgb, var(--glow) 25%, transparent) 50%, color-mix(in srgb, var(--glow) 55%, transparent) 100%); }
+      .hero .label { position: absolute; top: 50%; margin: 0; transform: translateY(-50%); font: 500 64px / 1 var(--font); letter-spacing: -0.03em; color: var(--fg-2); text-shadow: 0 0 24px #fafafa14; }
+      .hero .l { left: clamp(20px, 4vw, 56px); } .hero .r { right: clamp(20px, 4vw, 56px); }
+      .hero .hint { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); margin: 0; color: #fafafa99; font-size: 14px; }
+      .hero .replay { position: absolute; right: 12px; bottom: 12px; width: 36px; height: 36px; border: 0; border-radius: 9999px; background: #ffffff26; color: #ffffffcc; display: grid; place-items: center; }
+      .star { position: absolute; border-radius: 50%; width: 3px; height: 3px; background: var(--c); box-shadow: 0 0 10px var(--c), 0 0 2px #fff; }
+
+      /* palette */
+      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; }
+      .sw { border-radius: 10px; overflow: hidden; background: var(--surface); box-shadow: 0 0 0 1px var(--border-soft); }
+      .sw i { display: block; height: 72px; background: var(--v); }
+      .sw b { display: block; padding: 10px 12px 2px; font-weight: 500; font-size: 14px; }
+      .sw span { display: block; padding: 0 12px 10px; color: var(--meta); font: 400 13px / 1.4 var(--mono); }
+
+      /* type */
+      .type { display: grid; gap: 14px; }
+      .type div { display: grid; grid-template-columns: 200px 1fr; gap: 24px; align-items: baseline; }
+      .type code { color: var(--meta); font: 400 13px / 1.4 var(--mono); }
+      .h1 { font: 500 64px / 1 var(--font); letter-spacing: -0.03em; }
+      .h2 { font: 500 48px / 1.16 var(--font); letter-spacing: -0.02em; }
+      .h3 { font: 500 30px / 1.32 var(--font); letter-spacing: -0.01em; }
+      .h5 { font: 500 18px / 1.32 var(--font); letter-spacing: -0.01em; }
+      .p1 { color: var(--muted); max-width: 676px; }
+      .p2 { color: var(--muted); font-size: 14px; line-height: 1.64; max-width: 676px; }
+      .cta { font: 500 14px / 1 var(--font); letter-spacing: 0; }
+
+      /* components */
+      .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+      .btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-height: 40px; padding: 12px 16px; border: 0; border-radius: 9999px; font: 500 14px / 1 var(--font); letter-spacing: 0; cursor: pointer; transition: background-color 300ms cubic-bezier(.6, 0, .4, 1); }
+      .primary { background: var(--accent); color: var(--accent-on); } .primary:hover { background: var(--accent-hover); }
+      .glass { background: var(--glass); color: var(--fg); } .glass:hover { background: var(--glass-hover); }
+      .ghost { background: transparent; color: var(--fg); } .ghost:hover { background: var(--glass-hover); }
+      .cue { display: grid; place-items: center; width: min(576px, 100%); height: 240px; margin: 0 auto; border: 1px dashed var(--border-soft); border-radius: 10px; color: #fafafa4d; }
+      .cue svg { width: 96px; height: 96px; }
+      .caption { margin: 12px 0 0; text-align: center; font: 500 14px / 1.5 var(--font); letter-spacing: 0.08em; color: #fafafad9; }
+      table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+      th { text-align: left; padding: 12px 0; font: 500 18px / 1.32 var(--font); border-bottom: 1px solid var(--border); }
+      td { padding: 12px 0; border-bottom: 1px solid var(--border-soft); color: var(--muted); font-size: 14px; }
+      tr.f td { color: var(--fg); }
+      .bar { display: inline-block; height: 6px; border-radius: 3px; background: #ffffff70; margin-right: 8px; vertical-align: middle; }
+      tr.f .bar { background: #fff; }
+
+      .rules { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+      .rules ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 15px; }
+      .rules h3 { margin: 0 0 8px; font: 500 18px / 1.3 var(--font); }
+      @media (max-width: 720px) { .type div { grid-template-columns: 1fr; gap: 4px; } .rules { grid-template-columns: 1fr; } .hero .label { font-size: 36px; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Design System Inspired by OpenAI Astra</h1>
+        <p>The dark, cinematic launch-page register of openai.com: a black void, a living galaxy that tells the story on scroll, one typeface at weight 500, and monochrome pill chrome.</p>
+      </header>
+
+      <section>
+        <p class="kicker">Hero chrome</p>
+        <div class="hero" aria-hidden="true">
+          <span class="star" style="--c:#6dcbf4; left:40%; top:44%"></span>
+          <span class="star" style="--c:#7ab1fe; left:53%; top:56%"></span>
+          <span class="star" style="--c:#f87915; left:47%; top:50%; width:4px; height:4px"></span>
+          <span class="star" style="--c:#fa994c; left:59%; top:41%"></span>
+          <span class="star" style="--c:#f5f6fb; left:44%; top:61%"></span>
+          <span class="star" style="--c:#6dcbf4; left:36%; top:53%"></span>
+          <span class="star" style="--c:#f5f6fb; left:62%; top:52%"></span>
+          <p class="label l">GPT</p>
+          <p class="label r">Astra</p>
+          <p class="hint">Scroll</p>
+          <button class="replay">↻</button>
+        </div>
+        <p class="note">Split labels at 64px / 500, letters reveal over 1s (cubic-bezier .22,1,.36,1) with a 0.85–1.25s stagger. Ambient glow #23435f at 55% behind a three.js galaxy.</p>
+      </section>
+
+      <section>
+        <p class="kicker">Colour roles</p>
+        <div class="grid">
+          <div class="sw" style="--v:#000000"><i></i><b>Void</b><span>#000000 · background</span></div>
+          <div class="sw" style="--v:#1f1f1f"><i></i><b>Panel</b><span>#1f1f1f · surface</span></div>
+          <div class="sw" style="--v:#0a0a0a"><i></i><b>Band</b><span>#0a0a0a · section band</span></div>
+          <div class="sw" style="--v:#ffffff"><i></i><b>White</b><span>#ffffff · text, CTA</span></div>
+          <div class="sw" style="--v:#fafafa"><i></i><b>Hero white</b><span>#fafafa · hero chrome</span></div>
+          <div class="sw" style="--v:#ffffff99"><i></i><b>White 60</b><span>#ffffff99 · ledes</span></div>
+          <div class="sw" style="--v:#ffffff70"><i></i><b>White 44</b><span>#ffffff70 · meta</span></div>
+          <div class="sw" style="--v:#ffffff33"><i></i><b>Hairline</b><span>#ffffff33 · rules</span></div>
+          <div class="sw" style="--v:#ffffff1f"><i></i><b>Glass</b><span>#ffffff1f · pills</span></div>
+          <div class="sw" style="--v:#23435f"><i></i><b>Ambient glow</b><span>#23435f @ 55%</span></div>
+          <div class="sw" style="--v:#6dcbf4"><i></i><b>Star sky</b><span>#6dcbf4 · 36%</span></div>
+          <div class="sw" style="--v:#7ab1fe"><i></i><b>Star periwinkle</b><span>#7ab1fe · 16%</span></div>
+          <div class="sw" style="--v:#f87915"><i></i><b>Star ember</b><span>#f87915 · 12%</span></div>
+          <div class="sw" style="--v:#fa994c"><i></i><b>Star amber</b><span>#fa994c · 10%</span></div>
+          <div class="sw" style="--v:#f5f6fb"><i></i><b>Star white</b><span>#f5f6fb · 26%</span></div>
+        </div>
+        <p class="note">No coloured accent. Glow and star colours are atmosphere, never UI colour.</p>
+      </section>
+
+      <section>
+        <p class="kicker">Typography · OpenAI Sans (Inter fallback)</p>
+        <div class="type">
+          <div><code>h1 · 64px · 500 · -0.03em</code><span class="h1">Astra</span></div>
+          <div><code>h2 · 48px · 500</code><span class="h2">A new generation of intelligence</span></div>
+          <div><code>h3 · 30px · 500</code><span class="h3">The world’s best computer use model</span></div>
+          <div><code>h5 · 18px · 500</code><span class="h5">Long context</span></div>
+          <div><code>p1 · 17px / 28px</code><span class="p1">We’re introducing a model that brings together years of research across pre-training, reasoning, and alignment into one system.</span></div>
+          <div><code>p2 · 14px / 23px</code><span class="p2">Availability varies by region and plan. See the system card for methodology.</span></div>
+          <div><code>cta · 14px · 500</code><span class="cta">Read the research</span></div>
+        </div>
+      </section>
+
+      <section>
+        <p class="kicker">Buttons and controls</p>
+        <div class="row">
+          <button class="btn primary">Try in ChatGPT</button>
+          <button class="btn glass">Read the research</button>
+          <button class="btn ghost">System card →</button>
+          <button class="replay" style="position:static">↻</button>
+        </div>
+        <p class="note">One white pill per screen; every other control is glass. 40px min height, 12 × 16px padding, 300ms cubic-bezier(.6,0,.4,1).</p>
+      </section>
+
+      <section>
+        <p class="kicker">Shape cue</p>
+        <div class="cue"><svg viewBox="0 0 19 19" fill="none" stroke="currentColor" stroke-width="0.8"><path d="M9.60978 17.0223C9.24308 17.739 8.76808 18.189 8.18478 18.3723C7.60148 18.564 7.03478 18.4931 6.48478 18.1598C5.93478 17.8348 5.53061 17.314 5.27228 16.5973L0.672282 3.68478C0.497282 3.19312 0.455612 2.72645 0.547282 2.28478C0.638952 1.83478 0.838952 1.45561 1.14728 1.14728C1.45561 0.838948 1.83478 0.638949 2.28478 0.547279C2.73478 0.455619 3.20561 0.497279 3.69728 0.672279L16.6098 5.27228C17.3265 5.53062 17.8473 5.93478 18.1723 6.48478C18.5056 7.02648 18.5765 7.58898 18.3848 8.17228C18.2015 8.75558 17.7515 9.23058 17.0348 9.59728L12.1098 12.1098L9.60978 17.0223Z"/></svg></div>
+        <p class="caption">It takes action</p>
+        <p class="note">576px × 80vh frame reserved for the stars; the path is invisible in production.</p>
+      </section>
+
+      <section>
+        <p class="kicker">Benchmarks</p>
+        <table>
+          <thead><tr><th>Terminal-Bench 4.0</th><th>Score</th></tr></thead>
+          <tbody>
+            <tr class="f"><td>This model</td><td><span class="bar" style="width:180px"></span>91.4%</td></tr>
+            <tr><td>Previous generation</td><td><span class="bar" style="width:142px"></span>72.1%</td></tr>
+            <tr><td>Comparison</td><td><span class="bar" style="width:96px"></span>48.7%</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <p class="kicker">Rules</p>
+        <div class="rules">
+          <div><h3>Do</h3><ul><li>Keep the canvas #000000; the glow supplies softness.</li><li>676px copy column, empty rails on both sides.</li><li>Weight 500 headings, 400 body, -0.03em display tracking.</li><li>Only stars respond to scroll.</li><li>Ship the static fallback; honour reduced motion.</li></ul></div>
+          <div><h3>Don't</h3><ul><li>No gradients, coloured buttons, tinted cards.</li><li>No serif, second sans, 600+, italics.</li><li>No parallax on copy, pinned sections, scroll-snap.</li><li>No shadows or backdrop-filter over the canvas.</li><li>No affiliation claims.</li></ul></div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
