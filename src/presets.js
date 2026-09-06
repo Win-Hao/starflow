@@ -37,6 +37,8 @@ export const PATH_SHAPE_SETTINGS = {
   fillX: 0.6,
   fillY: 0.64,
   ambient: 0.12,
+  // 厚度来自 5 层的 Z 向起伏，不额外撒体积
+  depth: 0,
 }
 
 export const PATH_PRESETS = {
@@ -68,6 +70,7 @@ export const TEXT_SHAPE_SETTINGS = {
   fillX: 0.7,
   fillY: 0.64,
   ambient: 0.12,
+  depth: 0,
 }
 
 /** 星系 / 轮廓图标模式用的默认值，切回来时恢复。 */
@@ -80,6 +83,7 @@ export const DEFAULT_SHAPE_SETTINGS = {
   fillX: 0.8,
   fillY: 0.89,
   ambient: 0.55,
+  depth: 0.1,
 }
 
 export const ICON_PRESETS = {

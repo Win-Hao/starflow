@@ -58,7 +58,7 @@ function renderStats() {
  */
 function applyShapeSettings(settings) {
   const merged = { ...DEFAULT_SHAPE_SETTINGS, ...settings }
-  for (const [id, value] of [['scatter', merged.scatter], ['starCount', merged.starCount], ['flowSpeed', merged.flowSpeed]]) {
+  for (const [id, value] of [['scatter', merged.scatter], ['starCount', merged.starCount], ['flowSpeed', merged.flowSpeed], ['depth', merged.depth]]) {
     const input = $(id)
     input.value = value
     input.dispatchEvent(new Event('input'))

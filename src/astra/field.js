@@ -147,6 +147,47 @@ function allocate(weights, total) {
 }
 
 /**
+ * 原站的路径形状是由 5 层星系星组成的：每颗星带着自己那一层的 Z 向起伏（幅度、相位各不相同），
+ * 所以轮廓在 Z 向是一团有厚度的星，转到侧面是楔形而不是一张纸。
+ * 这里把每条路径复制成 5 层，套上星系 5 层的 depth / 相位 / 流速 / 强弱，星数按层分摊；
+ * rangeSpan 按「不同路径」的长度占比算，复制的层不会把流速放大。
+ */
+function expandPathLayers(layers) {
+  const total = layers.reduce((sum, layer) => sum + layer.weight, 0)
+  return layers.flatMap((layer) =>
+    GALAXY_LAYERS.map((preset, index) => {
+      const curve = Object.assign(Object.create(Object.getPrototypeOf(layer.curve)), layer.curve, {
+        depth: preset.depth,
+        depthPhase: 0.82 * index,
+        cacheArcLengths: undefined,
+      })
+      return {
+        ...layer,
+        curve,
+        depth: preset.depth,
+        strong: preset.strong,
+        speed: preset.speed,
+        phase: preset.phase,
+        weight: (layer.weight / GALAXY_LAYERS.length) * (preset.strong ? 1 : 0.77),
+        rangeSpan: Math.max(layer.weight / Math.max(total, 1e-6), 1e-3),
+      }
+    }),
+  )
+}
+
+/**
+ * 闭合轮廓从最低点起算（心形、闪电、星形的尖端都在最下面）：
+ * 五层的 Z 向起伏在路径两端归零、中段最大，转到侧面就是尖端薄、上半部厚的楔形，和原站的心形一样。
+ */
+function startAtTip(points) {
+  const n = points.length
+  if (n < 3) return points
+  let best = 0
+  for (let i = 1; i < n; i += 1) if (points[i][1] < points[best][1]) best = i
+  return points.slice(best).concat(points.slice(0, best))
+}
+
+/**
  * 把形状变成一组可以按弧长参数化的曲线。
  * 星系模式直接用原站的 5 条手绘曲线；其余来源先光栅化再抠轮廓。
  */
@@ -155,7 +196,7 @@ function buildLayers(source, options) {
     return { layers: createGalaxyLayers(options.rotationDepth), raster: null }
   }
   if (source.type === 'paths') {
-    return { layers: createPathLayers(source.paths, source.viewBox, options.rotationDepth), raster: null }
+    return { layers: expandPathLayers(createPathLayers(source.paths, source.viewBox, options.rotationDepth)), raster: null }
   }
   if (source.type === 'galaxy-text') {
     // 星系体数字：每位 5 条螺旋臂 + 一个核心，写法同原站的 6
@@ -196,7 +237,7 @@ function buildLayers(source, options) {
           weight: stroke.length * scale * (preset.strong ? 1 : 0.77),
         }
       })
-      return { layers, raster, strokes: true }
+      return { layers: options.pathShape ? expandPathLayers(layers) : layers, raster, strokes: true }
     }
   }
 
@@ -210,7 +251,8 @@ function buildLayers(source, options) {
 
   const layers = contours.map((contour, index) => {
     const preset = GALAXY_LAYERS[index % GALAXY_LAYERS.length]
-    const points = contour.points.map(([x, y]) => toWorld(x, y))
+    const mapped = contour.points.map(([x, y]) => toWorld(x, y))
+    const points = options.pathShape ? startAtTip(mapped) : mapped
     return {
       curve: new PolylineCurve(points, {
         closed: true,
@@ -227,7 +269,7 @@ function buildLayers(source, options) {
     }
   })
 
-  return { layers, raster, strokes: false }
+  return { layers: options.pathShape ? expandPathLayers(layers) : layers, raster, strokes: false }
 }
 
 /** 中线层：t 处的半笔宽（世界单位），和 PolylineCurve.getPoint 用同一套参数映射 */
@@ -290,7 +332,7 @@ export function generateStarField(source, userOptions = {}) {
   const shapeHeight = Math.max(maxY - minY, 1e-3)
   if (isPaths) {
     const totalLength = layers.reduce((sum, layer) => sum + layer.weight, 0)
-    for (const layer of layers) layer.rangeSpan = Math.max(layer.weight / Math.max(totalLength, 1e-6), 1e-3)
+    for (const layer of layers) layer.rangeSpan = layer.rangeSpan ?? Math.max(layer.weight / Math.max(totalLength, 1e-6), 1e-3)
   }
 
   // --- 数量分配 ---
@@ -321,7 +363,8 @@ export function generateStarField(source, userOptions = {}) {
   const sizeFactor = MathUtils.clamp(options.size, 0.25, 3)
   const scatterWorld = MathUtils.clamp(options.scatter, 0, 0.14) * shapeHeight
   // 中线管子本身就是圆的，额外体积默认只给轮廓模式
-  const depthWorld = MathUtils.clamp(options.depth ?? (raster && !isStrokes ? RASTER_DEPTH : 0), 0, 0.5) * shapeHeight
+  // 路径形状的厚度来自 5 层各自的 Z 向起伏（原站做法），不再额外撒体积
+  const depthWorld = MathUtils.clamp(options.depth ?? (raster && !isStrokes && !options.pathShape ? RASTER_DEPTH : 0), 0, 0.5) * shapeHeight
   const strokeSpread = MathUtils.clamp(options.strokeSpread, 0, 3)
   const falloff = MathUtils.clamp(options.densityFalloff, 0, 1)
   const seedMix = options.seed >>> 0
