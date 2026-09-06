@@ -4,6 +4,8 @@
 
 ## 1. nexu-io/open-design（设计系统包）
 
+**已提交：<https://github.com/nexu-io/open-design/pull/7806>（2026-09-06，`pnpm guard` 与 `pnpm typecheck` 均通过）。** 后续如需改动，在 fork `Win-Hao/open-design` 的 `add-openai-astra-design-system` 分支上继续提交即可。
+
 要求（CONTRIBUTING.md）：`design-systems/<slug>/` 下 `manifest.json` + `DESIGN.md`（≥7 个实质 H2）+ `tokens.css`；slug = `manifest.id`；DESIGN.md 里的颜色、字体、间距、动效要和 tokens.css 一致；一个 PR 一件事；提交前 `pnpm typecheck`。
 
 ```bash

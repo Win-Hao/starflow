@@ -24,7 +24,7 @@ Values are read from a local capture of the public page (2026-09-05). No fonts (
 ## Checks
 
 - `pnpm guard` passes (153 project manifests valid, package quality average 100, token-fixture sync, A1/A2/B-slot, unknown-token allowlist, flag parity, component manifest extraction)
-- `pnpm typecheck`: see the PR comment for the result on my machine
+- `pnpm typecheck` passes (full workspace)
 - Opened `components.html` and the three preview pages in a browser
 
 ## Related
