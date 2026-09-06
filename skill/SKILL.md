@@ -106,7 +106,8 @@ references/choreography.md         the four scroll stages, thresholds, cue geome
      with a bottom bar. Edit the words, not the geometry. Do not add a blur behind the header.
    - For benchmarks, quotes, screenshots and comparison tables use the recipes in `references/DESIGN.md`
      §4 (chart card, quote card, media frame, comparison table); `../design-systems/openai-astra/components.html`
-     has working markup for each.
+     has working markup for each, including the auto-advancing tabs (6s cycle, 2s hold then a 4s linear fill in the
+     selected pill; hover and off-screen pause; click restarts) linked to chart panels.
 5. **Choose the shapes.** Presets: `cursor` (single closed path, fast flow) and `openai-knot`
    (six arcs). For the user's own mark, export the outline as SVG paths and set
    `data-astra-shape="brand" data-astra-paths='["M…","M…"]' data-astra-viewbox="0 0 W H"` on the

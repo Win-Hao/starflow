@@ -112,6 +112,12 @@
       .segmented button { min-height: 40px; padding: var(--space-3) var(--space-4); border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--fg); font: 500 var(--text-sm) / 1 var(--font-body); letter-spacing: 0; white-space: nowrap; cursor: pointer; transition: background-color var(--motion-base) var(--ease-standard); }
       .segmented button:hover { background: var(--border-soft); }
       .segmented button[aria-selected="true"] { background: var(--astra-glass); }
+      /* ── Segmented control: autoplay countdown (page: AUTOPLAY_DURATION_MS 6000; keyframes hold 0–33.3% then linear scaleX 0→1) ── */
+      .segmented button { position: relative; isolation: isolate; overflow: hidden; }
+      .segmented .countdown { position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: var(--border); transform-origin: 0 50%; transform: scaleX(0); animation: tab-countdown 6000ms linear both; }
+      @keyframes tab-countdown { 0%, 33.3333% { transform: scaleX(0); } to { transform: scaleX(1); } }
+      .segmented[data-paused="true"] .countdown { animation-play-state: paused; }
+      @media (prefers-reduced-motion: reduce) { .segmented .countdown { animation: none; transform: scaleX(0); } }
 
       .chart-card { padding: var(--space-8); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg); }
       .chart-card .chart-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-4); }
@@ -241,41 +247,26 @@
       </section>
 
       <section class="wide" id="engine">
-        <h2>滚动编排：形状什么时候成形</h2>
-        <p class="lede">每个形状 cue 进入视口的过程被归一成 0 到 1。前 36% 成形，50% 到 86% 之间消散；最后一个 cue 常驻。下面是引擎里那两条曲线。</p>
+        <h2>滚动编排：三个阶段各自的曲线</h2>
+        <p class="lede">页面只量 DOM、算进度，阻尼和混合都在引擎里。下面三档每 6 秒自动切换一次，也可以点。</p>
         <div class="wide-actions">
-          <div class="segmented" role="tablist" aria-label="编排阶段">
-            <button type="button" role="tab" aria-selected="false">翻转</button>
-            <button type="button" role="tab" aria-selected="false">星轨</button>
-            <button type="button" role="tab" aria-selected="true">形状</button>
+          <div class="segmented" role="tablist" aria-label="编排阶段" data-autoplay="6000" id="stage-tabs">
+            <button type="button" role="tab" aria-selected="false" data-dataset="tilt">翻转</button>
+            <button type="button" role="tab" aria-selected="false" data-dataset="rails">星轨</button>
+            <button type="button" role="tab" aria-selected="true" data-dataset="shape">形状</button>
           </div>
         </div>
-        <figure class="chart-card" style="margin: 0">
+        <figure class="chart-card" style="margin: 0" id="stage-chart">
           <div class="chart-head">
             <div>
-              <h3>形状强度 · 随进入视口的进度</h3>
-              <button class="btn btn-glass select" type="button" aria-haspopup="listbox">光标 cue <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m4 6 4 4 4-4"/></svg></button>
+              <h3 data-chart-title>形状强度 · 随进入视口的进度</h3>
+              <button class="btn btn-glass select" type="button" aria-haspopup="listbox"><span data-chart-select>光标 cue</span> <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m4 6 4 4 4-4"/></svg></button>
             </div>
             <button class="icon-btn" type="button" aria-label="下载数据"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v8m-3-3 3 3 3-3M3 13h10"/></svg></button>
           </div>
-          <div class="legend">
-            <span><svg viewBox="0 0 22 22"><path class="s1" d="m11 2 2.6 6h6.4l-5.2 3.8 2 6.2L11 14.2 5.2 18l2-6.2L2 8h6.4z"/></svg>中间的 cue（光标）</span>
-            <span><svg viewBox="0 0 22 22"><circle class="s2" cx="11" cy="11" r="7"/></svg>最后一个 cue（常驻）</span>
-            <span class="ref"><svg viewBox="0 0 40 22"><path d="M2 11h36" stroke="#ac4f23" stroke-width="1.5" stroke-dasharray="8 6"/></svg>36% 处成形完成</span>
-          </div>
-          <svg class="plot" viewBox="0 0 640 340" role="img" aria-label="形状强度随进入视口进度的变化">
-            <line class="axis" x1="70" y1="20" x2="70" y2="280"/>
-            <line class="axis" x1="70" y1="280" x2="600" y2="280"/>
-            <g class="tick" text-anchor="end"><text x="60" y="24">100%</text><text x="60" y="89">75%</text><text x="60" y="154">50%</text><text x="60" y="219">25%</text><text x="60" y="284">0%</text></g>
-            <g class="tick" text-anchor="middle"><text x="70" y="306">0</text><text x="202" y="306">25%</text><text x="335" y="306">50%</text><text x="467" y="306">75%</text><text x="600" y="306">100%</text></g>
-            <text class="label" x="335" y="332" text-anchor="middle">进入视口的进度</text>
-            <line class="ref" x1="261" y1="20" x2="261" y2="280"/>
-            <polyline class="line s2" points="70,280 118,262 166,180 214,84 261,20 600,20"/>
-            <polyline class="line s1" points="70,280 118,262 166,180 214,84 261,20 335,20 383,68 431,166 479,246 526,280 600,280"/>
-            <g class="s1"><path d="m118 253 2.6 6h6.4l-5.2 3.8 2 6.2-5.8-3.8-5.8 3.8 2-6.2-5.2-3.8h6.4z"/><path d="m214 75 2.6 6h6.4l-5.2 3.8 2 6.2-5.8-3.8-5.8 3.8 2-6.2-5.2-3.8h6.4z"/><path d="m383 59 2.6 6h6.4l-5.2 3.8 2 6.2-5.8-3.8-5.8 3.8 2-6.2-5.2-3.8h6.4z"/><path d="m479 237 2.6 6h6.4l-5.2 3.8 2 6.2-5.8-3.8-5.8 3.8 2-6.2-5.2-3.8h6.4z"/></g>
-            <circle class="s2" cx="335" cy="20" r="5"/><circle class="s2" cx="479" cy="20" r="5"/><circle class="s2" cx="600" cy="20" r="5"/>
-          </svg>
-          <figcaption>成形用 smoothstep(0, 0.36)，消散用 1 − smoothstep(0.5, 0.86)，两者相乘就是强度。同一时刻只有强度最大的 cue 生效，往回滚一切逆序发生。</figcaption>
+          <div class="legend" data-chart-legend></div>
+          <svg class="plot" viewBox="0 0 640 340" role="img" aria-label="编排曲线" data-chart-plot></svg>
+          <figcaption data-chart-caption></figcaption>
         </figure>
       </section>
 
@@ -485,6 +476,114 @@
       window.addEventListener('resize', schedule, { passive: true })
       document.getElementById('replay').addEventListener('click', () => astra.replay())
       schedule()
+
+
+      // ── 编排曲线图表：三档数据都来自引擎里的真实规则 ──
+      const smooth = (x, a, b) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t) }
+      const smoother = (x, a, b) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * t * (t * (t * 6 - 15) + 10) }
+      const N = 41
+      const xs = Array.from({ length: N }, (_, i) => i / (N - 1))
+      const DATASETS = {
+        tilt: {
+          title: '翻转角度 · 随首段文案的进度', select: '首段文案', yTicks: ['−52°', '−39°', '−26°', '−13°', '0°'], ref: 0.75, refLabel: '75% 处最大',
+          series: [{ name: '绕 X 轴的翻转角', cls: 's1', marker: 'star', ys: xs.map((t) => Math.sin(Math.min(1, t / 0.75) * Math.PI / 2) * (1 - smoother(t, 0.75, 1))) }],
+          caption: '首段文案顶部到视口 66% 处开始、中线到视口中线时完成。星系绕 X 轴翻到 −52°，翻转进度 75% 处最大、100% 回平（tiltRise × tiltFall）。',
+        },
+        rails: {
+          title: '星轨 · 亮度与暗星尺寸随散开进度', select: '两侧星轨', yTicks: ['100%', '75%', '50%', '25%', '0%'], ref: null,
+          series: [
+            { name: '星星亮度（→ 18%）', cls: 's1', marker: 'star', ys: xs.map((t) => 1 - 0.82 * smoother(t, 0, 1)) },
+            { name: '暗星尺寸（→ 45%）', cls: 's2', marker: 'dot', ys: xs.map((t) => 1 - 0.55 * smoother(t, 0, 1)) },
+          ],
+          caption: '72% 的星被推到文案栏两侧，内缘用 sqrt 稀释；亮度降到 18%、暗星缩到 45%，随继续滚动带按深度分层的视差。',
+        },
+        shape: {
+          title: '形状强度 · 随进入视口的进度', select: '光标 cue', yTicks: ['100%', '75%', '50%', '25%', '0%'], ref: 0.36, refLabel: '36% 处成形完成',
+          series: [
+            { name: '中间的 cue（光标）', cls: 's1', marker: 'star', ys: xs.map((t) => smooth(t, 0, 0.36) * (1 - smooth(t, 0.5, 0.86))) },
+            { name: '最后一个 cue（常驻）', cls: 's2', marker: 'dot', ys: xs.map((t) => smooth(t, 0, 0.36)) },
+          ],
+          caption: '成形用 smoothstep(0, 0.36)，消散用 1 − smoothstep(0.5, 0.86)，两者相乘就是强度。同一时刻只有强度最大的 cue 生效，往回滚一切逆序发生。',
+        },
+      }
+      const STAR = 'm0 -9 2.6 6h6.4l-5.2 3.8 2 6.2-5.8-3.8-5.8 3.8 2-6.2-5.2-3.8h6.4z'
+      function renderChart(id) {
+        const d = DATASETS[id]
+        const X = (t) => 70 + t * 530, Y = (v) => 280 - v * 260
+        document.querySelector('[data-chart-title]').textContent = d.title
+        document.querySelector('[data-chart-select]').textContent = d.select
+        document.querySelector('[data-chart-legend]').innerHTML = d.series.map((s) => `<span><svg viewBox="0 0 22 22">${s.marker === 'star' ? `<path class="${s.cls}" d="m11 2 2.6 6h6.4l-5.2 3.8 2 6.2L11 14.2 5.2 18l2-6.2L2 8h6.4z"/>` : `<circle class="${s.cls}" cx="11" cy="11" r="7"/>`}</svg>${s.name}</span>`).join('')
+          + (d.ref != null ? `<span class="ref"><svg viewBox="0 0 40 22"><path d="M2 11h36" stroke="#ac4f23" stroke-width="1.5" stroke-dasharray="8 6"/></svg>${d.refLabel}</span>` : '')
+        const yTicks = d.yTicks.map((label, i) => `<text x="60" y="${24 + i * 65}">${label}</text>`).join('')
+        const lines = d.series.map((s) => `<polyline class="line ${s.cls}" points="${xs.map((t, i) => `${X(t).toFixed(1)},${Y(s.ys[i]).toFixed(1)}`).join(' ')}"/>`).join('')
+        const markers = d.series.map((s) => [4, 12, 20, 28, 36].map((i) => s.marker === 'star'
+          ? `<path class="${s.cls}" transform="translate(${X(xs[i]).toFixed(1)} ${Y(s.ys[i]).toFixed(1)})" d="${STAR}"/>`
+          : `<circle class="${s.cls}" cx="${X(xs[i]).toFixed(1)}" cy="${Y(s.ys[i]).toFixed(1)}" r="5"/>`).join('')).join('')
+        document.querySelector('[data-chart-plot]').innerHTML = `
+          <line class="axis" x1="70" y1="20" x2="70" y2="280"/><line class="axis" x1="70" y1="280" x2="600" y2="280"/>
+          <g class="tick" text-anchor="end">${yTicks}</g>
+          <g class="tick" text-anchor="middle"><text x="70" y="306">0</text><text x="202" y="306">25%</text><text x="335" y="306">50%</text><text x="467" y="306">75%</text><text x="600" y="306">100%</text></g>
+          <text class="label" x="335" y="332" text-anchor="middle">进度</text>
+          ${d.ref != null ? `<line class="ref" x1="${X(d.ref).toFixed(1)}" y1="20" x2="${X(d.ref).toFixed(1)}" y2="280"/>` : ''}
+          ${lines}${markers}`
+        document.querySelector('[data-chart-caption]').textContent = d.caption
+      }
+      // Autoplay tabs: 6s per tab (2s hold, then a 4s linear fill inside the selected pill), then the linked panel switches.
+      // Pauses on hover, when the tab list leaves the viewport, or when the page is hidden; a click switches at once and restarts the cycle.
+      function autoplayTabs(list, onChange) {
+        const tabs = Array.from(list.querySelectorAll('[role="tab"]'))
+        const duration = Number(list.dataset.autoplay) || 6000
+        const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+        let index = Math.max(0, tabs.findIndex((t) => t.getAttribute('aria-selected') === 'true'))
+        let elapsed = 0, startedAt = 0, timer = 0, hover = false, visible = true, seen = true
+        const paused = () => hover || !visible || !seen || reduced
+        function select(i) {
+          index = (i + tabs.length) % tabs.length
+          tabs.forEach((t, k) => {
+            const on = k === index
+            t.setAttribute('aria-selected', String(on))
+            t.tabIndex = on ? 0 : -1
+            const panel = t.getAttribute('aria-controls') && document.getElementById(t.getAttribute('aria-controls'))
+            if (panel) panel.hidden = !on
+            t.querySelector('.countdown')?.remove()
+          })
+          onChange?.(tabs[index], index)
+          elapsed = 0
+          restart()
+        }
+        function restart() {
+          clearTimeout(timer)
+          const tab = tabs[index]
+          tab.querySelector('.countdown')?.remove()
+          if (reduced) return
+          const fill = document.createElement('span')
+          fill.className = 'countdown'
+          fill.setAttribute('aria-hidden', 'true')
+          fill.style.animationDuration = `${duration}ms`
+          fill.style.animationDelay = `${-elapsed}ms`
+          tab.prepend(fill)
+          list.dataset.paused = String(paused())
+          if (paused()) return
+          startedAt = performance.now()
+          timer = setTimeout(() => select(index + 1), Math.max(duration - elapsed, 0))
+        }
+        function pause() {
+          if (!timer) return
+          clearTimeout(timer); timer = 0
+          elapsed = Math.min(duration, elapsed + performance.now() - startedAt)
+          list.dataset.paused = 'true'
+        }
+        function resume() { if (!timer && !paused()) restart() }
+        const update = () => (paused() ? pause() : resume())
+        list.addEventListener('mouseenter', () => { hover = true; update() })
+        list.addEventListener('mouseleave', () => { hover = false; update() })
+        document.addEventListener('visibilitychange', () => { visible = document.visibilityState === 'visible'; update() })
+        new IntersectionObserver(([e]) => { seen = e.isIntersecting; update() }, { threshold: 0.2 }).observe(list)
+        tabs.forEach((t, k) => t.addEventListener('click', () => select(k)))
+        select(index)
+        return { select, pause, resume }
+      }
+      autoplayTabs(document.getElementById('stage-tabs'), (tab) => renderChart(tab.dataset.dataset))
 
       // ── 录屏辅助：?autoscroll=110 → 入场结束后以 110px/s 匀速滚到底；?delay=6 改起始等待秒数。
       //    滚动中按任意键、滚轮或触摸都会停下来；?loop=1 到底后回到顶部重播。
