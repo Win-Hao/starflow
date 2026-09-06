@@ -266,7 +266,7 @@ The engine works without the three pages. `npm run build:lib` produces three fil
 
 | File | Contents | Use |
 |---|---|---|
-| `lib/starflow.js` | ES module with three + postprocessing bundled (~640 KB, 162 KB gzip) | Copy next to any page and `import { createAstraScene } from './starflow.js'` in a `<script type="module">` |
+| `lib/starflow.js` | ES module with three + postprocessing bundled (~650 KB, 165 KB gzip) | Copy next to any page and `import { createAstraScene } from './starflow.js'` in a `<script type="module">` |
 | `lib/starflow.iife.js` | Same, exposed as `window.Starflow` | Pages without modules |
 | `lib/starflow.slim.js` | No dependencies bundled | `npm i @win-hao/starflow`, then `import { createAstraScene } from '@win-hao/starflow'`; three / postprocessing resolve through npm |
 

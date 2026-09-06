@@ -66,7 +66,7 @@ page out in the Astra register, and write copy that the stars can accompany.
 | **Hero only** | A single screen: galaxy (or a shape) plus a headline and CTAs | `assets/hero.html` |
 | **Embed** | The user already has a page and wants the effect in one block | `<iframe src="hero.html?shape=…">` or a `<canvas>` with `createAstraScene` |
 
-Both pages import `./starflow.js` (ES module, self-contained, 638 KB / 162 KB gzip). Copy it next
+Both pages import `./starflow.js` (ES module, self-contained, 646 KB / 165 KB gzip). Copy it next
 to the HTML; do not rewrite the engine and do not load it from a CDN unless the user asks.
 
 ## Files

@@ -247,7 +247,7 @@ astra.dispose()
 
 | 文件 | 内容 | 用法 |
 |---|---|---|
-| `lib/starflow.js` | ES 模块，自带 three + postprocessing（约 640 KB，gzip 162 KB） | 复制到任意页面，`<script type="module">` 里 `import { createAstraScene } from './starflow.js'` |
+| `lib/starflow.js` | ES 模块，自带 three + postprocessing（约 650 KB，gzip 165 KB） | 复制到任意页面，`<script type="module">` 里 `import { createAstraScene } from './starflow.js'` |
 | `lib/starflow.iife.js` | 同上，挂成全局 `window.Starflow` | 不用模块的页面 |
 | `lib/starflow.slim.js` | 不带依赖 | `npm i @win-hao/starflow` 后 `import { createAstraScene } from '@win-hao/starflow'`，three / postprocessing 由 npm 解析 |
 
