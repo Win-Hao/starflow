@@ -12,13 +12,13 @@
 gh repo fork nexu-io/open-design --clone
 cd open-design
 git checkout -b add-openai-astra-design-system
-cp -R ../starflow-skill/design-systems/openai-astra design-systems/openai-astra
+cp -R ../starflow/design-systems/openai-astra design-systems/openai-astra
 pnpm install
 pnpm typecheck
 pnpm guard            # 校验 manifest 和 token 合约
 git add design-systems/openai-astra
 git commit -m "add openai-astra design system"
-gh pr create --title "add openai-astra design system" --body-file ../starflow-skill/docs/pr-open-design.md
+gh pr create --title "add openai-astra design system" --body-file ../starflow/docs/pr-open-design.md
 ```
 
 PR 描述要点（`docs/pr-open-design.md`）：
@@ -35,9 +35,9 @@ PR 描述要点（`docs/pr-open-design.md`）：
   "name": "community/starflow-launch",
   "title": "Starflow launch page",
   "version": "0.1.0",
-  "source": "github:Win-Hao/starflow-skill@main",
+  "source": "github:Win-Hao/starflow@main/skill",
   "publisher": { "id": "win-hao", "github": "Win-Hao", "url": "https://github.com/Win-Hao" },
-  "homepage": "https://github.com/Win-Hao/starflow-skill",
+  "homepage": "https://github.com/Win-Hao/starflow/tree/main/skill",
   "license": "MIT",
   "capabilitiesSummary": ["prompt:inject", "fs:write"],
   "tags": ["landing", "launch", "hero", "particles", "three.js", "dark"],
@@ -47,7 +47,7 @@ PR 描述要点（`docs/pr-open-design.md`）：
 
 ## 2. VoltAgent/awesome-design-md（DESIGN.md 目录）
 
-**2026-09 核对：它的 CONTRIBUTING.md 写明「We cannot accept DESIGN.md pull requests to maintain the quality of the existing collection」，只接受对现有条目的修正。** 所以新条目不要投 PR；`catalog/awesome-design-md/openai-astra/` 保留为该目录格式的成品（DESIGN.md + preview.html + preview-dark.html），等它们开放收录或有人在 issue 里要时再用。下面的命令仅在政策变化后使用。
+**2026-09 核对：它的 CONTRIBUTING.md 写明「We cannot accept DESIGN.md pull requests to maintain the quality of the existing collection」，只接受对现有条目的修正。** 所以新条目不要投 PR；`docs/awesome-design-md/openai-astra/` 保留为该目录格式的成品（DESIGN.md + preview.html + preview-dark.html），等它们开放收录或有人在 issue 里要时再用。下面的命令仅在政策变化后使用。
 
 ```bash
 gh issue create --repo VoltAgent/awesome-design-md \
@@ -58,7 +58,7 @@ gh repo fork VoltAgent/awesome-design-md --clone
 cd awesome-design-md
 git checkout -b add-openai-astra
 mkdir -p design-md/openai-astra
-cp ../starflow-skill/catalog/awesome-design-md/openai-astra/* design-md/openai-astra/
+cp ../starflow/docs/awesome-design-md/openai-astra/* design-md/openai-astra/
 git add design-md/openai-astra
 git commit -m "Add openai-astra DESIGN.md"
 gh pr create --title "Add openai-astra DESIGN.md" --body "Closes #<issue>. Dark launch-page system from the GPT-6 Astra page. See DESIGN.md for the 10 sections and preview.html for the catalogue page."

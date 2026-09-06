@@ -217,7 +217,20 @@ if (detectWebGL()) {
 }
 ```
 
-想让 coding agent 直接做出整页的滚动编排，用配套的 skill：[Win-Hao/starflow-skill](https://github.com/Win-Hao/starflow-skill)。里面有接好线的页面骨架、引擎单文件和一份 `openai-astra` 的 DESIGN.md 设计系统。
+想让 coding agent 直接做出整页的滚动编排，用仓库里的 skill，见下一节。
+
+## Skill 与设计系统
+
+仓库同时带一个给 coding agent 用的 skill 和一份 DESIGN.md 设计系统，三者共用同一份引擎：
+
+| 目录 | 内容 | 用法 |
+|---|---|---|
+| [`skill/`](skill/) | `starflow-launch`：SKILL.md、接好线的发布页骨架、纯首屏页、引擎单文件、参考文档 | Open Design：`od plugin install github:Win-Hao/starflow@main/skill`；Claude Code / Cursor：把 `skill/` 拷进 skills 目录，然后说「用 starflow 做一个发布页」 |
+| [`design-systems/openai-astra/`](design-systems/openai-astra/) | 从 GPT-6 Astra 发布页公开 CSS 提炼的暗色设计系统（DESIGN.md、tokens.css、组件页、preview），按 Open Design 项目规范打包，已投 [nexu-io/open-design#7806](https://github.com/nexu-io/open-design/pull/7806) | 单独把 `DESIGN.md` 丢进任何项目根目录，agent 就会按这套风格生成界面 |
+| [`docs/upstream-prs.md`](docs/upstream-prs.md) | 往上游目录投稿的步骤与 PR 文案 | |
+
+`npm run build:lib` 会把引擎产物同时写进 `lib/` 和 `skill/assets/`；改了 `tokens.css` 或 DESIGN.md 后跑 `scripts/sync-skill.sh` 同步组件页和副本。
+
 
 ## 项目结构
 
@@ -230,6 +243,10 @@ src/presets.js                            原站路径数据（光标、OpenAI �
 src/lib.js / vite.lib.config.js          库入口与库构建（lib/starflow*.js）
 src/astra/                                引擎：scene / field / shaders / paths / bloom / lensflare / ambient / motion / …
 docs/screenshots/                         README 用图
+skill/                                    coding agent 用的 skill（SKILL.md、页面骨架、引擎单文件）
+design-systems/openai-astra/              openai-astra DESIGN.md 设计系统包
+docs/upstream-prs.md                      往上游目录投稿的步骤与 PR 文案
+scripts/sync-skill.sh                     重建组件页、同步 DESIGN.md 副本
 ```
 
 参考页面的抓包文件和分析笔记不在仓库里；星星相关的算法都已按上表在源码里注明出处。

@@ -1,16 +1,13 @@
 #!/usr/bin/env bash
-# 从 starflow 重新构建并拉取引擎单文件；用 tokens.css 重建 components.html；同步 DESIGN.md 副本。
-# 可选：OD_REPO=/path/to/open-design 时用上游的提取器重新生成 components.manifest.json。
+# 重建 design-systems/openai-astra/components.html（把 tokens.css 的 :root 注入 scripts/components.src.html），
+# 并把 DESIGN.md 同步到 skill/references 与 docs/awesome-design-md 两个副本。
+# 引擎单文件不在这里处理：npm run build:lib 会直接把 lib/starflow.js 写进 skill/assets/。
+# 可选：OD_REPO=/path/to/open-design 时用上游自己的提取器重新生成 components.manifest.json。
 set -euo pipefail
-here="$(cd "$(dirname "$0")/.." && pwd)"
-starflow="${STARFLOW_DIR:-$here/../starflow}"
-pkg="$here/design-systems/openai-astra"
+root="$(cd "$(dirname "$0")/.." && pwd)"
+pkg="$root/design-systems/openai-astra"
 
-(cd "$starflow" && npm run build:lib)
-cp "$starflow/lib/starflow.js" "$here/assets/starflow.js"
-
-# components.html 的第一个 :root 必须与 tokens.css 逐条一致（open-design 的 token-fixture sync 校验）
-python3 - "$pkg" "$here/scripts/components.src.html" <<'PY'
+python3 - "$pkg" "$root/scripts/components.src.html" <<'PY'
 import re, sys
 pkg, src = sys.argv[1], sys.argv[2]
 css = re.sub(r"/\*.*?\*/", "", open(f"{pkg}/tokens.css", encoding="utf-8").read(), flags=re.S)
@@ -33,7 +30,7 @@ TS
   (cd "$OD_REPO" && pnpm exec tsx ./gen-manifest.tmp.ts && rm ./gen-manifest.tmp.ts)
 fi
 
-cp "$pkg/DESIGN.md" "$here/references/DESIGN.md"
-cp "$pkg/DESIGN.md" "$here/catalog/awesome-design-md/openai-astra/DESIGN.md"
-cp "$here/catalog/awesome-design-md/openai-astra/preview.html" "$here/catalog/awesome-design-md/openai-astra/preview-dark.html"
-echo "synced: assets/starflow.js, components.html, references/DESIGN.md, catalog copies"
+cp "$pkg/DESIGN.md" "$root/skill/references/DESIGN.md"
+cp "$pkg/DESIGN.md" "$root/docs/awesome-design-md/openai-astra/DESIGN.md"
+cp "$root/docs/awesome-design-md/openai-astra/preview.html" "$root/docs/awesome-design-md/openai-astra/preview-dark.html"
+echo "synced: components.html, skill/references/DESIGN.md, docs/awesome-design-md copies"

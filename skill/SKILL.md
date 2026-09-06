@@ -78,7 +78,7 @@ assets/hero.html                   hero only; ?shape= ?text= ?icon= switch the f
 references/DESIGN.md               the openai-astra design system (colours, type, layout, motion)
 references/engine-api.md           createAstraScene, setSource, setScroll, config keys, presets
 references/choreography.md         the four scroll stages, thresholds, cue geometry, tuning
-design-systems/openai-astra/       the same design system as an Open Design package
+../design-systems/openai-astra/    the same design system as an Open Design package (repo root; use references/DESIGN.md when only this folder is installed)
 ```
 
 ## Workflow
@@ -141,6 +141,6 @@ dense UI, copy that animates on scroll, a canvas that stops the page from scroll
 
 ## Attribution
 
-Engine: Starflow (<https://github.com/Win-Hao/starflow>, MIT), a re-implementation of the
+Engine: Starflow (<https://github.com/Win-Hao/starflow>, MIT; this skill lives in the same repository under `skill/`), a re-implementation of the
 particle choreography on the GPT-6 Astra launch page. The design system is an independent
 distillation of that page's public CSS; it is not affiliated with OpenAI.

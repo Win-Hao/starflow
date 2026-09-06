@@ -18,7 +18,7 @@
     "name": "Win-Hao",
     "url": "https://github.com/Win-Hao"
   },
-  "homepage": "https://github.com/Win-Hao/starflow-skill",
+  "homepage": "https://github.com/Win-Hao/starflow/tree/main/skill",
   "tags": [
     "landing",
     "launch",
@@ -81,7 +81,7 @@
       "via_skill": {
         "name": "starflow-launch",
         "author": "Win-Hao",
-        "url": "https://github.com/Win-Hao/starflow-skill",
+        "url": "https://github.com/Win-Hao/starflow/tree/main/skill",
         "license": "MIT",
         "source_file": "SKILL.md"
       },

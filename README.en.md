@@ -236,7 +236,20 @@ if (detectWebGL()) {
 }
 ```
 
-To have a coding agent build the whole scroll-choreographed page, use the companion skill: [Win-Hao/starflow-skill](https://github.com/Win-Hao/starflow-skill). It ships a wired page skeleton, the single-file engine and an `openai-astra` DESIGN.md design system.
+To have a coding agent build the whole scroll-choreographed page, use the skill in this repository, see the next section.
+
+## Skill and design system
+
+The repository also ships a skill for coding agents and a DESIGN.md design system; all three share one engine:
+
+| Folder | Contents | Use |
+|---|---|---|
+| [`skill/`](skill/) | `starflow-launch`: SKILL.md, a wired launch-page skeleton, a hero-only page, the single-file engine, reference docs | Open Design: `od plugin install github:Win-Hao/starflow@main/skill`; Claude Code / Cursor: copy `skill/` into the skills folder and ask for "a launch page with starflow" |
+| [`design-systems/openai-astra/`](design-systems/openai-astra/) | The dark design system distilled from the public CSS of the GPT-6 Astra launch page (DESIGN.md, tokens.css, component fixture, previews), packaged in the Open Design project shape; submitted as [nexu-io/open-design#7806](https://github.com/nexu-io/open-design/pull/7806) | Drop `DESIGN.md` alone into any project root and agents generate UI in this register |
+| [`docs/upstream-prs.md`](docs/upstream-prs.md) | Steps and PR copy for contributing to upstream catalogues | |
+
+`npm run build:lib` writes the engine bundle to both `lib/` and `skill/assets/`; after editing `tokens.css` or DESIGN.md run `scripts/sync-skill.sh` to rebuild the fixture and the copies.
+
 
 ## Project layout
 
@@ -249,6 +262,10 @@ src/presets.js                            path data (cursor, knot) and icon pres
 src/lib.js / vite.lib.config.js          library entry and build (lib/starflow*.js)
 src/astra/                                engine: scene / field / shaders / paths / bloom / lensflare / ambient / motion / …
 docs/screenshots/                         README images
+skill/                                    skill for coding agents (SKILL.md, page skeleton, engine bundle)
+design-systems/openai-astra/              openai-astra DESIGN.md package
+docs/upstream-prs.md                      steps and PR copy for upstream catalogues
+scripts/sync-skill.sh                     rebuild the component fixture, sync DESIGN.md copies
 ```
 
 The captured reference page and the analysis notes are not part of the repository; every star-related algorithm is

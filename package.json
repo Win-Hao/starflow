@@ -45,7 +45,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview --port 4173",
-    "build:lib": "rm -rf lib && vite build --config vite.lib.config.js && STARFLOW_SLIM=1 vite build --config vite.lib.config.js",
+    "build:lib": "rm -rf lib && vite build --config vite.lib.config.js && STARFLOW_SLIM=1 vite build --config vite.lib.config.js && cp lib/starflow.js skill/assets/starflow.js",
     "prepublishOnly": "npm run build:lib"
   },
   "dependencies": {
