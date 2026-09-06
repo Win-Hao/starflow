@@ -58,6 +58,8 @@
             ? { type: 'text', value: params.get('text') || '6', fontWeight: 700 }
             : { type: 'galaxy' }
       const settings = { ...DEFAULT_SHAPE_SETTINGS, ...(preset?.settings ?? {}) }
+      // galaxy digits: each digit is its own galaxy, so the star budget grows with the digit count
+      if (source.type === 'galaxy-text') settings.starCount = Math.min(16000, 4000 * String(source.value).length)
       const fieldOptions = { starCount: settings.starCount, scatter: settings.scatter, brightRetention: settings.brightRetention, size: 2.05, palette: 'astra' }
 
       if (!detectWebGL() || prefersReducedMotion()) {

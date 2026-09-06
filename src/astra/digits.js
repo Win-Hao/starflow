@@ -100,6 +100,37 @@ const flip = ([x, y]) => [DIGIT_ADVANCE - x, DIGIT_HEIGHT - y]
 const stroke = (points, preset, core = null) => ({ points, core, preset })
 
 /**
+ * 一条笔画拆成几股平行的臂，像原站 6 的竖笔那样是双股 / 三股一起走的。
+ * offsets：各股相对主线的法向偏移；trims：各股两端各去掉的比例，让收尾错开；presets：各股的强弱档。
+ */
+function band(points, { offsets = [0, 6, -5], trims = [[0, 0], [0.1, 0.12], [0.16, 0.06]], presets = [0, 1, 1], core = null } = {}) {
+  const dense = []
+  for (let i = 0; i < points.length - 1; i += 1) {
+    const [x0, y0] = points[i]
+    const [x1, y1] = points[i + 1]
+    const n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0) / 2))
+    for (let k = 0; k < n; k += 1) dense.push([x0 + ((x1 - x0) * k) / n, y0 + ((y1 - y0) * k) / n])
+  }
+  dense.push(points[points.length - 1])
+  const normals = dense.map((p, i) => {
+    const a = dense[Math.max(0, i - 1)]
+    const b = dense[Math.min(dense.length - 1, i + 1)]
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1
+    return [-(b[1] - a[1]) / len, (b[0] - a[0]) / len]
+  })
+  return offsets.map((offset, index) => {
+    const [head, tail] = trims[index] ?? [0, 0]
+    const from = Math.round(dense.length * head)
+    const to = dense.length - Math.round(dense.length * tail)
+    const shifted = dense.slice(from, Math.max(from + 2, to)).map((p, k) => {
+      const nrm = normals[from + k]
+      return [p[0] + nrm[0] * offset, p[1] + nrm[1] * offset]
+    })
+    return { points: shifted, core, preset: presets[index] ?? index % 2 }
+  })
+}
+
+/**
  * 原站 6 的三条内臂（第 3、4、5 条：从核心旋出去的那三条），以核心为原点缩放 / 旋转后搬到 (cx, cy)。
  * 顺时针的数字做水平镜像。每个数字的核心都用这三条手绘臂，星系味才和 6 一样。
  */
@@ -133,6 +164,7 @@ export const GALAXY_DIGITS = {
     arms: () => [
       { points: S(50, 70, 36, 31, 270, -130, 1.62), core: [50, 70], preset: 0 },
       { points: S(50, 70, 39, 35, 60, -260, 1.62), core: [50, 70], preset: 1 },
+      { points: S(50, 70, 28, 24, 180, -110, 1.55), core: [50, 70], preset: 0 },
       ...originalInner(50, 70, 0.6, -1, 0, 1.3),
     ],
   },
@@ -140,50 +172,47 @@ export const GALAXY_DIGITS = {
     cores: [[46, 38]],
     spin: -1,
     arms: () => [
-      stroke([[52, 134], [53, 118], [53, 96], [52, 72], [50, 52], [47, 40]], 0),
-      stroke([[44, 132], [45, 116], [45, 94], [44, 72], [43, 54]], 1),
-      stroke([[10, 62], [20, 52], [32, 44], [44, 39]], 0),
+      ...band([[52, 134], [53, 118], [53, 96], [52, 72], [50, 52], [47, 40]], { offsets: [0, 7, -7], trims: [[0, 0], [0.05, 0.14], [0.02, 0.22]], presets: [0, 1, 1] }),
+      ...band([[10, 62], [20, 52], [32, 44], [44, 39]], { offsets: [0, 5], trims: [[0, 0], [0.1, 0.2]], presets: [0, 1] }),
       ...originalInner(46, 38, 0.36, -1, 30),
-      stroke([[60, 128], [61, 108], [61, 84], [59, 62]], 1),
     ],
   },
   2: {
     cores: [[44, 46]],
     spin: -1,
     arms: () => [
-      // 一笔写成：从核心里卷出来一圈半，过顶、沿右侧下来，在右下方顺着切线滑进斜笔，再拉出底线；
-      // 主臂就是最外面那条，星星倒着往核心里流
-      { points: J(S(44, 46, 6, 36, 200, 770), [[60, 88], [44, 104], [26, 118], [14, 128], [18, 131], [44, 131], [90, 130]]), core: [44, 46], preset: 0 },
-      // 伴臂都在主臂内侧：圈里一条贴着走，斜笔左侧一条，底线上方一条，各自早早收尾
+      // 一笔写成：从核心里卷出来一圈半，过顶、沿右侧下来，顺着切线滑进斜笔，再拉出微微下沉的底线；主臂是最外面那条
+      { points: J(S(44, 46, 6, 36, 200, 770), [[60, 88], [44, 104], [26, 118], [14, 128], [18, 131], [44, 133], [70, 132], [90, 129]]), core: [44, 46], preset: 0 },
+      // 圈里两条贴着走的伴臂，一内一外错开
       { points: S(44, 46, 30, 30, 240, 390), core: [44, 46], preset: 1 },
+      { points: S(44, 46, 24, 22, 560, 300), core: [44, 46], preset: 0 },
       ...originalInner(44, 46, 0.26, -1, 20),
-      stroke([[54, 84], [38, 100], [22, 114]], 1, [44, 46]),
-      stroke([[36, 124], [62, 124], [86, 124]], 1, [44, 46]),
+      // 斜笔和底线都是双股
+      ...band([[63, 84], [46, 102], [28, 118], [16, 128], [30, 131], [60, 131], [88, 129]], { offsets: [-6, 5], trims: [[0.02, 0.4], [0.05, 0.02]], presets: [1, 1], core: [44, 46] }),
     ],
   },
   3: {
     cores: [[52, 92], [50, 40]],
     spin: 1,
     arms: () => [
-      // 3 的两个圈都开口向左：外臂只扫到底部，内臂缩小、少一条，左边才留得出空
-      { points: S(52, 92, 35, 30, 205, 440), core: [52, 92], preset: 0 },
-      { points: S(52, 92, 39, 34, 220, 435), core: [52, 92], preset: 1 },
-      ...originalInner(52, 92, 0.34, 1).filter((arm) => arm.preset !== 3),
-      { points: S(50, 40, 27, 23, 205, 430), core: [50, 40], preset: 0 },
-      { points: S(50, 40, 31, 27, 220, 425), core: [50, 40], preset: 1 },
-      ...originalInner(50, 40, 0.26, 1).filter((arm) => arm.preset !== 3),
+      // 一笔写成：上圈顺时针绕过右侧到中间，接着下圈绕右下、卷一圈半进核心
+      { points: J(S(50, 40, 27, 27, 205, 440), [[58, 66]], S(52, 92, 34, 6, 285, 845)), core: [52, 92], preset: 0 },
+      { points: S(50, 40, 33, 31, 215, 430), core: [50, 40], preset: 1 },
+      { points: S(52, 92, 40, 37, 300, 480), core: [52, 92], preset: 1 },
+      { points: S(52, 92, 26, 24, 230, 470), core: [52, 92], preset: 0 },
+      ...originalInner(52, 92, 0.26, 1).filter((arm) => arm.preset !== 3),
+      ...originalInner(50, 40, 0.2, 1).filter((arm) => arm.preset !== 3),
     ],
   },
   4: {
     cores: [[64, 96]],
     spin: 1,
     arms: () => [
-      stroke([[66, 6], [52, 32], [34, 60], [16, 88], [10, 98]], 0),
-      stroke([[74, 14], [60, 40], [42, 68], [26, 92]], 1),
-      stroke([[6, 99], [30, 99], [60, 99]], 0),
-      stroke([[94, 97], [80, 98], [68, 98]], 1),
-      stroke([[66, 134], [66, 116], [66, 100]], 0),
-      stroke([[66, 24], [66, 58], [66, 94]], 1),
+      ...band([[66, 6], [52, 32], [34, 60], [16, 88], [10, 98]], { offsets: [0, 7], trims: [[0, 0], [0.08, 0.1]], presets: [0, 1] }),
+      ...band([[6, 99], [30, 99], [60, 99]], { offsets: [0, -5], trims: [[0, 0], [0.1, 0.05]], presets: [0, 1] }),
+      ...band([[94, 97], [80, 98], [68, 98]], { offsets: [0, 5], trims: [[0, 0], [0.1, 0.05]], presets: [1, 0] }),
+      ...band([[66, 134], [66, 116], [66, 100]], { offsets: [0, 6], trims: [[0, 0], [0.05, 0.1]], presets: [0, 1] }),
+      ...band([[66, 24], [66, 58], [66, 94]], { offsets: [0, -6], trims: [[0, 0], [0.1, 0.08]], presets: [1, 0] }),
       ...originalInner(64, 96, 0.34, 1),
     ],
   },
@@ -191,12 +220,14 @@ export const GALAXY_DIGITS = {
     cores: [[52, 90]],
     spin: 1,
     arms: () => [
-      // 一笔写成：横、竖，然后圈顺时针卷进核心（一圈半），像 6 的竖笔接圈
+      // 一笔写成：横、竖，然后圈顺时针卷一圈半进核心
       { points: J([[86, 12], [60, 11], [32, 12], [25, 18], [24, 36], [22, 60], [21, 72]], S(52, 90, 34, 6, 205, 765)), core: [52, 90], preset: 0 },
-      // 伴臂：横竖的平行线 + 圈外沿
-      { points: [[82, 21], [58, 20], [36, 22], [31, 30], [30, 48], [29, 64]], core: [52, 90], preset: 1 },
-      { points: S(52, 90, 39, 36, 215, 455), core: [52, 90], preset: 1 },
-      ...originalInner(52, 90, 0.26, 1).filter((arm) => arm.preset !== 3),
+      // 横竖的平行伴臂（内外各一股，错开收尾）
+      ...band([[86, 12], [60, 11], [32, 12], [25, 18], [24, 36], [22, 60]], { offsets: [7, -6], trims: [[0.04, 0.05], [0.12, 0.3]], presets: [1, 1], core: [52, 90] }),
+      // 圈的外沿和圈里的一条
+      { points: S(52, 90, 40, 37, 215, 455), core: [52, 90], preset: 1 },
+      { points: S(52, 90, 25, 23, 240, 500), core: [52, 90], preset: 0 },
+      ...originalInner(52, 90, 0.24, 1).filter((arm) => arm.preset !== 3),
     ],
   },
   6: {
@@ -208,10 +239,8 @@ export const GALAXY_DIGITS = {
     cores: [[78, 22]],
     spin: 1,
     arms: () => [
-      stroke([[10, 14], [40, 12], [70, 12], [84, 17]], 0),
-      stroke([[16, 22], [44, 21], [70, 22]], 1),
-      stroke([[34, 132], [38, 114], [50, 88], [64, 60], [78, 34]], 0),
-      stroke([[46, 124], [50, 104], [60, 80], [72, 54]], 1),
+      ...band([[10, 14], [40, 12], [70, 12], [84, 17]], { offsets: [0, 7], trims: [[0, 0], [0.06, 0.12]], presets: [0, 1] }),
+      ...band([[34, 132], [38, 114], [50, 88], [64, 60], [78, 34]], { offsets: [0, 7, -6], trims: [[0, 0], [0.04, 0.16], [0.1, 0.08]], presets: [0, 1, 1] }),
       ...originalInner(78, 22, 0.3, 1, 150),
     ],
   },
@@ -221,10 +250,12 @@ export const GALAXY_DIGITS = {
     arms: () => [
       { points: S(50, 96, 31, 27, 250, -85), core: [50, 96], preset: 0 },
       { points: S(50, 96, 34, 30, 40, -260), core: [50, 96], preset: 1 },
-      ...originalInner(50, 96, 0.44, -1),
+      { points: S(50, 96, 24, 22, 200, -90), core: [50, 96], preset: 0 },
+      ...originalInner(50, 96, 0.4, -1).filter((arm) => arm.preset !== 3),
       { points: S(50, 42, 25, 21, 250, -85), core: [50, 42], preset: 0 },
       { points: S(50, 42, 28, 24, 40, -260), core: [50, 42], preset: 1 },
-      ...originalInner(50, 42, 0.34, -1),
+      { points: S(50, 42, 19, 17, 200, -90), core: [50, 42], preset: 0 },
+      ...originalInner(50, 42, 0.3, -1).filter((arm) => arm.preset !== 3),
     ],
   },
   9: {

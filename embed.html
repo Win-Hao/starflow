@@ -33,6 +33,8 @@
             ? { type: 'text', value: params.get('text') || '6', fontWeight: Number(params.get('weight') ?? 700) }
             : { type: 'galaxy' }
       const settings = { ...DEFAULT_SHAPE_SETTINGS, ...(shapePreset?.settings ?? {}) }
+      // 星系体数字：每位都是一个星系，星数按位数加
+      if (source.type === 'galaxy-text') settings.starCount = Math.min(16000, 4000 * String(source.value).length)
 
       const fieldOptions = {
         starCount: Number(params.get('stars') ?? settings.starCount),
