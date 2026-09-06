@@ -15,10 +15,10 @@ OpenAI GPT-6 Astra 发布页的实现（下文简称「原站」），并在此�
 **1. 让 coding agent 做一整页（推荐）**
 
 ```bash
+# Claude Code / Codex / Cursor / Copilot 等：一条命令装进当前项目（加 -g 装到用户级）
+npx skills add Win-Hao/starflow
 # Open Design
 od plugin install github:Win-Hao/starflow@main/skill
-# Claude Code / Codex / Cursor：把 skill/ 拷进 skills 目录
-git clone https://github.com/Win-Hao/starflow && cp -r starflow/skill ~/.claude/skills/starflow-launch
 ```
 
 然后对 agent 说一句需求，例如「用 Astra 风格给我们的新模型 Nova 2 做一个发布页：星系首屏、三段故事，星星先聚成光标、再聚成我们的 logo，加一张跑分图表」。它会照抄引擎和首屏骨架、填入你的文案、按设计系统拼出组件。细节见 [Skill 与设计系统](#skill-与设计系统)。
@@ -267,7 +267,7 @@ if (detectWebGL()) {
 
 | 目录 | 内容 | 用法 |
 |---|---|---|
-| [`skill/`](skill/) | `starflow-launch`：SKILL.md、接好线的发布页骨架、纯首屏页、引擎单文件、参考文档 | Open Design：`od plugin install github:Win-Hao/starflow@main/skill`；Claude Code / Cursor：把 `skill/` 拷进 skills 目录，然后说「用 starflow 做一个发布页」 |
+| [`skill/`](skill/) | `starflow-launch`：SKILL.md、接好线的发布页骨架、纯首屏页、引擎单文件、参考文档 | Open Design：`od plugin install github:Win-Hao/starflow@main/skill`；Claude Code / Codex / Cursor：`npx skills add Win-Hao/starflow`（或手动把 `skill/` 拷进 skills 目录），然后说「用 starflow 做一个发布页」 |
 | [`design-systems/openai-astra/`](design-systems/openai-astra/) | 从 GPT-6 Astra 发布页公开 CSS 提炼的暗色设计系统（DESIGN.md、tokens.css、组件页、preview），按 Open Design 项目规范打包，已投 [nexu-io/open-design#7806](https://github.com/nexu-io/open-design/pull/7806) | 单独把 `DESIGN.md` 丢进任何项目根目录，agent 就会按这套风格生成界面 |
 | [`docs/upstream-prs.md`](docs/upstream-prs.md) | 往上游目录投稿的步骤与 PR 文案 | |
 
