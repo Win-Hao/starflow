@@ -1,0 +1,49 @@
+# 构建三个页面 + 示例发布页 + 设计系统组件页 + skill 骨架，发到 GitHub Pages
+name: pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: STARFLOW_BASE=/starflow/ npm run build
+      - name: Add the static showcases
+        run: |
+          mkdir -p dist/lib dist/examples/launch-page dist/design-systems dist/skill
+          cp lib/starflow.js lib/starflow.iife.js lib/starflow.slim.js dist/lib/
+          cp examples/launch-page/index.html dist/examples/launch-page/
+          cp -r design-systems/openai-astra dist/design-systems/
+          cp -r skill/assets dist/skill/
+          touch dist/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
