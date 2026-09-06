@@ -34,7 +34,7 @@ od plugin install github:Win-Hao/starflow@main/skill
 <script type="module">
   import { createAstraScene } from './starflow.js'
   const astra = createAstraScene(document.querySelector('#sky'), { autoRotate: true })
-  astra.setSource({ type: 'galaxy' })   // 或 { type: 'text', text: '6' }、{ type: 'paths', … }
+  astra.setSource({ type: 'galaxy' })   // 或 { type: 'galaxy-text', value: '2026' }、{ type: 'text', value: '6' }、{ type: 'paths', … }
 </script>
 ```
 
@@ -57,7 +57,7 @@ npm run dev      # http://127.0.0.1:5173  主页 / lab.html 实验室 / embed.ht
 |---|---|
 | `/` | 主页：原站首页的滚动编排。右上角可切换中 / 英文，「调节粒子」打开调节面板 |
 | `/lab.html` | 实验室：把星星摆成任意文字、内置图标、粘贴的 SVG 或上传的图片，所有参数可调 |
-| `/embed.html` | 无 UI 的纯效果页，可直接 `<iframe>` 嵌入。`?shape=cursor` / `?shape=openai-knot` / `?text=6` / `?icon=heart` 切换形状 |
+| `/embed.html` | 无 UI 的纯效果页，可直接 `<iframe>` 嵌入。`?shape=cursor` / `?shape=openai-knot` / `?digits=2026` / `?text=6` / `?icon=heart` 切换形状 |
 
 ```bash
 npm install
@@ -118,6 +118,7 @@ astra.setScroll({
 形状来源
   ├─ galaxy        paths.js   原站 5 条曲线 → THREE.Curve（含 Z 向起伏）
   ├─ paths         paths.js   任意一组 SVG 路径，每条子路径一层（光标 / OpenAI 结）
+  ├─ galaxy-text   digits.js      0–9 每位 5 条手排的螺旋臂 + 核心，写法同原站的 6；多位横向排开
   └─ text/svg/img  rasterize.js → skeleton.js   光栅化 → 距离变换 + Zhang–Suen 细化取笔画中线，星星沿中线撒成管子（文字、描边图标；原站数字的做法）
                                  → contours.js   实心图标 / 图片：marching squares 抠闭合轮廓 → 等距重采样
         ↓
@@ -133,7 +134,8 @@ import { createAstraScene } from './astra/index.js'
 const astra = createAstraScene(document.querySelector('canvas'))
 astra.setSource({ type: 'galaxy' })                                              // 原站星系
 astra.setSource({ type: 'paths', paths: ['M… C…'], viewBox: [0, 0, 19, 19] })     // 一组 SVG 路径
-astra.setSource({ type: 'text', value: '6', fontWeight: 700 })                   // 任意文字
+astra.setSource({ type: 'galaxy-text', value: '2026' })                          // 星系体数字：每位 5 条螺旋臂 + 一个星系核，原站那个 6 的写法
+astra.setSource({ type: 'text', value: '6', fontWeight: 700 })                   // 任意文字：沿笔画中线撒成星管
 astra.setSource({ type: 'svg', markup: '<svg viewBox="0 0 24 24">…</svg>' })
 astra.setSource({ type: 'image', image: htmlImageElement, useLuminance: true })
 
@@ -257,7 +259,7 @@ import { createAstraScene, detectWebGL, renderStaticFallback } from './starflow.
 const canvas = document.querySelector('canvas')
 if (detectWebGL()) {
   const astra = createAstraScene(canvas, { autoRotate: true })
-  astra.setSource({ type: 'galaxy' })          // 或 { type: 'paths' | 'text' | 'svg' | 'image', … }
+  astra.setSource({ type: 'galaxy' })          // 或 { type: 'galaxy-text' | 'paths' | 'text' | 'svg' | 'image', … }
   // 滚动编排：每帧把进度喂进来，见 src/home.js
   // astra.setScroll({ progress, tiltProgress, scatterProgress, contentBounds, shape })
 } else {

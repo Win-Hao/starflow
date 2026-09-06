@@ -220,9 +220,10 @@ export function createPathLayers(paths, viewBox = [0, 0, 100, 100], rotationDept
  * 原站 F()：决定流动方向。flowInward 时让星星朝离原点更近的那一端走，
  * 于是每条星臂都是「往星系核汇入」的观感。
  */
-export function flowDirection(curve, speed, inward) {
-  const startDistance = curve.getPointAt(0).lengthSq()
-  const endCloser = curve.getPointAt(1).lengthSq() < startDistance
+export function flowDirection(curve, speed, inward, center = null) {
+  const distance = (p) => (center ? (p.x - center[0]) ** 2 + (p.y - center[1]) ** 2 : p.lengthSq())
+  const startDistance = distance(curve.getPointAt(0))
+  const endCloser = distance(curve.getPointAt(1)) < startDistance
   return Math.abs(speed) * ((inward ? endCloser : !endCloser) ? 1 : -1)
 }
 

@@ -74,7 +74,7 @@ to the HTML; do not rewrite the engine and do not load it from a CDN unless the 
 ```
 assets/starflow.js                 the engine (three.js + postprocessing bundled), MIT
 assets/template.html               launch page: hero chrome, title stage, copy blocks, two cues, tail
-assets/hero.html                   hero only; ?shape= ?text= ?icon= switch the formation
+assets/hero.html                   hero only; ?shape= ?digits= ?text= ?icon= switch the formation
 references/DESIGN.md               the openai-astra design system (colours, type, layout, motion)
 references/engine-api.md           createAstraScene, setSource, setScroll, config keys, presets
 references/choreography.md         the four scroll stages, thresholds, cue geometry, tuning
@@ -112,7 +112,9 @@ references/choreography.md         the four scroll stages, thresholds, cue geome
    (six arcs). For the user's own mark, export the outline as SVG paths and set
    `data-astra-shape="brand" data-astra-paths='["M…","M…"]' data-astra-viewbox="0 0 W H"` on the
    cue. Stars follow stroke centre-lines, so use outlines, not filled blobs; keep it to a few
-   paths. For filled text or icons in hero-only mode use `setSource({ type: 'text' | 'svg' | 'image' })`.
+   paths. For a number written the way the page writes its 6 (each digit = five spiral arms + a core) use
+   `setSource({ type: 'galaxy-text', value: '2026' })` or `hero.html?digits=2026`; for filled text or icons use
+   `setSource({ type: 'text' | 'svg' | 'image' })` (text rides stroke centre-lines as a tube of stars).
 6. **Write the copy.** Headings at h2 size, sentences that stand alone, no exclamation marks, no
    feature lists in the reveals. The caption under a cue names what the shape means ("It takes
    action"), the note under it is one sentence.

@@ -38,12 +38,16 @@ let lastStats = null
 
 function renderStats() {
   if (!lastStats) return
-  const kind = t(source.type === 'galaxy' ? 'lab.kind.galaxy' : source.type === 'paths' ? 'lab.kind.paths' : lastStats.strokes ? 'lab.kind.strokes' : 'lab.kind.contours')
+  const kind = t(source.type === 'galaxy' ? 'lab.kind.galaxy' : source.type === 'galaxy-text' ? 'lab.kind.galaxyText' : source.type === 'paths' ? 'lab.kind.paths' : lastStats.strokes ? 'lab.kind.strokes' : 'lab.kind.contours')
+  // 只有光栅形状才有星线 / 填充这些选项
+  const raster = ['text', 'svg', 'image'].includes(source.type)
+  for (const block of document.querySelectorAll('[data-raster-only]')) block.hidden = !raster
   // 中线模式下星带宽度由笔画宽度决定，只剩散布倍率可调
   const center = source.type !== 'galaxy' && source.type !== 'paths' && !!lastStats.strokes
   for (const block of document.querySelectorAll('[data-stroke-center]')) block.hidden = !center
   for (const block of document.querySelectorAll('[data-stroke-outline]')) block.hidden = center
-  $('stats').textContent = t('lab.stats', lastStats.count, lastStats.layers, kind)
+  const units = source.type === 'galaxy-text' ? String(source.value).length : lastStats.layers
+  $('stats').textContent = t('lab.stats', lastStats.count, units, kind)
 }
 
 /**
@@ -61,7 +65,7 @@ function applyShapeSettings(settings) {
   astra?.setConfig({ dimSizeScale: merged.dimSizeScale, fillX: merged.fillX, fillY: merged.fillY, ambientOpacity: merged.ambient })
 }
 
-const shapeOptions = () => ({ ...fieldOptions, depth: source.type === 'galaxy' ? 0 : fieldOptions.depth })
+const shapeOptions = () => ({ ...fieldOptions, depth: source.type === 'galaxy' || source.type === 'galaxy-text' ? 0 : fieldOptions.depth })
 
 function rebuild() {
   try {
@@ -96,26 +100,37 @@ modeSelect.addEventListener('change', () => {
   }
   if (modeSelect.value === 'galaxy') {
     source = { type: 'galaxy' }
+    textKind = ''
     applyShapeSettings({})
     scheduleRebuild()
   }
   if (modeSelect.value === 'text') {
-    applyShapeSettings(TEXT_SHAPE_SETTINGS)
+    textKind = ''
     applyText()
   }
   if (modeSelect.value === 'icon') applyIcon()
 })
 
+let textKind = ''
 function applyText() {
-  source = {
-    type: 'text',
-    value: $('text').value || '6',
-    fontWeight: Number($('weight').value),
+  const value = $('text').value || '6'
+  const galaxy = $('textStyle').value === 'galaxy' && /^[0-9]+$/.test(value)
+  if (galaxy) {
+    source = { type: 'galaxy-text', value }
+    // 每位数字自己就是一个星系：星数按位数加，其余沿用星系模式的参数
+    const kind = `galaxy${value.length}`
+    if (textKind !== kind) applyShapeSettings({ starCount: Math.min(12000, 4000 * value.length) })
+    textKind = kind
+  } else {
+    source = { type: 'text', value, fontWeight: Number($('weight').value) }
+    if (textKind !== 'stroke') applyShapeSettings(TEXT_SHAPE_SETTINGS)
+    textKind = 'stroke'
   }
   scheduleRebuild()
 }
 $('text').addEventListener('input', applyText)
 $('weight').addEventListener('change', applyText)
+$('textStyle').addEventListener('change', applyText)
 
 const chips = $('textChips')
 for (const preset of TEXT_PRESETS) {

@@ -25,6 +25,9 @@ export {
   rasterize,
   extractContours,
   extractStrokes,
+  GALAXY_DIGITS,
+  GALAXY_DIGIT_CHARS,
+  createGalaxyTextLayers,
 } from './astra/index.js'
 
 export {

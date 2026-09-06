@@ -18,13 +18,15 @@
 
       // 通过 URL 参数驱动，方便直接 <iframe src="embed.html"> 用。
       // 不带参数 = 原站星系；?shape=cursor / ?shape=openai-knot 是原站的路径形状；
-      // ?text=6 / ?icon=heart 切到其它形状。
+      // ?digits=2026 是星系体数字（原站那个 6 的写法）；?text=6 / ?icon=heart 切到其它形状。
       const params = new URLSearchParams(location.search)
       const canvas = document.getElementById('astra')
 
       const shapePreset = PATH_PRESETS[params.get('shape')]
       const source = shapePreset
         ? { type: 'paths', paths: shapePreset.paths, viewBox: shapePreset.viewBox }
+        : params.has('digits')
+          ? { type: 'galaxy-text', value: params.get('digits') || '6' }
         : params.has('icon')
           ? { type: 'svg', markup: ICON_PRESETS[params.get('icon')]?.markup ?? ICON_PRESETS.heart.markup }
           : params.has('text')

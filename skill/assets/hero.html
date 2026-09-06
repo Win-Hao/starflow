@@ -42,6 +42,7 @@
       import { createAstraScene, detectWebGL, prefersReducedMotion, renderStaticFallback, PATH_PRESETS, DEFAULT_SHAPE_SETTINGS, ICON_PRESETS } from './starflow.js'
 
       // ?shape=cursor | openai-knot   → the page's path shapes
+      // ?digits=2026                   → galaxy digits: each digit drawn as five spiral arms + a core, like the page's own 6
       // ?text=6 | ?icon=heart          → rasterised text / icon (also: {type:'svg', markup} or {type:'image', src})
       // no params                      → the galaxy
       const params = new URLSearchParams(location.search)
@@ -49,6 +50,8 @@
       const preset = PATH_PRESETS[params.get('shape')]
       const source = preset
         ? { type: 'paths', paths: preset.paths, viewBox: preset.viewBox }
+        : params.has('digits')
+          ? { type: 'galaxy-text', value: params.get('digits') || '6' }
         : params.has('icon')
           ? { type: 'svg', markup: (ICON_PRESETS[params.get('icon')] ?? ICON_PRESETS.heart).markup }
           : params.has('text')

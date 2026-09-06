@@ -25,7 +25,7 @@ SKILL.md                   skill 本体（工作流、规则、反模式）
 open-design.json           Open Design 插件清单
 assets/starflow.js         引擎单文件（three + postprocessing 已打包）
 assets/template.html       发布页骨架：首屏 chrome、标题段、文案段、两个形状 cue、结尾
-assets/hero.html           纯首屏：?shape= ?text= ?icon= 切形状
+assets/hero.html           纯首屏：?shape= ?digits= ?text= ?icon= 切形状
 references/DESIGN.md       设计系统副本
 references/engine-api.md   引擎 API 与参数
 references/choreography.md 四段滚动编排的阈值与几何

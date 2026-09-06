@@ -36,7 +36,8 @@ observes size changes. Returns:
 |---|---|
 | `{ type: 'galaxy' }` | The five-arm spiral from the launch page. Default. |
 | `{ type: 'paths', paths: [d, …], viewBox: [x, y, w, h] }` | Stars along SVG path centre-lines, one layer per path. Use for cursor, knot, logos. |
-| `{ type: 'text', value: '6', fontWeight: 700, fontFamily? }` | Rasterised text → contours → stars. |
+| `{ type: 'galaxy-text', value: '2026' }` | Galaxy digits 0–9: each digit is five spiral arms plus a core cluster with its own flare, the way the page writes its 6. Multi-digit strings are laid out left to right. |
+| `{ type: 'text', value: '6', fontWeight: 700, fontFamily? }` | Rasterised text → stroke centre-lines → a tube of stars. |
 | `{ type: 'svg', markup: '<svg …>' }` | Rasterised SVG → contours. Filled shapes work here. |
 | `{ type: 'image', src: url }` | Rasterised image (alpha or luminance) → contours. |
 
@@ -120,6 +121,7 @@ the page only measures the DOM. `assets/template.html` contains the reference `u
   `settings` are the hero-only field/config values that make each shape read well.
 - `ICON_PRESETS`: `cursor`, `heart`, `star`, `bolt`, `ring` as `{ markup }` for `type: 'svg'`.
 - `TEXT_PRESETS`: sample strings for `type: 'text'`.
+- `GALAXY_DIGITS` / `GALAXY_DIGIT_CHARS` / `createGalaxyTextLayers(value)`: the galaxy-digit arm layouts (100 × 140 grid per digit) if you want to draw your own.
 - Custom logo: export outlines from Figma as SVG, take the `d` of each `<path>`, pass them as
   `paths` with the SVG `viewBox`. Keep to a handful of paths; stars follow stroke centre-lines.
 

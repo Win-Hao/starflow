@@ -21,6 +21,7 @@ import {
   Vector3,
   Vector4,
 } from 'three'
+import { createGalaxyTextLayers } from './digits.js'
 import { extractStrokes } from './skeleton.js'
 import { extractContours, resampleClosed, signedArea, smoothClosed } from './contours.js'
 import { HERO_COLOR_SEEDS, writeStarColor } from './palette.js'
@@ -153,6 +154,11 @@ function buildLayers(source, options) {
   if (source.type === 'paths') {
     return { layers: createPathLayers(source.paths, source.viewBox, options.rotationDepth), raster: null }
   }
+  if (source.type === 'galaxy-text') {
+    // 星系体数字：每位 5 条螺旋臂 + 一个核心，写法同原站的 6
+    const { layers, cores } = createGalaxyTextLayers(source.value, options.rotationDepth)
+    return { layers, raster: null, cores }
+  }
 
   const { mask, width: maskWidth, height: maskHeight } = rasterize(source)
   // 光栅形状按"高 9.7 / 宽不超过 19.4"归一到与星系相同的世界单位，
@@ -241,7 +247,7 @@ function strokeWidthAt(layer, t) {
  */
 export function generateStarField(source, userOptions = {}) {
   const options = { ...DEFAULT_FIELD_OPTIONS, ...userOptions }
-  const { layers, raster, strokes: isStrokes } = buildLayers(source, options)
+  const { layers, raster, strokes: isStrokes, cores: textCores = [] } = buildLayers(source, options)
   const layerCount = layers.length
   const isGalaxy = source.type === 'galaxy'
   const isPaths = source.type === 'paths'
@@ -273,7 +279,7 @@ export function generateStarField(source, userOptions = {}) {
       if (point.y < minY) minY = point.y
       if (point.y > maxY) maxY = point.y
     }
-    layer.flowSpeed = layer.closed ? layer.speed : flowDirection(layer.curve, layer.speed, options.flowInward)
+    layer.flowSpeed = layer.closed ? layer.speed : flowDirection(layer.curve, layer.speed, options.flowInward, layer.flowCenter ?? null)
   })
   const shapeWidth = Math.max(maxX - minX, 1e-3)
   const shapeHeight = Math.max(maxY - minY, 1e-3)
@@ -288,7 +294,11 @@ export function generateStarField(source, userOptions = {}) {
   const counts = allocate(layers.map((layer) => layer.weight), outlineTotal)
   const backgroundCounts = counts.map((n) => Math.round(n * Math.max(options.backgroundRatio, 0)))
   const fillTotal = raster ? Math.max(0, options.starCount - outlineTotal) : 0
-  const clusterTotal = isGalaxy && options.centerCluster ? Math.max(0, Math.round(options.clusterCount)) : 0
+  const clusterEach = options.centerCluster ? Math.max(0, Math.round(options.clusterCount)) : 0
+  // 星系核：星系一个，星系体数字每位一个
+  const clusterTotal = isGalaxy ? clusterEach : clusterEach * textCores.length
+  // 给每个数字核心留一个主星位，剩下的才给星臂
+  const reservedHeroes = Math.min(textCores.length, 4)
   const total =
     counts.reduce((a, b) => a + b, 0) + backgroundCounts.reduce((a, b) => a + b, 0) + fillTotal + clusterTotal
 
@@ -395,7 +405,7 @@ export function generateStarField(source, userOptions = {}) {
 
     // 每层提拔主星：放大、增亮、换成专属颜色，作为镜头光晕的追踪源。
     for (const { index: bestIndex } of top) {
-      if (heroes.length >= MAX_HEROES - 1) break
+      if (heroes.length >= MAX_HEROES - 1 - reservedHeroes) break
       scales[bestIndex] = Math.max(scales[bestIndex], (layer.strong ? 2.2 : 2.05) * sizeFactor)
       brightness[bestIndex] = Math.max(brightness[bestIndex], layer.strong ? 3.35 : 2.85)
       flags[bestIndex * 4] = heroes.length + 1
@@ -465,9 +475,58 @@ export function generateStarField(source, userOptions = {}) {
     }
   }
 
+  // --- 数字核心：和星系核同一种星团，但不挂 isCore（那会绕原点自转），当静止星随所属层一起拖转；每个核心提拔一颗静止主星给光晕 ---
+  if (textCores.length > 0 && clusterEach > 0) {
+    const random = makeRandom(0xb7e15162 ^ seedMix)
+    const colorRandom = makeRandom(0xc0ac29b7 ^ seedMix)
+    for (const core of textCores) {
+      let best = -Infinity
+      let bestIndex = cursor
+      for (let i = 0; i < clusterEach; i += 1) {
+        const radius = random() ** 2.4 * 0.42
+        const angle = random() * TAU
+        const index = cursor
+        positions[index * 3] = core.position[0] + Math.cos(angle) * radius
+        positions[index * 3 + 1] = core.position[1] + Math.sin(angle) * radius * 0.72
+        positions[index * 3 + 2] = (random() - 0.5) * 0.16
+        const inner = 1 - radius / 0.42
+        const bright = 1.2 + 2.8 * inner + 0.6 * random()
+        brightness[index] = bright * 1.22
+        writeStarColor(colors, index * 3, inner > 0.74 ? 0.99 : colorRandom(), options.palette, options.colorMode)
+        opacity[index] = 0.62 + 0.38 * inner
+        const scale = (0.28 + 1.45 * inner + 0.45 * random()) * sizeFactor * 0.8
+        scales[index] = scale
+        if (bright * scale > best) {
+          best = bright * scale
+          bestIndex = index
+        }
+        twinkle[index * 2] = random() * TAU
+        twinkle[index * 2 + 1] = 0.55 + 0.45 * random()
+        flags[index * 4 + 1] = 1
+        path[index * 3] = Math.min(core.layer, MAX_SPIN_LAYERS - 1)
+        cursor += 1
+      }
+      if (heroes.length < MAX_HEROES - 1) {
+        flags[bestIndex * 4] = heroes.length + 1
+        heroes.push({
+          slot: heroes.length,
+          layer: Math.min(core.layer, MAX_SPIN_LAYERS - 1),
+          index: bestIndex,
+          isCore: false,
+          isStatic: true,
+          seed: 0,
+          speed: 0,
+          across: 0,
+          depth: 0,
+          position: [positions[bestIndex * 3], positions[bestIndex * 3 + 1], positions[bestIndex * 3 + 2]],
+        })
+      }
+    }
+  }
+
   // --- 星系核（原站 center cluster）：致密的椭圆亮星团，越靠中心越亮越白 ---
   let coreHero = null
-  if (clusterTotal > 0) {
+  if (isGalaxy && clusterTotal > 0) {
     const random = makeRandom(0xb7e15162 ^ seedMix)
     const colorRandom = makeRandom(0xc0ac29b7 ^ seedMix)
     let best = -Infinity

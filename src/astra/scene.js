@@ -532,6 +532,11 @@ export function createAstraScene(canvas, initialConfig = {}) {
       let sizeFade = 1
       if (hero.isCore) {
         heroPosition.set(hero.position[0], hero.position[1], hero.position[2]).applyEuler(coreEuler)
+      } else if (hero.isStatic) {
+        // 数字核心的主星：不在路径上，随所属层一起拖转
+        const spinIndex = Math.min(hero.layer, MAX_SPIN_LAYERS - 1)
+        euler.set(layerSpin[spinIndex].x, layerSpin[spinIndex].y, 0, 'XYZ')
+        heroPosition.set(hero.position[0], hero.position[1], hero.position[2]).applyEuler(euler)
       } else {
         const layer = field.layers[hero.layer]
         const phase = MathUtils.euclideanModulo(hero.seed + flowOffset * (hero.speed ?? layer.speed), 1)

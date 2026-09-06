@@ -36,7 +36,7 @@ Copy [`lib/starflow.js`](lib/starflow.js) next to the page (one file, three bund
 <script type="module">
   import { createAstraScene } from './starflow.js'
   const astra = createAstraScene(document.querySelector('#sky'), { autoRotate: true })
-  astra.setSource({ type: 'galaxy' })   // or { type: 'text', text: '6' }, { type: 'paths', … }
+  astra.setSource({ type: 'galaxy' })   // or { type: 'galaxy-text', value: '2026' }, { type: 'text', value: '6' }, { type: 'paths', … }
 </script>
 ```
 
@@ -59,7 +59,7 @@ Just want the design spec: drop [`design-systems/openai-astra/DESIGN.md`](design
 |---|---|
 | `/` | Home: the scroll choreography of the original landing page. Language switch (中 / EN) and a "Tune particles" panel in the top-right corner |
 | `/lab.html` | Lab: arrange the stars into any text, a built-in icon, pasted SVG, or an uploaded image, with every parameter exposed |
-| `/embed.html` | Bare effect page for `<iframe>` embedding. `?shape=cursor` / `?shape=openai-knot` / `?text=6` / `?icon=heart` switch the shape |
+| `/embed.html` | Bare effect page for `<iframe>` embedding. `?shape=cursor` / `?shape=openai-knot` / `?digits=2026` / `?text=6` / `?icon=heart` switch the shape |
 
 ```bash
 npm install
@@ -125,6 +125,7 @@ parameterized by arc length — `orbitProgress`, that one-dimensional parameter,
 Shape sources
   ├─ galaxy        paths.js   the original's 5 curves → THREE.Curve (with z undulation)
   ├─ paths         paths.js   any set of SVG paths, one layer per sub-path (cursor / knot)
+  ├─ galaxy-text   digits.js      0–9, each digit five hand-laid spiral arms + a core, the original's 6 written out; strings lay out left to right
   └─ text/svg/img  rasterize.js → skeleton.js   rasterize → distance transform + Zhang–Suen thinning → stroke centre-lines, stars scattered into a tube (text, stroke icons; how the original does its digits)
                                  → contours.js   filled icons / images: marching squares outlines → resample by arc length
         ↓
@@ -143,7 +144,8 @@ import { createAstraScene } from './astra/index.js'
 const astra = createAstraScene(document.querySelector('canvas'))
 astra.setSource({ type: 'galaxy' })                                              // the galaxy
 astra.setSource({ type: 'paths', paths: ['M… C…'], viewBox: [0, 0, 19, 19] })     // a set of SVG paths
-astra.setSource({ type: 'text', value: '6', fontWeight: 700 })                   // any text
+astra.setSource({ type: 'galaxy-text', value: '2026' })                          // galaxy digits: five spiral arms + a core per digit, the way the original writes its 6
+astra.setSource({ type: 'text', value: '6', fontWeight: 700 })                   // any text, as a tube of stars along the stroke centre-lines
 astra.setSource({ type: 'svg', markup: '<svg viewBox="0 0 24 24">…</svg>' })
 astra.setSource({ type: 'image', image: htmlImageElement, useLuminance: true })
 
@@ -276,7 +278,7 @@ import { createAstraScene, detectWebGL, renderStaticFallback } from './starflow.
 const canvas = document.querySelector('canvas')
 if (detectWebGL()) {
   const astra = createAstraScene(canvas, { autoRotate: true })
-  astra.setSource({ type: 'galaxy' })          // or { type: 'paths' | 'text' | 'svg' | 'image', … }
+  astra.setSource({ type: 'galaxy' })          // or { type: 'galaxy-text' | 'paths' | 'text' | 'svg' | 'image', … }
   // Scroll choreography: feed progress every frame, see src/home.js
   // astra.setScroll({ progress, tiltProgress, scatterProgress, contentBounds, shape })
 } else {

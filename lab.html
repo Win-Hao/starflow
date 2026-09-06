@@ -38,6 +38,13 @@
 
           <div data-mode="text" hidden>
             <label class="row"><span data-i18n="lab.text">内容</span><input id="text" type="text" value="6" maxlength="12" /></label>
+            <label class="row"><span data-i18n="lab.textStyle">写法</span>
+              <select id="textStyle">
+                <option value="galaxy" data-i18n="lab.textStyle.galaxy">星系体（原站的 6）</option>
+                <option value="stroke" data-i18n="lab.textStyle.stroke">笔画中线</option>
+              </select>
+            </label>
+            <p class="note" data-i18n="lab.textStyleNote">星系体目前只有 0–9：每位数字 5 条螺旋臂 + 一个星系核。含字母时自动改走笔画中线。</p>
             <div class="chips" id="textChips"></div>
             <label class="row"><span data-i18n="lab.weight">字重</span>
               <select id="weight">
