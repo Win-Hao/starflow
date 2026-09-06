@@ -151,12 +151,14 @@ export const GALAXY_DIGITS = {
     cores: [[44, 46]],
     spin: -1,
     arms: () => [
-      // 一笔写成：从核心里卷出来（顺时针一圈半），过顶、沿右侧下来，斜到左下角，再拉出底线；星星倒着往核心里流
-      { points: J(S(44, 46, 6, 33, 200, 760), [[69, 67], [62, 84], [46, 102], [28, 118], [14, 128], [16, 130], [40, 131], [90, 130]]), core: [44, 46], preset: 0 },
-      // 伴臂：贴着外圈从左上绕到右下，再顺着斜笔走
-      { points: J(S(44, 46, 37, 37, 200, 400), [[77, 74], [70, 92], [54, 110], [40, 124]]), core: [44, 46], preset: 1 },
-      ...originalInner(44, 46, 0.28, -1, 20),
-      stroke([[36, 123], [62, 123], [88, 123]], 1, [44, 46]),
+      // 一笔写成：从核心里卷出来一圈半，过顶、沿右侧下来，在右下方顺着切线滑进斜笔，再拉出底线；
+      // 主臂就是最外面那条，星星倒着往核心里流
+      { points: J(S(44, 46, 6, 36, 200, 770), [[60, 88], [44, 104], [26, 118], [14, 128], [18, 131], [44, 131], [90, 130]]), core: [44, 46], preset: 0 },
+      // 伴臂都在主臂内侧：圈里一条贴着走，斜笔左侧一条，底线上方一条，各自早早收尾
+      { points: S(44, 46, 30, 30, 240, 390), core: [44, 46], preset: 1 },
+      ...originalInner(44, 46, 0.26, -1, 20),
+      stroke([[54, 84], [38, 100], [22, 114]], 1, [44, 46]),
+      stroke([[36, 124], [62, 124], [86, 124]], 1, [44, 46]),
     ],
   },
   3: {
@@ -249,11 +251,17 @@ function flowSignFor(points, core, spin) {
     sweep += delta
     previous = angle
   }
-  if (Math.abs(sweep) >= rad(40)) return Math.sign(sweep) === spin ? 1 : -1
   const first = points[0]
   const last = points[points.length - 1]
-  const inward = Math.hypot(last[0] - core[0], last[1] - core[1]) < Math.hypot(first[0] - core[0], first[1] - core[1])
-  return inward ? 1 : -1
+  const rStart = Math.hypot(first[0] - core[0], first[1] - core[1])
+  const rEnd = Math.hypot(last[0] - core[0], last[1] - core[1])
+  let length = 0
+  for (let i = 1; i < points.length; i += 1) length += Math.hypot(points[i][0] - points[i - 1][0], points[i][1] - points[i - 1][1])
+  // 绕核心走得够远、或者半径基本不变的，才是「弧」：按旋向走。
+  // 像 5 的横竖伴臂那样斜着掠过核心的直笔画，绕核心也会扫过几十度，但那是径向笔画，得朝核心流
+  const arcLike = Math.abs(sweep) >= rad(120) || (Math.abs(sweep) >= rad(40) && Math.abs(rEnd - rStart) < 0.3 * length)
+  if (arcLike) return Math.sign(sweep) === spin ? 1 : -1
+  return rEnd < rStart ? 1 : -1
 }
 
 /**
