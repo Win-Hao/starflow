@@ -122,8 +122,19 @@
       .chart-card { padding: var(--space-8); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg); }
       .chart-card .chart-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-4); }
       .chart-card h3 { margin: 0 0 var(--space-3); font: 500 var(--text-xl) / 1.26 var(--font-display); letter-spacing: -0.01em; }
-      .chart-card .select { height: 40px; gap: 0.3em; }
-      .chart-card .select svg { width: 14px; height: 14px; }
+      .chart-card .select-trigger { height: 40px; min-height: 0; gap: 0.3em; }
+      .chart-card .select-trigger svg { width: 14px; height: 14px; }
+      /* ── Select (dropdown): glass trigger pill; menu on #1f1f1f, 12px radius, 8px padding, 40px options, selected #ffffff1f, chevron flips ── */
+      .select { position: relative; display: inline-block; }
+      .select-trigger[aria-expanded="true"] { box-shadow: var(--elev-ring); }
+      .select-trigger svg { transition: rotate var(--motion-fast); }
+      .select-trigger[aria-expanded="true"] svg { rotate: 180deg; }
+      .select-menu { position: absolute; top: calc(100% + 8px); left: 0; z-index: 5; min-width: max(100%, 190px); width: max-content; margin: 0; padding: var(--space-2); list-style: none; border: 1px solid var(--border-soft); border-radius: 12px; background: var(--surface); box-shadow: 0 10px 15px -3px #0000001a, 0 4px 6px -4px #0000001a; }
+      .select-menu[hidden] { display: none; }
+      .select-menu li { display: flex; align-items: center; min-height: 40px; padding: 0 var(--space-4); border-radius: var(--radius-md); font: 500 var(--text-sm) / 1 var(--font-body); letter-spacing: 0; color: var(--fg); cursor: pointer; }
+      .select-menu li + li { margin-top: var(--space-1); }
+      .select-menu li:hover, .select-menu li:focus-visible { background: var(--border-soft); outline: none; }
+      .select-menu li[aria-selected="true"] { background: #ffffff1f; }
       .icon-btn { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--muted); cursor: pointer; transition: background-color 200ms linear; }
       .icon-btn:hover { background: var(--astra-glass); }
       .legend { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-6); margin: var(--space-5) 0 var(--space-4); font-size: var(--text-base); }
@@ -260,7 +271,13 @@
           <div class="chart-head">
             <div>
               <h3 data-chart-title>形状强度 · 随进入视口的进度</h3>
-              <button class="btn btn-glass select" type="button" aria-haspopup="listbox"><span data-chart-select>光标 cue</span> <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m4 6 4 4 4-4"/></svg></button>
+              <div class="select" id="axis-select">
+                <button class="btn btn-glass select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false"><span data-select-label>进度百分比</span> <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m4 6 4 4 4-4"/></svg></button>
+                <ul class="select-menu" role="listbox" aria-label="横轴单位" hidden>
+                  <li role="option" aria-selected="true" data-value="percent">进度百分比</li>
+                  <li role="option" aria-selected="false" data-value="px">滚动像素（800px 一轮）</li>
+                </ul>
+              </div>
             </div>
             <button class="icon-btn" type="button" aria-label="下载数据"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v8m-3-3 3 3 3-3M3 13h10"/></svg></button>
           </div>
@@ -507,11 +524,13 @@
         },
       }
       const STAR = 'm0 -9 2.6 6h6.4l-5.2 3.8 2 6.2-5.8-3.8-5.8 3.8 2-6.2-5.2-3.8h6.4z'
+      const X_AXES = { percent: { ticks: ['0', '25%', '50%', '75%', '100%'], label: '进度' }, px: { ticks: ['0', '200px', '400px', '600px', '800px'], label: '滚动距离' } }
+      let xAxis = 'percent', currentDataset = 'shape'
       function renderChart(id) {
+        currentDataset = id
         const d = DATASETS[id]
         const X = (t) => 70 + t * 530, Y = (v) => 280 - v * 260
         document.querySelector('[data-chart-title]').textContent = d.title
-        document.querySelector('[data-chart-select]').textContent = d.select
         document.querySelector('[data-chart-legend]').innerHTML = d.series.map((s) => `<span><svg viewBox="0 0 22 22">${s.marker === 'star' ? `<path class="${s.cls}" d="m11 2 2.6 6h6.4l-5.2 3.8 2 6.2L11 14.2 5.2 18l2-6.2L2 8h6.4z"/>` : `<circle class="${s.cls}" cx="11" cy="11" r="7"/>`}</svg>${s.name}</span>`).join('')
           + (d.ref != null ? `<span class="ref"><svg viewBox="0 0 40 22"><path d="M2 11h36" stroke="#ac4f23" stroke-width="1.5" stroke-dasharray="8 6"/></svg>${d.refLabel}</span>` : '')
         const yTicks = d.yTicks.map((label, i) => `<text x="60" y="${24 + i * 65}">${label}</text>`).join('')
@@ -522,8 +541,8 @@
         document.querySelector('[data-chart-plot]').innerHTML = `
           <line class="axis" x1="70" y1="20" x2="70" y2="280"/><line class="axis" x1="70" y1="280" x2="600" y2="280"/>
           <g class="tick" text-anchor="end">${yTicks}</g>
-          <g class="tick" text-anchor="middle"><text x="70" y="306">0</text><text x="202" y="306">25%</text><text x="335" y="306">50%</text><text x="467" y="306">75%</text><text x="600" y="306">100%</text></g>
-          <text class="label" x="335" y="332" text-anchor="middle">进度</text>
+          <g class="tick" text-anchor="middle">${X_AXES[xAxis].ticks.map((t, i) => `<text x="${70 + i * 132.5}" y="306">${t}</text>`).join('')}</g>
+          <text class="label" x="335" y="332" text-anchor="middle">${X_AXES[xAxis].label}</text>
           ${d.ref != null ? `<line class="ref" x1="${X(d.ref).toFixed(1)}" y1="20" x2="${X(d.ref).toFixed(1)}" y2="280"/>` : ''}
           ${lines}${markers}`
         document.querySelector('[data-chart-caption]').textContent = d.caption
@@ -583,6 +602,32 @@
         select(index)
         return { select, pause, resume }
       }
+      // Dropdown select: click opens the listbox under the pill, chevron flips, Escape / outside click closes,
+      // arrows move, Enter or click selects and reports the value.
+      function dropdown(root, onChange) {
+        const trigger = root.querySelector('.select-trigger')
+        const label = root.querySelector('[data-select-label]') || trigger
+        const menu = root.querySelector('.select-menu')
+        const options = Array.from(menu.querySelectorAll('[role="option"]'))
+        options.forEach((o) => { o.tabIndex = -1 })
+        const open = () => { menu.hidden = false; trigger.setAttribute('aria-expanded', 'true'); (options.find((o) => o.getAttribute('aria-selected') === 'true') || options[0]).focus() }
+        const close = (focusBack = true) => { if (menu.hidden) return; menu.hidden = true; trigger.setAttribute('aria-expanded', 'false'); if (focusBack) trigger.focus() }
+        const select = (o) => { options.forEach((x) => x.setAttribute('aria-selected', String(x === o))); label.textContent = o.textContent.trim(); close(); onChange?.(o.dataset.value, o) }
+        trigger.addEventListener('click', () => (menu.hidden ? open() : close()))
+        options.forEach((o, i) => {
+          o.addEventListener('click', () => select(o))
+          o.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown') { e.preventDefault(); options[(i + 1) % options.length].focus() }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); options[(i - 1 + options.length) % options.length].focus() }
+            else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(o) }
+            else if (e.key === 'Escape') { e.preventDefault(); close() }
+          })
+        })
+        trigger.addEventListener('keydown', (e) => { if (e.key === 'ArrowDown') { e.preventDefault(); open() } })
+        document.addEventListener('pointerdown', (e) => { if (!root.contains(e.target)) close(false) })
+        return { open, close, select }
+      }
+      dropdown(document.getElementById('axis-select'), (value) => { xAxis = value; renderChart(currentDataset) })
       autoplayTabs(document.getElementById('stage-tabs'), (tab) => renderChart(tab.dataset.dataset))
 
       // ── 录屏辅助：?autoscroll=110 → 入场结束后以 110px/s 匀速滚到底；?delay=6 改起始等待秒数。

@@ -105,7 +105,7 @@ references/choreography.md         the four scroll stages, thresholds, cue geome
      13px nav links, search, glass "Log in" pill, one white CTA) and a footer of link groups at 13px / 500
      with a bottom bar. Edit the words, not the geometry. Do not add a blur behind the header.
    - For benchmarks, quotes, screenshots and comparison tables use the recipes in `references/DESIGN.md`
-     §4 (chart card, quote card, media frame, comparison table); `../design-systems/openai-astra/components.html`
+     §4 (chart card, dropdown select, quote card, media frame, comparison table); `../design-systems/openai-astra/components.html`
      has working markup for each, including the auto-advancing tabs (6s cycle, 2s hold then a 4s linear fill in the
      selected pill; hover and off-screen pause; click restarts) linked to chart panels.
 5. **Choose the shapes.** Presets: `cursor` (single closed path, fast flow) and `openai-knot`
