@@ -45,7 +45,7 @@ PR 描述要点（`docs/pr-open-design.md`）：
 
 ## 2. VoltAgent/awesome-design-md（DESIGN.md 目录）
 
-要求：先开 issue 讨论，再 PR；目录 `design-md/<brand>/` 下 `DESIGN.md` + `preview.html` + `preview-dark.html`；Stitch 九节格式；MIT。
+**2026-09 核对：它的 CONTRIBUTING.md 写明「We cannot accept DESIGN.md pull requests to maintain the quality of the existing collection」，只接受对现有条目的修正。** 所以新条目不要投 PR；`catalog/awesome-design-md/openai-astra/` 保留为该目录格式的成品（DESIGN.md + preview.html + preview-dark.html），等它们开放收录或有人在 issue 里要时再用。下面的命令仅在政策变化后使用。
 
 ```bash
 gh issue create --repo VoltAgent/awesome-design-md \
