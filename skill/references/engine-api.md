@@ -52,6 +52,7 @@ observes size changes. Returns:
 | `rotationDepth` | 1.4 | Z undulation of arms so drag-rotation shows depth. |
 | `stroke` | auto | Raster sources: `center` = stars ride the stroke centre-line as a round tube (text, stroke icons; the original's digits), `outline` = follow the contour; auto picks by stroke thickness. |
 | `strokeSpread` | 1.3 | Centre-line spread, multiple of the local half stroke width. |
+| `pathShape` | false | Raster shapes use the original path-shape star rules (thick band, five heroes, half the bright stars dimmed), the look of the page's cursor / heart cues; pair with `scatter: 0.07` and `PATH_SHAPE_SETTINGS`. |
 | `depth` | auto | Extra Z spread per star (fraction of shape height) for outline mode, default 0.1; centre-line mode, galaxy and paths default to 0. |
 | `palette` | `'astra'` | `astra`, `aurora`, `ember`, `ice`, `gold` (see `PALETTES`). |
 | `brightRetention` | 1 | Share of bright stars kept bright in path mode (page: 0.5). |

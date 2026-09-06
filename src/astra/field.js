@@ -89,6 +89,9 @@ export const DEFAULT_FIELD_OPTIONS = {
   stroke: 'auto',
   // 中线模式的散布：相对当前位置半笔宽的倍率，>1 让星星略微溢出笔画边缘
   strokeSpread: 1.3,
+  // 光栅形状按原站「路径形状」的规矩撒星（发布页里光标 / 心形那种厚实的星团）：
+  // 横向偏移从星系带来再加抖动、五颗主星分散在轮廓上、一半亮星压暗
+  pathShape: false,
 }
 
 /** auto 模式下，最大半笔宽超过形状高度的这个比例就当实心图形，走轮廓 */
@@ -250,7 +253,7 @@ export function generateStarField(source, userOptions = {}) {
   const { layers, raster, strokes: isStrokes, cores: textCores = [] } = buildLayers(source, options)
   const layerCount = layers.length
   const isGalaxy = source.type === 'galaxy'
-  const isPaths = source.type === 'paths'
+  const isPaths = source.type === 'paths' || (!!raster && !!options.pathShape)
   // 原站的路径形状里，5 颗主星散落在各段路径上；层数不够 5 就每层多选几颗。笔画中线同样处理
   const heroesPerLayer = isPaths || isStrokes ? Math.max(1, Math.ceil(5 / layerCount)) : 1
   const brightRetention = MathUtils.clamp(options.brightRetention, 0, 1)

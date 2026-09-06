@@ -26,7 +26,7 @@ const svg = (viewBox, body) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox=
  *   brightRetention 一半亮星压暗到 42%
  *   fillY / ambient 图标只占六成多视口高度，背景氛围色几乎关掉
  */
-const PATH_SHAPE_SETTINGS = {
+export const PATH_SHAPE_SETTINGS = {
   starCount: 5000,
   // 原站：星系里的横向偏移 × 1.1 再加抖动，落到 6.3 单位高的形状上，最宽处约为形状高的 7%
   scatter: 0.07,

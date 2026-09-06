@@ -216,6 +216,7 @@ overhead. So the strategy is fewer passes, not fewer stars:
 | `rotationDepth` | 1.4 | Z undulation of the curves; depth layering when rotated |
 | `stroke` | `auto` | Star lines for raster shapes: `center` scatters stars into a round tube along the stroke centre-line (how the original does its digits), `outline` follows the contour; `auto` = text and thin stroke icons use centre-lines, filled icons / images use outlines |
 | `strokeSpread` | 1.3 | Centre-line spread as a multiple of the local half stroke width; across and Z are equal, so the shape is a tube from any angle |
+| `pathShape` | false | Scatter raster shapes with the original's path-shape rules (across offsets carried over from the galaxy, five hero stars, half the bright stars dimmed): the thick star band of the launch page's cursor and heart. The lab enables it for icons / SVG / images, with `scatter: 0.07` |
 | `depth` | auto | Volume for outline mode: extra Z spread per star as a fraction of the shape height, default 0.1; centre-line mode is already a tube, default 0; galaxy and path shapes default to 0 |
 | `flowInward` | true | Flow toward the core; false flows outward |
 | `size` | 2.05 | Overall star size |

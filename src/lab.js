@@ -1,6 +1,6 @@
 import { detectWebGL, renderStaticFallback } from './astra/fallback.js'
 import { createAstraScene } from './astra/scene.js'
-import { DEFAULT_SHAPE_SETTINGS, ICON_PRESETS, PATH_PRESETS, TEXT_PRESETS, TEXT_SHAPE_SETTINGS } from './presets.js'
+import { DEFAULT_SHAPE_SETTINGS, ICON_PRESETS, PATH_PRESETS, TEXT_PRESETS, TEXT_SHAPE_SETTINGS, PATH_SHAPE_SETTINGS } from './presets.js'
 import { applyLocale, detectLocale, getLocale, t } from './i18n.js'
 
 applyLocale(detectLocale())
@@ -28,6 +28,8 @@ const fieldOptions = {
   depth: 0.1,
   stroke: 'auto',
   strokeSpread: 1.3,
+  // 图标 / SVG / 图片默认按原站路径形状撒星：厚实的星团、五颗主星，和发布页里的光标、心形一样
+  pathShape: true,
   size: 2.05,
   palette: 'astra',
 }
@@ -65,7 +67,11 @@ function applyShapeSettings(settings) {
   astra?.setConfig({ dimSizeScale: merged.dimSizeScale, fillX: merged.fillX, fillY: merged.fillY, ambientOpacity: merged.ambient })
 }
 
-const shapeOptions = () => ({ ...fieldOptions, depth: source.type === 'galaxy' || source.type === 'galaxy-text' ? 0 : fieldOptions.depth })
+const shapeOptions = () => ({
+  ...fieldOptions,
+  depth: source.type === 'galaxy' || source.type === 'galaxy-text' ? 0 : fieldOptions.depth,
+  pathShape: fieldOptions.pathShape && (source.type === 'svg' || source.type === 'image'),
+})
 
 function rebuild() {
   try {
@@ -165,7 +171,7 @@ function applyIcon() {
     applyShapeSettings(pathPreset.settings)
   } else {
     source = { type: 'svg', markup: ICON_PRESETS[iconSelect.value].markup }
-    applyShapeSettings({})
+    applyShapeSettings(fieldOptions.pathShape ? PATH_SHAPE_SETTINGS : {})
   }
   scheduleRebuild()
 }
@@ -175,6 +181,7 @@ $('applySvg').addEventListener('click', () => {
   const markup = $('svg').value.trim()
   if (!markup) return
   source = { type: 'svg', markup }
+  applyShapeSettings(fieldOptions.pathShape ? PATH_SHAPE_SETTINGS : {})
   rebuild()
 })
 
@@ -183,6 +190,7 @@ $('file').addEventListener('change', async (event) => {
   if (!file) return
   if (file.type.includes('svg')) {
     source = { type: 'svg', markup: await file.text() }
+    applyShapeSettings(fieldOptions.pathShape ? PATH_SHAPE_SETTINGS : {})
     rebuild()
     return
   }
@@ -190,6 +198,7 @@ $('file').addEventListener('change', async (event) => {
   image.src = URL.createObjectURL(file)
   await image.decode()
   source = { type: 'image', image, useLuminance: true }
+  applyShapeSettings(fieldOptions.pathShape ? PATH_SHAPE_SETTINGS : {})
   rebuild()
 })
 
@@ -220,6 +229,11 @@ bindRange('rotationDepth', 'field', 'rotationDepth')
 bindRange('strokeSpread', 'field', 'strokeSpread')
 $('stroke').addEventListener('change', () => {
   fieldOptions.stroke = $('stroke').value
+  scheduleRebuild()
+})
+$('rasterStyle').addEventListener('change', () => {
+  fieldOptions.pathShape = $('rasterStyle').value === 'paths'
+  applyShapeSettings(fieldOptions.pathShape ? PATH_SHAPE_SETTINGS : {})
   scheduleRebuild()
 })
 bindRange('depth', 'field', 'depth', (v) => v.toFixed(3))

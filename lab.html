@@ -74,6 +74,12 @@
         <section>
           <h2 data-i18n="lab.field">星场</h2>
           <label class="row"><span><span data-i18n="lab.starCount">星数</span> <b id="v-starCount"></b></span><input id="starCount" type="range" min="800" max="16000" step="200" value="4000" /></label>
+          <label class="row" data-raster-only hidden><span data-i18n="lab.rasterStyle">撒星</span>
+            <select id="rasterStyle">
+              <option value="paths" data-i18n="lab.rasterStyle.paths">原站路径形状（厚实）</option>
+              <option value="plain" data-i18n="lab.rasterStyle.plain">普通</option>
+            </select>
+          </label>
           <label class="row" data-raster-only hidden><span data-i18n="lab.stroke">星线</span>
             <select id="stroke">
               <option value="auto" data-i18n="lab.stroke.auto">自动</option>
