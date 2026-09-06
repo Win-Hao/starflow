@@ -191,6 +191,50 @@
       /* footer：整宽不透明纯黑。上面所有段落都透出画布，黑色从最后一段结束处开始，和原站一样是一条随内容滚动的硬边 */
       .site-footer { position: relative; margin: 0; padding: calc(120px + var(--space-12)) 0 var(--space-8); background: var(--bg); font: 500 var(--text-xs) / 1.5 var(--font-body); letter-spacing: 0; }
       .footer-inner { max-width: var(--container-max); margin: 0 auto; padding: 0 var(--space-6); }
+      /* ── Motion (page classes): fast 100ms · short 200ms linear · medium 300ms curve-d · long 400ms; curve-out-cubic = cubic-bezier(.33,1,.68,1) ── */
+      .select-trigger svg { transition: rotate 100ms linear; }
+      .site-header .btn { transition: background-color 200ms linear, color 200ms linear; }
+      .media-frame { transition: background-color 300ms cubic-bezier(0.6, 0, 0.4, 1); }
+      /* menus: opacity + 6px slide, enter 160ms / exit 120ms curve-out-cubic (page keyframes; durations inferred) */
+      .select-menu:not([hidden]), .action-menu:not([hidden]) { animation: menu-enter 160ms cubic-bezier(0.33, 1, 0.68, 1) both; }
+      @keyframes menu-enter { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+      /* action-menu trigger: icon at 64% opacity, 200ms ease-in-out to 100% on hover / focus / open (page CSS) */
+      .icon-btn.plain svg { opacity: 0.64; transition: opacity 200ms ease-in-out; }
+      .icon-btn.plain:hover svg, .icon-btn.plain:focus-visible svg, .icon-btn.plain[aria-expanded="true"] svg { opacity: 1; }
+      .icon-btn.plain:hover { color: var(--fg); }
+      /* chart motion (page: cues 'draw' | 'fade', trigger visibility 0.75, ease-out): lines draw, marks fade with a stagger, bars rise */
+      .plot.is-playing .line { animation: chart-draw 900ms ease-out forwards; }
+      .plot .mark { opacity: 0; }
+      .plot.is-playing .mark { animation: chart-fade 400ms ease-out forwards; }
+      .plot .bar-rect { transform-box: fill-box; transform-origin: 50% 100%; }
+      .plot.is-playing .bar-rect { animation: chart-rise 700ms ease-out both; }
+      .plot.is-static .line { animation: none; stroke-dashoffset: 0; }
+      .plot.is-static .mark { animation: none; opacity: 1; }
+      @keyframes chart-draw { to { stroke-dashoffset: 0; } }
+      @keyframes chart-fade { to { opacity: 1; } }
+      @keyframes chart-rise { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+      .legend span { transition: opacity 200ms ease; }
+      /* carousel (page: figures stacked, opacity 250ms cubic-bezier(.23,1,.32,1); nav 32px round buttons; ring fills linearly over the auto-advance delay, fades in 1250ms / out 250ms) */
+      .carousel-stage { display: grid; }
+      .carousel-stage > * { grid-area: 1 / 1; transition: opacity 250ms cubic-bezier(0.23, 1, 0.32, 1); }
+      .carousel-stage > [aria-hidden="true"] { opacity: 0; pointer-events: none; visibility: hidden; transition: opacity 250ms cubic-bezier(0.23, 1, 0.32, 1), visibility 0s 250ms; }
+      .carousel-nav { display: flex; align-items: center; justify-content: center; gap: var(--space-2); margin-top: var(--space-5); }
+      .carousel-nav button { position: relative; display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--fg); cursor: pointer; transition: color 200ms linear; }
+      .carousel-nav button:hover { color: var(--muted); }
+      .carousel-nav button svg.icon { width: 16px; height: 16px; }
+      .carousel-nav .count { min-width: 56px; text-align: center; font: 400 var(--text-sm) / 1.64 var(--font-body); letter-spacing: 0; font-variant-numeric: tabular-nums; }
+      .carousel-nav .ring { position: absolute; inset: 0; width: 32px; height: 32px; pointer-events: none; }
+      .carousel-nav .ring circle { fill: none; stroke: var(--fg); stroke-width: 1.5; transform: rotate(-90deg); transform-origin: 50% 50%; stroke-dasharray: 94.25; stroke-dashoffset: 94.25; opacity: 0; transition: opacity 250ms cubic-bezier(0.33, 1, 0.68, 1); }
+      .carousel-nav .ring.active circle { animation: ring-fill 5000ms linear forwards; opacity: 1; transition: opacity 1250ms cubic-bezier(0.33, 1, 0.68, 1); }
+      .carousel-nav .ring.paused circle { animation-play-state: paused; }
+      @keyframes ring-fill { to { stroke-dashoffset: 0; } }
+      @media (prefers-reduced-motion: reduce) {
+        .select-menu:not([hidden]), .action-menu:not([hidden]) { animation: none; }
+        .plot .line { stroke-dashoffset: 0 !important; animation: none !important; }
+        .plot .mark { opacity: 1 !important; animation: none !important; }
+        .plot .bar-rect { animation: none !important; }
+        .carousel-nav .ring circle { animation: none; opacity: 0; }
+      }
       .footer-columns { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-8); margin-bottom: var(--space-12); }
       .footer-group h4 { margin: 0 0 var(--space-4); font: inherit; color: var(--muted); }
       .footer-group ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-5); }
@@ -333,11 +377,30 @@
       </section>
 
       <section class="wide" id="design">
-        <figure class="quote">
-          <div class="logo"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3v22M3 14h22M6 6l16 16M22 6 6 22"/></svg>星流 Starflow</div>
-          <blockquote>“四千颗星，一座星系。粒子的分布、流动、辉光和镜头光晕的算法参考了原站，代码是独立实现，MIT 开源。skill 和 openai-astra 设计系统都在同一个仓库里。”</blockquote>
-          <figcaption>Winhao，星流作者</figcaption>
-        </figure>
+        <div class="carousel" data-carousel="5000">
+          <div class="carousel-stage">
+            <figure class="quote" aria-hidden="false">
+              <div class="logo"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3v22M3 14h22M6 6l16 16M22 6 6 22"/></svg>星流 Starflow</div>
+              <blockquote>“四千颗星，一座星系。粒子的分布、流动、辉光和镜头光晕的算法参考了原站，代码是独立实现，MIT 开源。skill 和 openai-astra 设计系统都在同一个仓库里。”</blockquote>
+              <figcaption>Winhao，星流作者</figcaption>
+            </figure>
+            <figure class="quote" aria-hidden="true">
+              <div class="logo"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3v22M3 14h22M6 6l16 16M22 6 6 22"/></svg>Skill</div>
+              <blockquote>“装上 starflow-launch，对 agent 说一句『用 starflow 做一个发布页』。引擎、排版、滚动编排都在包里，它只负责填内容。”</blockquote>
+              <figcaption>skill/SKILL.md</figcaption>
+            </figure>
+            <figure class="quote" aria-hidden="true">
+              <div class="logo"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3v22M3 14h22M6 6l16 16M22 6 6 22"/></svg>设计系统</div>
+              <blockquote>“纯黑画布、白字、白色透明度做次级色；一套字体两种字重；胶囊控件；唯一的色彩是星星和那层氛围光。”</blockquote>
+              <figcaption>design-systems/openai-astra/DESIGN.md</figcaption>
+            </figure>
+          </div>
+            <div class="carousel-nav">
+              <button type="button" data-prev aria-label="上一条"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m10 3-5 5 5 5"/></svg></button>
+              <span class="count" aria-live="polite">1 / 3</span>
+              <button type="button" data-next aria-label="下一条"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m6 3 5 5-5 5"/></svg><svg class="ring" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15"/></svg></button>
+            </div>
+        </div>
       </section>
 
       <section class="wide" id="compare">
@@ -553,8 +616,8 @@
         const yTicks = d.yTicks.map((label, i) => `<text x="60" y="${24 + i * 65}">${label}</text>`).join('')
         const lines = d.series.map((s) => `<polyline class="line ${s.cls}" points="${xs.map((t, i) => `${X(t).toFixed(1)},${Y(s.ys[i]).toFixed(1)}`).join(' ')}"/>`).join('')
         const markers = d.series.map((s) => [4, 12, 20, 28, 36].map((i) => s.marker === 'star'
-          ? `<path class="${s.cls}" transform="translate(${X(xs[i]).toFixed(1)} ${Y(s.ys[i]).toFixed(1)})" d="${STAR}"/>`
-          : `<circle class="${s.cls}" cx="${X(xs[i]).toFixed(1)}" cy="${Y(s.ys[i]).toFixed(1)}" r="5"/>`).join('')).join('')
+          ? `<path class="${s.cls} mark" transform="translate(${X(xs[i]).toFixed(1)} ${Y(s.ys[i]).toFixed(1)})" d="${STAR}"/>`
+          : `<circle class="${s.cls} mark" cx="${X(xs[i]).toFixed(1)}" cy="${Y(s.ys[i]).toFixed(1)}" r="5"/>`).join('')).join('')
         document.querySelector('[data-chart-plot]').innerHTML = `
           <line class="axis" x1="70" y1="20" x2="70" y2="280"/><line class="axis" x1="70" y1="280" x2="600" y2="280"/>
           <g class="tick" text-anchor="end">${yTicks}</g>
@@ -563,6 +626,7 @@
           ${d.ref != null ? `<line class="ref" x1="${X(d.ref).toFixed(1)}" y1="20" x2="${X(d.ref).toFixed(1)}" y2="280"/>` : ''}
           ${lines}${markers}`
         document.querySelector('[data-chart-caption]').textContent = d.caption
+        if (typeof playChartMotion === 'function') playChartMotion(document.querySelector('[data-chart-plot]'))
       }
       // Autoplay tabs: 6s per tab (2s hold, then a 4s linear fill inside the selected pill), then the linked panel switches.
       // Pauses on hover, when the tab list leaves the viewport, or when the page is hidden; a click switches at once and restarts the cycle.
@@ -686,6 +750,54 @@
       }
       function saveBlob(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000) }
       for (const root of document.querySelectorAll('.menu-root')) actionMenu(root, chartActions)
+      // Chart motion: lines draw, marks fade in with a stagger, bars rise. Plays when 75% of the chart is visible and again on every re-render.
+      var reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
+      function playChartMotion(svg) {
+        if (!svg) return
+        if (reducedMotion) { svg.classList.add('is-static'); return }
+        svg.classList.remove('is-playing')
+        svg.querySelectorAll('.line').forEach((l) => { const len = l.getTotalLength ? l.getTotalLength() : 1000; l.style.strokeDasharray = len.toFixed(1); l.style.strokeDashoffset = len.toFixed(1) })
+        svg.querySelectorAll('.mark').forEach((m, i) => { m.style.animationDelay = `${450 + i * 70}ms` })
+        void svg.getBoundingClientRect()
+        svg.classList.add('is-playing')
+      }
+      const chartObserver = new IntersectionObserver((entries) => {
+        for (const e of entries) if (e.isIntersecting) { playChartMotion(e.target); chartObserver.unobserve(e.target) }
+      }, { threshold: 0.75 })
+      document.querySelectorAll('svg.plot').forEach((svg) => chartObserver.observe(svg))
+
+      // Carousel: stacked slides crossfade (250ms), 32px round prev / next, "n / total" counter, auto-advance with a progress ring.
+      // Pauses on hover, focus, hidden page or reduced motion; manual navigation restarts the delay (page: createAutoAdvance).
+      function carousel(root, { delayMs = 5000 } = {}) {
+        const slides = Array.from(root.querySelector('.carousel-stage').children)
+        const count = root.querySelector('.count'), ring = root.querySelector('.ring'), prev = root.querySelector('[data-prev]'), next = root.querySelector('[data-next]')
+        let index = 0, timer = 0, hover = false, focus = false
+        const paused = () => hover || focus || document.visibilityState !== 'visible' || reducedMotion
+        function show(i) {
+          index = (i + slides.length) % slides.length
+          slides.forEach((s, k) => s.setAttribute('aria-hidden', String(k !== index)))
+          if (count) count.textContent = `${index + 1} / ${slides.length}`
+          schedule()
+        }
+        function schedule() {
+          clearTimeout(timer)
+          if (ring) { ring.classList.remove('active', 'paused'); void ring.getBoundingClientRect(); ring.querySelector('circle').style.animationDuration = `${delayMs}ms` }
+          if (paused()) { ring?.classList.remove('active'); return }
+          ring?.classList.add('active')
+          timer = setTimeout(() => show(index + 1), delayMs)
+        }
+        function update() { if (paused()) { clearTimeout(timer); timer = 0; ring?.classList.add('paused') } else if (!timer) schedule() }
+        root.addEventListener('mouseenter', () => { hover = true; update() })
+        root.addEventListener('mouseleave', () => { hover = false; update() })
+        root.addEventListener('focusin', () => { focus = true; update() })
+        root.addEventListener('focusout', () => { focus = false; update() })
+        document.addEventListener('visibilitychange', update)
+        prev?.addEventListener('click', () => show(index - 1))
+        next?.addEventListener('click', () => show(index + 1))
+        show(0)
+        return { show }
+      }
+      for (const root of document.querySelectorAll('[data-carousel]')) carousel(root, { delayMs: Number(root.dataset.carousel) || 5000 })
       autoplayTabs(document.getElementById('stage-tabs'), (tab) => renderChart(tab.dataset.dataset))
 
       // ── 录屏辅助：?autoscroll=110 → 入场结束后以 110px/s 匀速滚到底；?delay=6 改起始等待秒数。
