@@ -99,6 +99,38 @@
       [data-astra-static="true"] .chrome .letter { opacity: 1; animation: none; transform: none; }
       [data-astra-static="true"] #astra { cursor: auto; }
 
+      /* ── Site header: fixed, 54px, transparent. Only links and buttons take the pointer; no blur behind it. ── */
+      .site-header { position: fixed; top: 0; left: 0; right: 0; z-index: 4; display: flex; align-items: center; gap: var(--space-5); height: 54px; padding: 0 var(--space-6); pointer-events: none; background: linear-gradient(#000000b3, transparent); }
+      .site-header a, .site-header button { pointer-events: auto; }
+      .site-header .wordmark { display: inline-flex; align-items: center; height: 17px; font: 500 var(--text-lg) / 1 var(--font-display); letter-spacing: -0.02em; color: var(--fg); text-decoration: none; }
+      .site-header nav { display: flex; align-items: center; align-self: stretch; flex: 1; min-width: 0; }
+      .site-header nav a { display: inline-flex; align-items: center; height: 100%; padding: 0 var(--space-4); font: 500 var(--text-xs) / 1.5 var(--font-body); letter-spacing: 0; color: var(--fg); text-decoration: none; transition: color var(--motion-fast); }
+      .site-header nav a:hover { color: var(--muted); }
+      .site-header .nav-actions { display: flex; align-items: center; gap: var(--space-2); }
+      .site-header .search { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--muted); cursor: pointer; transition: background-color 200ms linear; }
+      .site-header .search:hover { background: var(--astra-glass); }
+      .site-header .btn { height: 40px; gap: 0.3em; }
+      .site-header .btn svg { width: 16px; height: 16px; }
+      @media (max-width: 720px) { .site-header nav, .site-header .btn-glass { display: none; } }
+
+      /* ── Footer: link groups at 13px / 500, bottom bar. The canvas keeps running behind it. ── */
+      .site-footer { position: relative; max-width: var(--container-max); margin: 120px auto 0; padding: var(--space-12) var(--space-6) var(--space-8); font: 500 var(--text-xs) / 1.5 var(--font-body); letter-spacing: 0; }
+      .footer-columns { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-8); margin-bottom: var(--space-12); }
+      .footer-group h4 { margin: 0 0 var(--space-4); font: inherit; color: var(--muted); }
+      .footer-group ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-5); }
+      .footer-group a { display: inline-flex; align-items: center; gap: 0.3em; color: var(--fg); text-decoration: none; transition: color 250ms linear; }
+      .footer-group a:hover { color: var(--muted); }
+      .footer-group a svg { width: 10px; height: 10px; }
+      .footer-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4); padding-top: var(--space-8); border-top: 1px solid var(--border-soft); }
+      .footer-bar .social { display: flex; gap: var(--space-4); }
+      .footer-bar .social a { display: grid; place-items: center; width: 24px; height: 24px; color: var(--fg); }
+      .footer-bar .social svg { width: 16px; height: 16px; }
+      .footer-bar .legal { display: flex; flex-wrap: wrap; gap: var(--space-2); color: var(--fg); }
+      .footer-bar .legal a { color: var(--fg); text-decoration: underline; text-decoration-color: var(--meta); text-underline-offset: 2px; }
+      .footer-bar .lang { height: 40px; gap: 0.3em; }
+      .footer-bar .lang span { color: var(--muted); }
+      @media (max-width: 720px) { .footer-columns { grid-template-columns: 1fr 1fr; } }
+
       @media (max-width: 720px) { .copy { padding: 18vh var(--space-5); } }
       @media (prefers-reduced-motion: reduce) { .chrome .letter { opacity: 1; animation: none; transform: none; } }
     </style>
@@ -108,6 +140,19 @@
     <div class="stage" aria-hidden="true">
       <canvas id="astra"></canvas>
     </div>
+
+    <!-- Site header: edit the wordmark, the links and the CTA text; keep the geometry. -->
+    <header class="site-header">
+      <a class="wordmark" href="#">Nova</a>
+      <nav aria-label="Primary">
+        <a href="#">Research</a><a href="#">Product</a><a href="#">Safety</a><a href="#">Company</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="search" type="button" aria-label="Search"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg></button>
+        <a class="btn btn-glass" href="#">Log in <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m4 6 4 4 4-4"/></svg></a>
+        <a class="btn btn-primary" href="#">Try Nova 2 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 11 11 5M6 5h5v5"/></svg></a>
+      </div>
+    </header>
 
     <!-- Hero chrome. Edit the two data-astra-label texts; letters are split and revealed by the script. -->
     <div class="chrome" id="chrome" aria-hidden="true">
@@ -163,6 +208,24 @@
         <p>Available today to a limited set of organisations, and to everyone over the coming weeks.</p>
         <p><a class="btn btn-glass" href="#">Read the system card</a></p>
       </section>
+
+      <footer class="site-footer">
+        <div class="footer-columns">
+          <div class="footer-group"><h4>Research</h4><ul><li><a href="#">Research index</a></li><li><a href="#">Nova 2 system card</a></li><li><a href="#">Safety approach</a></li></ul></div>
+          <div class="footer-group"><h4>Product</h4><ul><li><a href="#">Overview</a></li><li><a href="#">API docs <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 8 8 2M3 2h5v5"/></svg></a></li><li><a href="#">Release notes</a></li></ul></div>
+          <div class="footer-group"><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Careers</a></li><li><a href="#">News</a></li></ul></div>
+          <div class="footer-group"><h4>Terms &amp; policies</h4><ul><li><a href="#">Terms of use</a></li><li><a href="#">Privacy policy</a></li></ul></div>
+        </div>
+        <div class="footer-bar">
+          <div class="social" aria-label="Social">
+            <a href="#" aria-label="X"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3l10 10M13 3 3 13"/></svg></a>
+            <a href="#" aria-label="YouTube"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 4.5A1.5 1.5 0 0 1 3.5 3h9A1.5 1.5 0 0 1 14 4.5v7a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 11.5zM6.5 6v4L10 8z"/></svg></a>
+            <a href="#" aria-label="GitHub"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="5.5"/><path d="M6 13.5v-2c0-.6.2-1 .5-1.3C5 10 4 9.3 4 7.5c0-.6.2-1.1.6-1.5-.1-.4-.1-1 .1-1.5.6 0 1.2.3 1.6.6a5 5 0 0 1 3.4 0c.4-.3 1-.6 1.6-.6.2.5.2 1.1.1 1.5.4.4.6.9.6 1.5 0 1.8-1 2.5-2.5 2.7.3.3.5.7.5 1.3v2"/></svg></a>
+          </div>
+          <div class="legal"><span>Nova © 2026</span><a href="#">Manage cookies</a></div>
+          <a class="btn btn-glass lang" href="#"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8" cy="8" r="6"/><path d="M2 8h12M8 2c2.5 2.5 2.5 9.5 0 12M8 2c-2.5 2.5-2.5 9.5 0 12"/></svg>English <span>United States</span></a>
+        </div>
+      </footer>
     </main>
 
     <script type="module">

@@ -101,6 +101,12 @@ references/choreography.md         the four scroll stages, thresholds, cue geome
    - `[data-astra-shape]` sections are the reveals. The frame is 576px × 80vh; do not resize it.
    - The last cue holds its shape for the rest of the page. Put the strongest shape last.
    - Story sections between cues are plain `.copy` blocks: an `h2` and one or two paragraphs.
+   - The page keeps the site chrome from `template.html`: a fixed 54px transparent header (wordmark,
+     13px nav links, search, glass "Log in" pill, one white CTA) and a footer of link groups at 13px / 500
+     with a bottom bar. Edit the words, not the geometry. Do not add a blur behind the header.
+   - For benchmarks, quotes, screenshots and comparison tables use the recipes in `references/DESIGN.md`
+     §4 (chart card, quote card, media frame, comparison table); `../design-systems/openai-astra/components.html`
+     has working markup for each.
 5. **Choose the shapes.** Presets: `cursor` (single closed path, fast flow) and `openai-knot`
    (six arcs). For the user's own mark, export the outline as SVG paths and set
    `data-astra-shape="brand" data-astra-paths='["M…","M…"]' data-astra-viewbox="0 0 W H"` on the
