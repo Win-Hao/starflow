@@ -23,7 +23,7 @@ npx skills add Win-Hao/starflow
 od plugin install github:Win-Hao/starflow@main/skill
 ```
 
-Then give the agent one sentence, e.g. "Make a launch page for our new model Nova 2 in the Astra style: galaxy hero, three story sections, the stars form a cursor and then our logo, plus a benchmark chart." It copies the engine and hero skeleton, fills in your copy and builds the components from the design system. Details in [Skill and design system](#skill-and-design-system).
+Then type `/starflow` in Claude Code, or just give the agent one sentence, e.g. "Make a launch page for our new model Nova 2 in the Astra style: galaxy hero, three story sections, the stars form a cursor and then our logo, plus a benchmark chart." It copies the engine and hero skeleton, fills in your copy and builds the components from the design system. Details in [Skill and design system](#skill-and-design-system).
 
 **2. Only embed the starfield in your own page**
 
@@ -286,7 +286,7 @@ The repository also ships a skill for coding agents and a DESIGN.md design syste
 
 | Folder | Contents | Use |
 |---|---|---|
-| [`skill/`](skill/) | `starflow-launch`: SKILL.md, a wired launch-page skeleton, a hero-only page, the single-file engine, reference docs | Open Design: `od plugin install github:Win-Hao/starflow@main/skill`; Claude Code / Codex / Cursor: `npx skills add Win-Hao/starflow` (or copy `skill/` into the skills folder by hand), then ask for "a launch page with starflow" |
+| [`skill/`](skill/) | `starflow`: SKILL.md, a wired launch-page skeleton, a hero-only page, the single-file engine, reference docs | Open Design: `od plugin install github:Win-Hao/starflow@main/skill`; Claude Code / Codex / Cursor: `npx skills add Win-Hao/starflow` (or copy `skill/` into the skills folder by hand), then ask for "a launch page with starflow" |
 | [`design-systems/openai-astra/`](design-systems/openai-astra/) | The dark design system distilled from the public CSS of the GPT-6 Astra launch page (DESIGN.md, tokens.css, component fixture, previews), packaged in the Open Design project shape; submitted as [nexu-io/open-design#7806](https://github.com/nexu-io/open-design/pull/7806) | Drop `DESIGN.md` alone into any project root and agents generate UI in this register |
 | [`docs/upstream-prs.md`](docs/upstream-prs.md) | Steps and PR copy for contributing to upstream catalogues | |
 

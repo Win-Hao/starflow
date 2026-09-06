@@ -32,7 +32,7 @@ PR 描述要点（`docs/pr-open-design.md`）：
 
 ```json
 {
-  "name": "community/starflow-launch",
+  "name": "community/starflow",
   "title": "Starflow launch page",
   "version": "0.1.0",
   "source": "github:Win-Hao/starflow@main/skill",

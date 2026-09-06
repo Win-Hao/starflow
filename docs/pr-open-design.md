@@ -29,4 +29,4 @@ Values are read from a local capture of the public page (2026-09-05). No fonts (
 
 ## Related
 
-Pairs with the external `starflow-launch` plugin (`github:Win-Hao/starflow@main/skill`), which bundles the particle engine and a wired page skeleton. That plugin is intentionally not part of this PR.
+Pairs with the external `starflow` plugin (`github:Win-Hao/starflow@main/skill`), which bundles the particle engine and a wired page skeleton. That plugin is intentionally not part of this PR.

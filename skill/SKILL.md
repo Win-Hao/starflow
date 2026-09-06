@@ -1,5 +1,5 @@
 ---
-name: starflow-launch
+name: starflow
 zh_name: "星流发布页"
 en_name: "Starflow launch page"
 description: |

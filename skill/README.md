@@ -1,4 +1,4 @@
-# starflow-launch · 星流发布页 skill
+# starflow · 星流发布页 skill
 
 中文 · [English](#english)
 
@@ -11,7 +11,7 @@
 | 环境 | 做法 |
 |---|---|
 | Open Design | 应用内「安装 skill」填 `github:Win-Hao/starflow@main/skill`，或 `od plugin install github:Win-Hao/starflow@main/skill`。设计系统在顶栏下拉里选 `openai-astra`（把 `design-systems/openai-astra/` 放进它的 `data/design-systems/`）。 |
-| Claude Code / Codex / Cursor | `npx skills add Win-Hao/starflow`（装进当前项目；`-g` 装到用户级），或手动把本目录拷到 agent 的 skills 目录（例如 `~/.claude/skills/starflow-launch/`）。然后对 agent 说「用 starflow 做一个发布页」。 |
+| Claude Code / Codex / Cursor | `npx skills add Win-Hao/starflow`（装进当前项目；`-g` 装到用户级），或手动把本目录拷到 agent 的 skills 目录（例如 `~/.claude/skills/starflow/`）。然后输入 `/starflow` 或对 agent 说「用 starflow 做一个发布页」。 |
 | 只要效果 | 打开 `assets/template.html` 或 `assets/hero.html`，把 `assets/starflow.js` 一起拷走。 |
 
 ## 用起来是什么样
@@ -44,7 +44,7 @@ This folder is self-contained: `assets/starflow.js` is written by `npm run build
 | Where | How |
 |---|---|
 | Open Design | "Install skill" with `github:Win-Hao/starflow@main/skill`, or `od plugin install github:Win-Hao/starflow@main/skill`. Pick `openai-astra` in the design-system dropdown after dropping `design-systems/openai-astra/` into its `data/design-systems/`. |
-| Claude Code / Codex / Cursor | `npx skills add Win-Hao/starflow` (into the current project; `-g` for user level), or copy this folder into the agent's skills directory (e.g. `~/.claude/skills/starflow-launch/`). Then ask for "a launch page with starflow". |
+| Claude Code / Codex / Cursor | `npx skills add Win-Hao/starflow` (into the current project; `-g` for user level), or copy this folder into the agent's skills directory (e.g. `~/.claude/skills/starflow/`). Then type `/starflow` or ask for "a launch page with starflow". |
 | Effect only | Open `assets/template.html` or `assets/hero.html` and take `assets/starflow.js` with it. |
 
 ### What using it looks like
