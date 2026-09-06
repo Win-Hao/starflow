@@ -25,7 +25,7 @@
         --container-max: 1088px;
         --astra-ambient-color: #23435f;
         --astra-glass: #ffffff1f; --astra-glass-hover: #ffffff33;
-        --astra-copy-max: 676px; --astra-shape-max-width: 576px;
+        --astra-copy-max: 669px; --astra-shape-max-width: 576px;
         --astra-viewport-height: 100svh; --astra-copy-opacity: 1; --astra-title-parallax-y: 0px;
         --astra-label-duration: 1s; --astra-label-ease: cubic-bezier(0.22, 1, 0.36, 1);
         color-scheme: dark;
@@ -58,14 +58,16 @@
       .hero { height: var(--astra-viewport-height); }
 
       .copy { max-width: var(--astra-copy-max); margin: 0 auto; padding: 26vh var(--space-6); }
-      .copy h2 { margin: 0 0 var(--space-4); font: 500 clamp(30px, calc(2rem + (100vw - 375px) * 0.01502), var(--text-3xl)) / 1.16 var(--font-display); letter-spacing: -0.03em; text-wrap: balance; }
-      .copy p { margin: 0 0 1.1em; color: var(--muted); text-wrap: pretty; }
+      .copy h2 { margin: 0 0 var(--space-4); max-width: 1000px; font: 500 var(--text-2xl) / 1.32 var(--font-display); letter-spacing: -0.01em; text-wrap: balance; }
+      .copy.title-stage h2 { font: 500 clamp(30px, calc(2rem + (100vw - 375px) * 0.01502), var(--text-3xl)) / 1.16 var(--font-display); letter-spacing: -0.03em; }
+      .copy p { margin: 0 0 var(--space-6); color: var(--muted); text-wrap: pretty; }
+      .copy p a, .wide p a { color: var(--fg); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
       .copy .lede { font-size: var(--text-lg); }
       .copy.title-stage { padding-top: 30vh; }
       .copy.title-stage h2 { translate: 0 var(--astra-title-parallax-y); will-change: translate; }
       .copy.tail { padding-bottom: 50vh; text-align: center; }
       .copy.tail p { color: var(--meta); }
-      .copy code { font: 400 0.92em / 1.6 var(--font-mono); letter-spacing: 0; color: var(--fg); background: var(--astra-glass); padding: 2px 8px; border-radius: var(--radius-sm); }
+      .copy code, .wide code { font: 400 0.875em / 1.6 var(--font-mono); letter-spacing: 0; color: var(--fg); background: #ffffff33; padding: 0 4px; border-radius: 4px; }
 
       .actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
       .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-1); min-height: 40px; padding: var(--space-3) var(--space-4); border: 0; border-radius: var(--radius-pill); font: 500 var(--text-sm) / 1 var(--font-body); letter-spacing: 0; white-space: nowrap; text-decoration: none; cursor: pointer; transition: background-color var(--motion-base) var(--ease-standard), color var(--motion-base) var(--ease-standard); }
@@ -105,11 +107,12 @@
 
       /* ── 宽栏：图表、引言、对比这些超出 676px 文案栏的组件 ── */
       .wide { max-width: var(--container-max); margin: 0 auto; padding: 10vh var(--space-6); }
-      .wide > h2 { margin: 0 0 var(--space-6); font: 500 var(--text-2xl) / 1.32 var(--font-display); letter-spacing: -0.01em; text-wrap: balance; }
+      .wide > h2 { margin: 0 0 var(--space-6); max-width: 1000px; font: 500 var(--text-2xl) / 1.32 var(--font-display); letter-spacing: -0.01em; text-wrap: balance; }
       .wide > p.lede { max-width: var(--astra-copy-max); margin: 0 0 var(--space-6); color: var(--muted); }
-      .wide-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); margin-bottom: var(--space-6); }
+      .wide.narrow { max-width: calc(669px + 2 * var(--space-6)); }
+      .wide-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--space-4); margin-bottom: var(--space-6); }
 
-      .segmented { display: inline-flex; align-items: center; gap: var(--space-1); padding: var(--space-1); border: 1px solid var(--border); border-radius: var(--radius-pill); pointer-events: auto; }
+      .segmented { display: flex; width: max-content; margin: 0 auto; align-items: center; gap: var(--space-2); padding: var(--space-1); border: 1px solid var(--border); border-radius: var(--radius-pill); pointer-events: auto; }
       .segmented button { min-height: 40px; padding: var(--space-3) var(--space-4); border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--fg); font: 500 var(--text-sm) / 1 var(--font-body); letter-spacing: 0; white-space: nowrap; cursor: pointer; transition: background-color var(--motion-base) var(--ease-standard); }
       .segmented button:hover { background: var(--border-soft); }
       .segmented button[aria-selected="true"] { background: var(--astra-glass); }
@@ -120,27 +123,35 @@
       .segmented[data-paused="true"] .countdown { animation-play-state: paused; }
       @media (prefers-reduced-motion: reduce) { .segmented .countdown { animation: none; transform: scaleX(0); } }
 
-      .chart-card { padding: var(--space-8); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg); }
+      .chart-card { max-width: 669px; margin: 0 auto; padding: var(--space-4) var(--space-5) var(--space-5); border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgba(0, 0, 0, 0.2); pointer-events: auto; }
       .chart-card .chart-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-4); }
-      .chart-card h3 { margin: 0 0 var(--space-3); font: 500 var(--text-xl) / 1.26 var(--font-display); letter-spacing: -0.01em; }
-      .chart-card .select-trigger { height: 32px; min-height: 32px; padding: 0 var(--space-4); gap: var(--space-2); box-shadow: var(--elev-ring); }
+      .chart-card h3 { margin: 0 0 var(--space-3); font: 500 var(--text-lg) / 1.32 var(--font-display); letter-spacing: -0.01em; }
+      .chart-card .select-trigger { height: 32px; min-height: 32px; padding: 0 12px; gap: 6px; font-weight: 400; background: rgba(51, 51, 51, 0.8); box-shadow: var(--elev-ring); }
       .chart-card .select-trigger svg { width: 12px; height: 12px; }
       /* ── Select (dropdown): glass trigger pill; menu on #1f1f1f, 12px radius, 8px padding, 40px options, selected #ffffff1f, chevron flips ── */
       .select { position: relative; display: inline-block; }
       .select-trigger[aria-expanded="true"] { box-shadow: var(--elev-ring), 0 0 0 1px var(--border); }
       .select-trigger svg { transition: rotate var(--motion-fast); }
       .select-trigger[aria-expanded="true"] svg { rotate: 180deg; }
-      .select-menu { position: absolute; top: calc(100% + 8px); left: 0; z-index: 5; min-width: max(100%, 190px); width: max-content; margin: 0; padding: var(--space-2); list-style: none; border: 1px solid var(--border-soft); border-radius: 12px; background: var(--surface); box-shadow: 0 10px 15px -3px #0000001a, 0 4px 6px -4px #0000001a; }
+      /* ── Menus (measured on the page): #2b2b2b panel, 12px radius; select menu 8px padding / 40px rows; action menu 12px padding / 32px rows ── */
+      .select-menu { position: absolute; top: calc(100% + 8px); left: 0; z-index: 5; min-width: max(100%, 160px); width: max-content; margin: 0; padding: var(--space-2); list-style: none; border-radius: 12px; background: #2b2b2b; box-shadow: 0 10px 15px -3px #0000001a, 0 4px 6px -4px #0000001a; }
       .select-menu[hidden] { display: none; }
-      .select-menu li { display: flex; align-items: center; min-height: 40px; padding: 0 var(--space-4); border-radius: var(--radius-md); font: 500 var(--text-sm) / 1 var(--font-body); letter-spacing: 0; color: var(--fg); cursor: pointer; }
+      .select-menu li { display: flex; align-items: center; min-height: 40px; padding: 0 var(--space-3); border-radius: var(--radius-md); font: 400 var(--text-sm) / 1 var(--font-body); letter-spacing: 0; color: var(--fg); cursor: pointer; }
       .select-menu li + li { margin-top: var(--space-1); }
       .select-menu li:hover, .select-menu li:focus-visible { background: var(--border-soft); outline: none; }
       .select-menu li[aria-selected="true"] { background: #ffffff1f; }
+      .action-menu { position: absolute; top: calc(100% + 8px); right: 0; z-index: 5; min-width: 160px; width: max-content; margin: 0; padding: var(--space-3) 0; list-style: none; border-radius: 12px; background: #2b2b2b; box-shadow: 0 10px 15px -3px #0000001a, 0 4px 6px -4px #0000001a; }
+      .action-menu[hidden] { display: none; }
+      .action-menu button { display: flex; align-items: center; width: 100%; min-height: 32px; padding: 0 20px; border: 0; background: transparent; font: 400 var(--text-sm) / 1 var(--font-body); letter-spacing: 0; color: var(--fg); text-align: left; cursor: pointer; }
+      .action-menu button:hover, .action-menu button:focus-visible { background: var(--border-soft); outline: none; }
+      .menu-root { position: relative; display: inline-block; }
+      .icon-btn.plain { width: 20px; height: 20px; color: var(--fg); }
+      .icon-btn.plain:hover { background: transparent; color: var(--muted); }
       .icon-btn { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--muted); cursor: pointer; transition: background-color 200ms linear; }
       .icon-btn:hover { background: var(--astra-glass); }
-      .legend { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-6); margin: var(--space-5) 0 var(--space-4); font-size: var(--text-base); }
+      .legend { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-6); margin: var(--space-5) 0 var(--space-4); font: 400 var(--text-sm) / 20px var(--font-body); }
       .legend span { display: inline-flex; align-items: center; gap: var(--space-2); }
-      .legend svg { width: 22px; height: 22px; }
+      .legend svg { width: 18px; height: 18px; }
       .legend .ref svg { width: 40px; }
       .plot { display: block; width: 100%; height: auto; font: 400 13px / 1 var(--font-mono); letter-spacing: 0; }
       .plot .axis { stroke: var(--fg); stroke-width: 1; }
@@ -153,10 +164,10 @@
       .plot .line { fill: none; stroke-width: 2; }
       .chart-card figcaption { max-width: 640px; margin: var(--space-6) auto 0; text-align: center; font-style: italic; font-size: var(--text-sm); line-height: 1.64; color: var(--fg); text-wrap: pretty; }
 
-      .quote { max-width: 880px; margin: 0 auto; padding: var(--space-8) var(--space-6); border: 1px solid var(--astra-glass); border-radius: var(--radius-md); background: var(--surface); }
+      .quote { max-width: 899px; margin: 0 auto; padding: var(--space-8) var(--space-6); border: 1px solid var(--astra-glass); border-radius: var(--radius-sm); background: var(--surface); }
       .quote .logo { display: flex; align-items: center; gap: var(--space-2); height: 32px; margin-bottom: var(--space-4); font: 500 var(--text-xl) / 1 var(--font-display); letter-spacing: -0.02em; }
       .quote .logo svg { width: 28px; height: 28px; }
-      .quote blockquote { margin: 0 0 var(--space-5) 0.5em; font: 500 var(--text-lg) / 1.5 var(--font-body); letter-spacing: -0.01em; text-wrap: pretty; }
+      .quote blockquote { margin: 0 0 var(--space-5) 0.5em; font: 500 var(--text-lg) / 1.32 var(--font-body); letter-spacing: -0.025em; text-wrap: pretty; }
       .quote figcaption { margin-left: 0.5em; font: 500 var(--text-sm) / 1.4 var(--font-body); letter-spacing: 0; color: var(--muted); }
 
       .media-frame { overflow: hidden; border: 1px solid var(--border-soft); border-radius: var(--radius-md); background: var(--surface-warm); }
@@ -169,14 +180,12 @@
       .two-up code { font-size: 0.9em; }
       @media (max-width: 720px) { .two-up { grid-template-columns: 1fr; } }
 
-      .compare { width: 100%; border-collapse: collapse; table-layout: fixed; }
-      .compare th, .compare td { padding: var(--space-5) var(--space-6) var(--space-5) 0; border-top: 1px solid var(--border); text-align: left; vertical-align: top; font: 400 var(--text-base) / 1.5 var(--font-body); letter-spacing: -0.01em; color: var(--fg); }
-      .compare thead th { font-weight: 500; }
-      .compare th:first-child { width: 30%; }
-      .compare :is(th, td):last-child { padding-right: 0; }
+      .compare { width: 100%; margin: 28px 0; border-collapse: collapse; }
+      .compare th, .compare td { padding: var(--space-3); border-top: 1px solid var(--border); text-align: left; vertical-align: top; font: 400 var(--text-sm) / 1.64 var(--font-body); letter-spacing: -0.01em; color: var(--fg); overflow-wrap: break-word; }
+      .compare thead th { font-weight: 600; }
       .compare tbody tr:last-child td { border-bottom: 1px solid var(--border); }
       .compare .dash { color: var(--muted); }
-      .compare code { font-size: 0.9em; }
+      .compare code { font-size: 0.875em; }
 
       /* ── footer：13px/500，画布在后面继续跑 ── */
       /* footer：整宽不透明纯黑。上面所有段落都透出画布，黑色从最后一段结束处开始，和原站一样是一条随内容滚动的硬边 */
@@ -268,7 +277,7 @@
             <button type="button" role="tab" aria-selected="true" data-dataset="shape">形状</button>
           </div>
         </div>
-        <figure class="chart-card" style="margin: 0" id="stage-chart">
+        <figure class="chart-card" id="stage-chart">
           <div class="chart-head">
             <div>
               <h3 data-chart-title>形状强度 · 随进入视口的进度</h3>
@@ -280,7 +289,14 @@
                 </ul>
               </div>
             </div>
-            <button class="icon-btn" type="button" aria-label="下载数据"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v8m-3-3 3 3 3-3M3 13h10"/></svg></button>
+            <div class="menu-root">
+              <button class="icon-btn plain" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="图表选项"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v8m-3-3 3 3 3-3M3 13h10"/></svg></button>
+              <ul class="action-menu" role="menu" hidden>
+                <li><button type="button" role="menuitem" data-action="png">下载 PNG</button></li>
+                <li><button type="button" role="menuitem" data-action="svg">下载 SVG</button></li>
+                <li><button type="button" role="menuitem" data-action="link">复制链接</button></li>
+              </ul>
+            </div>
           </div>
           <div class="legend" data-chart-legend></div>
           <svg class="plot" viewBox="0 0 640 340" role="img" aria-label="编排曲线" data-chart-plot></svg>
@@ -317,7 +333,7 @@
       </section>
 
       <section class="wide" id="design">
-        <figure class="quote" style="margin: 0">
+        <figure class="quote">
           <div class="logo"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3v22M3 14h22M6 6l16 16M22 6 6 22"/></svg>星流 Starflow</div>
           <blockquote>“四千颗星，一座星系。粒子的分布、流动、辉光和镜头光晕的算法参考了原站，代码是独立实现，MIT 开源。skill 和 openai-astra 设计系统都在同一个仓库里。”</blockquote>
           <figcaption>Winhao，星流作者</figcaption>
@@ -629,6 +645,47 @@
         return { open, close, select }
       }
       dropdown(document.getElementById('axis-select'), (value) => { xAxis = value; renderChart(currentDataset) })
+      // Action menu (chart download): 20px icon button with no hover fill; the menu drops right-aligned, 8px below.
+      function actionMenu(root, actions) {
+        const trigger = root.querySelector('[aria-haspopup="menu"]')
+        const menu = root.querySelector('.action-menu')
+        const items = Array.from(menu.querySelectorAll('[role="menuitem"]'))
+        const open = () => { menu.hidden = false; trigger.setAttribute('aria-expanded', 'true'); items[0]?.focus() }
+        const close = (back = true) => { if (menu.hidden) return; menu.hidden = true; trigger.setAttribute('aria-expanded', 'false'); if (back) trigger.focus() }
+        trigger.addEventListener('click', () => (menu.hidden ? open() : close()))
+        items.forEach((it, i) => {
+          it.tabIndex = -1
+          it.addEventListener('click', () => { close(); actions?.[it.dataset.action]?.(root) })
+          it.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus() }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus() }
+            else if (e.key === 'Escape') { e.preventDefault(); close() }
+          })
+        })
+        document.addEventListener('pointerdown', (e) => { if (!root.contains(e.target)) close(false) })
+        return { open, close }
+      }
+      // Real exports for inline SVG charts: SVG file, 2× PNG via canvas, or the section link.
+      const chartActions = {
+        svg(root) { const svg = root.closest('.chart-card').querySelector('svg.plot'); const blob = new Blob([serializeSvg(svg)], { type: 'image/svg+xml' }); saveBlob(blob, 'chart.svg') },
+        png(root) {
+          const svg = root.closest('.chart-card').querySelector('svg.plot'); const [, , w, h] = svg.getAttribute('viewBox').split(/\s+/).map(Number)
+          const url = URL.createObjectURL(new Blob([serializeSvg(svg)], { type: 'image/svg+xml' })); const img = new Image()
+          img.onload = () => { const c = document.createElement('canvas'); c.width = w * 2; c.height = h * 2; const g = c.getContext('2d'); g.scale(2, 2); g.fillStyle = '#000'; g.fillRect(0, 0, w, h); g.drawImage(img, 0, 0, w, h); URL.revokeObjectURL(url); c.toBlob((b) => saveBlob(b, 'chart.png'), 'image/png') }
+          img.src = url
+        },
+        link(root) { const id = root.closest('section')?.id; navigator.clipboard?.writeText(location.origin + location.pathname + (id ? '#' + id : '')) },
+      }
+      function serializeSvg(svg) {
+        const clone = svg.cloneNode(true); const cs = getComputedStyle(svg)
+        clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg'); clone.setAttribute('width', svg.getAttribute('viewBox').split(/\s+/)[2]); clone.setAttribute('height', svg.getAttribute('viewBox').split(/\s+/)[3])
+        // inline the computed colours so the file stands alone
+        clone.querySelectorAll('*').forEach((el, i) => { const src = svg.querySelectorAll('*')[i]; const c = getComputedStyle(src); el.setAttribute('fill', c.fill); el.setAttribute('stroke', c.stroke); el.setAttribute('stroke-width', c.strokeWidth); if (c.strokeDasharray !== 'none') el.setAttribute('stroke-dasharray', c.strokeDasharray); if (el.tagName === 'text') { el.setAttribute('font-family', c.fontFamily); el.setAttribute('font-size', c.fontSize) } })
+        clone.style.font = cs.font
+        return new XMLSerializer().serializeToString(clone)
+      }
+      function saveBlob(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000) }
+      for (const root of document.querySelectorAll('.menu-root')) actionMenu(root, chartActions)
       autoplayTabs(document.getElementById('stage-tabs'), (tab) => renderChart(tab.dataset.dataset))
 
       // ── 录屏辅助：?autoscroll=110 → 入场结束后以 110px/s 匀速滚到底；?delay=6 改起始等待秒数。

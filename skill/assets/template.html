@@ -30,7 +30,7 @@
         --astra-ambient-opacity: 0.55;
         --astra-glass: #ffffff1f;
         --astra-glass-hover: #ffffff33;
-        --astra-copy-max: 676px;
+        --astra-copy-max: 669px;
         --astra-shape-max-width: 576px;
         --astra-viewport-height: 100svh;
         --astra-copy-opacity: 1;
@@ -72,8 +72,10 @@
 
       /* First block after the hero: its position drives tilt + scatter (data-astra-intro). */
       .copy { max-width: var(--astra-copy-max); margin: 0 auto; padding: 26vh var(--space-6); }
-      .copy h2 { margin: 0 0 var(--space-4); font: 500 clamp(32px, calc(2rem + (100vw - 375px) * 0.01502), var(--text-3xl)) / 1.16 var(--font-display); letter-spacing: -0.03em; text-wrap: balance; }
-      .copy p { margin: 0 0 1.1em; color: var(--muted); text-wrap: pretty; }
+      .copy h2 { margin: 0 0 var(--space-4); max-width: 1000px; font: 500 var(--text-2xl) / 1.32 var(--font-display); letter-spacing: -0.01em; text-wrap: balance; }
+      .copy.title-stage h2 { font: 500 clamp(32px, calc(2rem + (100vw - 375px) * 0.01502), var(--text-3xl)) / 1.16 var(--font-display); letter-spacing: -0.03em; }
+      .copy p { margin: 0 0 var(--space-6); color: var(--muted); text-wrap: pretty; }
+      .copy p a, .wide p a { color: var(--fg); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
       .copy .lede { font-size: var(--text-lg); color: var(--muted); }
       .copy.title-stage { padding-top: 30vh; }
       .copy.title-stage h2 { translate: 0 var(--astra-title-parallax-y); will-change: translate; }

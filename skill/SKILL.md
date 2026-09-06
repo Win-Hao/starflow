@@ -93,7 +93,7 @@ references/choreography.md         the four scroll stages, thresholds, cue geome
    system's contract.
 3. **Apply the design system.** If the selected design system is `openai-astra` you already have
    it in context. Otherwise read `references/DESIGN.md` and keep its rules: black canvas, white
-   text, white-at-alpha secondaries, one typeface at weight 500 / 400, pill controls, a 676px copy
+   text, white-at-alpha secondaries, one typeface at weight 500 / 400, pill controls, a 669px copy
    column with empty rails, no gradients, no shadows, no scroll effects on copy.
 4. **Lay the page out** (launch mode). Keep the section order and the `data-astra-*` attributes:
    - `.hero` is exactly one viewport tall and holds no copy.

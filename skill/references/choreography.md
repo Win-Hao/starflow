@@ -27,7 +27,7 @@ every stage in reverse; seeds make it deterministic.
 
 ## Geometry
 
-- Copy column: `max-width 676px`, centred. `contentBounds` is measured from the first `.copy` and
+- Copy column: `max-width 669px`, centred. `contentBounds` is measured from the first `.copy` and
   passed as viewport fractions.
 - Cue frame: `576px` max width × `0.8 × viewport height`. The frame holds an invisible SVG with the
   path so the aspect ratio is reserved; the target rect is converted to NDC (`centerNdc`,
