@@ -8,7 +8,7 @@ OpenAI GPT-6 Astra 发布页的实现（下文简称「原站」），并在此�
 
 ![主页首屏：四千颗星组成的螺旋星系](docs/screenshots/01-hero.jpeg)
 
-**在线演示**：[主页](https://win-hao.github.io/starflow/) · [实验室](https://win-hao.github.io/starflow/lab.html) · [纯效果页](https://win-hao.github.io/starflow/embed.html?shape=cursor) · [用 skill 做出的发布页](https://win-hao.github.io/starflow/examples/launch-page/) · [设计系统组件页](https://win-hao.github.io/starflow/design-systems/openai-astra/components.html) · [skill 页面骨架](https://win-hao.github.io/starflow/skill/assets/template.html)
+**在线演示**：[主页](https://win-hao.github.io/starflow/) · [实验室](https://win-hao.github.io/starflow/lab.html) · [纯效果页](https://win-hao.github.io/starflow/embed.html?shape=cursor) · [星系体数字 2026](https://win-hao.github.io/starflow/embed.html?digits=2026) · [用 skill 做出的发布页](https://win-hao.github.io/starflow/examples/launch-page/) · [设计系统组件页](https://win-hao.github.io/starflow/design-systems/openai-astra/components.html) · [skill 页面骨架](https://win-hao.github.io/starflow/skill/assets/template.html)
 
 ## 快速开始
 

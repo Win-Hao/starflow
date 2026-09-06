@@ -10,7 +10,7 @@ adaptive performance, and bilingual copy.
 
 ![Home page: a spiral galaxy of four thousand stars](docs/screenshots/01-hero.jpeg)
 
-**Live demos**: [Home](https://win-hao.github.io/starflow/) · [Lab](https://win-hao.github.io/starflow/lab.html) · [Effect only](https://win-hao.github.io/starflow/embed.html?shape=cursor) · [Launch page built with the skill](https://win-hao.github.io/starflow/examples/launch-page/) · [Design-system components](https://win-hao.github.io/starflow/design-systems/openai-astra/components.html) · [Skill page skeleton](https://win-hao.github.io/starflow/skill/assets/template.html)
+**Live demos**: [Home](https://win-hao.github.io/starflow/) · [Lab](https://win-hao.github.io/starflow/lab.html) · [Effect only](https://win-hao.github.io/starflow/embed.html?shape=cursor) · [Galaxy digits 2026](https://win-hao.github.io/starflow/embed.html?digits=2026) · [Launch page built with the skill](https://win-hao.github.io/starflow/examples/launch-page/) · [Design-system components](https://win-hao.github.io/starflow/design-systems/openai-astra/components.html) · [Skill page skeleton](https://win-hao.github.io/starflow/skill/assets/template.html)
 
 ## Quick start
 
