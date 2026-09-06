@@ -1,6 +1,6 @@
 import { detectWebGL, renderStaticFallback } from './astra/fallback.js'
 import { createAstraScene } from './astra/scene.js'
-import { DEFAULT_SHAPE_SETTINGS, ICON_PRESETS, PATH_PRESETS, TEXT_PRESETS } from './presets.js'
+import { DEFAULT_SHAPE_SETTINGS, ICON_PRESETS, PATH_PRESETS, TEXT_PRESETS, TEXT_SHAPE_SETTINGS } from './presets.js'
 import { applyLocale, detectLocale, getLocale, t } from './i18n.js'
 
 applyLocale(detectLocale())
@@ -26,6 +26,8 @@ const fieldOptions = {
   rotationDepth: 1.4,
   // 形状体积：只对文字 / 图标 / 路径生效，星系模式传 0 保持原站的逐星序列
   depth: 0.1,
+  stroke: 'auto',
+  strokeSpread: 1.3,
   size: 2.05,
   palette: 'astra',
 }
@@ -36,7 +38,11 @@ let lastStats = null
 
 function renderStats() {
   if (!lastStats) return
-  const kind = t(source.type === 'galaxy' ? 'lab.kind.galaxy' : source.type === 'paths' ? 'lab.kind.paths' : 'lab.kind.contours')
+  const kind = t(source.type === 'galaxy' ? 'lab.kind.galaxy' : source.type === 'paths' ? 'lab.kind.paths' : lastStats.strokes ? 'lab.kind.strokes' : 'lab.kind.contours')
+  // 中线模式下星带宽度由笔画宽度决定，只剩散布倍率可调
+  const center = source.type !== 'galaxy' && source.type !== 'paths' && !!lastStats.strokes
+  for (const block of document.querySelectorAll('[data-stroke-center]')) block.hidden = !center
+  for (const block of document.querySelectorAll('[data-stroke-outline]')) block.hidden = center
   $('stats').textContent = t('lab.stats', lastStats.count, lastStats.layers, kind)
 }
 
@@ -94,7 +100,7 @@ modeSelect.addEventListener('change', () => {
     scheduleRebuild()
   }
   if (modeSelect.value === 'text') {
-    applyShapeSettings({})
+    applyShapeSettings(TEXT_SHAPE_SETTINGS)
     applyText()
   }
   if (modeSelect.value === 'icon') applyIcon()
@@ -196,6 +202,11 @@ bindRange('fillRatio', 'field', 'fillRatio')
 bindRange('backgroundRatio', 'field', 'backgroundRatio')
 bindRange('scatter', 'field', 'scatter', (v) => v.toFixed(3))
 bindRange('rotationDepth', 'field', 'rotationDepth')
+bindRange('strokeSpread', 'field', 'strokeSpread')
+$('stroke').addEventListener('change', () => {
+  fieldOptions.stroke = $('stroke').value
+  scheduleRebuild()
+})
 bindRange('depth', 'field', 'depth', (v) => v.toFixed(3))
 bindRange('size', 'field', 'size')
 bindRange('sizeFalloff', 'config', 'sizeFalloff')

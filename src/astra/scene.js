@@ -440,7 +440,7 @@ export function createAstraScene(canvas, initialConfig = {}) {
     applyConfig()
     layout()
     replay()
-    return { count: field.count, layers: field.layerCount, contours: field.layerCount }
+    return { count: field.count, layers: field.layerCount, contours: field.layerCount, strokes: !!field.isStrokes }
   }
 
   function applyConfig() {

@@ -49,7 +49,9 @@ observes size changes. Returns:
 | `scatter` | 0.041 | Half-width of the star band relative to shape height. Path shapes: 0.07. |
 | `backgroundRatio` | 0.14 | Share of stars left in the sky as background. |
 | `rotationDepth` | 1.4 | Z undulation of arms so drag-rotation shows depth. |
-| `depth` | auto | Extra Z spread per star (fraction of shape height). Text / svg / image sources default to 0.1 (a rotated shape is a tube, not a sheet); galaxy and paths default to 0. |
+| `stroke` | auto | Raster sources: `center` = stars ride the stroke centre-line as a round tube (text, stroke icons; the original's digits), `outline` = follow the contour; auto picks by stroke thickness. |
+| `strokeSpread` | 1.3 | Centre-line spread, multiple of the local half stroke width. |
+| `depth` | auto | Extra Z spread per star (fraction of shape height) for outline mode, default 0.1; centre-line mode, galaxy and paths default to 0. |
 | `palette` | `'astra'` | `astra`, `aurora`, `ember`, `ice`, `gold` (see `PALETTES`). |
 | `brightRetention` | 1 | Share of bright stars kept bright in path mode (page: 0.5). |
 | `densityFalloff` | 0.22 | Sparser at arm ends, denser mid-arm. |

@@ -21,6 +21,7 @@ import {
   Vector3,
   Vector4,
 } from 'three'
+import { extractStrokes } from './skeleton.js'
 import { extractContours, resampleClosed, signedArea, smoothClosed } from './contours.js'
 import { HERO_COLOR_SEEDS, writeStarColor } from './palette.js'
 import { createGalaxyLayers, createPathLayers, flowDirection, GALAXY_HEIGHT, GALAXY_LAYERS, PolylineCurve } from './paths.js'
@@ -82,7 +83,16 @@ export const DEFAULT_FIELD_OPTIONS = {
   seed: 0,
   contourThreshold: 0.5,
   minContourArea: 24,
+  // 光栅形状的星线：'center' 沿笔画中线撒成管子（原站数字的做法），'outline' 沿轮廓，
+  // 'auto' = 文字和细描边图标走中线，实心图标 / 图片走轮廓
+  stroke: 'auto',
+  // 中线模式的散布：相对当前位置半笔宽的倍率，>1 让星星略微溢出笔画边缘
+  strokeSpread: 1.3,
 }
+
+/** auto 模式下，最大半笔宽超过形状高度的这个比例就当实心图形，走轮廓 */
+const STROKE_AUTO_LIMIT = 0.15
+const strokeCache = new WeakMap()
 
 /** 原站 densityProgress：把均匀种子沿弧长挤一挤。着色器里有同一份。 */
 export function densityProgress(seed, falloff) {
@@ -150,6 +160,37 @@ function buildLayers(source, options) {
   const scale = Math.min((GALAXY_HEIGHT * 2) / maskWidth, GALAXY_HEIGHT / maskHeight)
   const toWorld = (x, y) => [(x - maskWidth / 2) * scale, (maskHeight / 2 - y) * scale]
 
+  const raster = { mask, width: maskWidth, height: maskHeight, toWorld, scale }
+  const rotationDepth = MathUtils.clamp(options.rotationDepth, 0, 2)
+
+  // 笔画中线：文字 / 描边图标像原站的数字一样，星星沿中线撒成一根管子
+  if (options.stroke !== 'outline') {
+    const cached = strokeCache.get(source)
+    const result = cached && cached.threshold === options.contourThreshold
+      ? cached.result
+      : extractStrokes(mask, maskWidth, maskHeight, { threshold: options.contourThreshold })
+    strokeCache.set(source, { threshold: options.contourThreshold, result })
+    const thin = result.maxHalfWidth / maskHeight < STROKE_AUTO_LIMIT
+    const useStrokes = result.strokes.length > 0 && (options.stroke === 'center' || source.type === 'text' || thin)
+    if (useStrokes) {
+      const layers = result.strokes.map((stroke, index) => {
+        const preset = GALAXY_LAYERS[index % GALAXY_LAYERS.length]
+        const points = stroke.points.map(([x, y]) => toWorld(x, y))
+        return {
+          curve: new PolylineCurve(points, { closed: stroke.closed, depth: preset.depth, rotationDepth, depthPhase: 0.82 * index }),
+          closed: stroke.closed,
+          widths: stroke.widths.map((half) => half * scale),
+          depth: preset.depth,
+          strong: preset.strong,
+          speed: preset.speed,
+          phase: preset.phase,
+          weight: stroke.length * scale * (preset.strong ? 1 : 0.77),
+        }
+      })
+      return { layers, raster, strokes: true }
+    }
+  }
+
   const contours = extractContours(mask, maskWidth, maskHeight, { threshold: options.contourThreshold })
     .map((points) => smoothClosed(points, 2))
     .filter((points) => Math.abs(signedArea(points)) >= options.minContourArea)
@@ -158,7 +199,6 @@ function buildLayers(source, options) {
     .sort((a, b) => b.perimeter - a.perimeter)
   if (contours.length === 0) throw new Error('没能从这个形状里提取到轮廓')
 
-  const rotationDepth = MathUtils.clamp(options.rotationDepth, 0, 2)
   const layers = contours.map((contour, index) => {
     const preset = GALAXY_LAYERS[index % GALAXY_LAYERS.length]
     const points = contour.points.map(([x, y]) => toWorld(x, y))
@@ -178,7 +218,21 @@ function buildLayers(source, options) {
     }
   })
 
-  return { layers, raster: { mask, width: maskWidth, height: maskHeight, toWorld, scale } }
+  return { layers, raster, strokes: false }
+}
+
+/** 中线层：t 处的半笔宽（世界单位），和 PolylineCurve.getPoint 用同一套参数映射 */
+function strokeWidthAt(layer, t) {
+  const widths = layer.widths
+  const n = widths.length
+  if (layer.closed) {
+    const f = MathUtils.euclideanModulo(t, 1) * n
+    const i0 = Math.floor(f) % n
+    return MathUtils.lerp(widths[i0], widths[(i0 + 1) % n], f - Math.floor(f))
+  }
+  const f = MathUtils.clamp(t, 0, 1) * (n - 1)
+  const i0 = Math.min(Math.floor(f), n - 1)
+  return MathUtils.lerp(widths[i0], widths[Math.min(i0 + 1, n - 1)], f - i0)
 }
 
 /**
@@ -187,12 +241,12 @@ function buildLayers(source, options) {
  */
 export function generateStarField(source, userOptions = {}) {
   const options = { ...DEFAULT_FIELD_OPTIONS, ...userOptions }
-  const { layers, raster } = buildLayers(source, options)
+  const { layers, raster, strokes: isStrokes } = buildLayers(source, options)
   const layerCount = layers.length
   const isGalaxy = source.type === 'galaxy'
   const isPaths = source.type === 'paths'
-  // 原站的路径形状里，5 颗主星散落在各段路径上；层数不够 5 就每层多选几颗
-  const heroesPerLayer = isPaths ? Math.max(1, Math.ceil(5 / layerCount)) : 1
+  // 原站的路径形状里，5 颗主星散落在各段路径上；层数不够 5 就每层多选几颗。笔画中线同样处理
+  const heroesPerLayer = isPaths || isStrokes ? Math.max(1, Math.ceil(5 / layerCount)) : 1
   const brightRetention = MathUtils.clamp(options.brightRetention, 0, 1)
   // 原站路径形状：星星带着自己在星系里那一层的流速过来，5 档速度混在同一条路径上，
   // 相位又按「这段子路径占总长的比例」放大——结的 6 段弧每段只占 1/6，流速就是 6 倍。
@@ -251,7 +305,9 @@ export function generateStarField(source, userOptions = {}) {
 
   const sizeFactor = MathUtils.clamp(options.size, 0.25, 3)
   const scatterWorld = MathUtils.clamp(options.scatter, 0, 0.14) * shapeHeight
-  const depthWorld = MathUtils.clamp(options.depth ?? (raster ? RASTER_DEPTH : 0), 0, 0.5) * shapeHeight
+  // 中线管子本身就是圆的，额外体积默认只给轮廓模式
+  const depthWorld = MathUtils.clamp(options.depth ?? (raster && !isStrokes ? RASTER_DEPTH : 0), 0, 0.5) * shapeHeight
+  const strokeSpread = MathUtils.clamp(options.strokeSpread, 0, 3)
   const falloff = MathUtils.clamp(options.densityFalloff, 0, 1)
   const seedMix = options.seed >>> 0
   const tangent = new Vector3()
@@ -281,11 +337,20 @@ export function generateStarField(source, userOptions = {}) {
 
       // 星带在中段最宽、两端收窄；三角分布的尾巴比高斯长，边缘不会像被裁刀切过。
       // 路径形状：横向偏移是从星系里带过来的，与它在这条路径上的位置无关，再加一层均匀抖动
-      const envelope = isPaths ? Math.sin(random() * Math.PI) : middle
-      const spread = scatterWorld * MathUtils.lerp(0.3, 1, envelope) * (0.22 + 0.78 * random())
-      let across = (random() + random() - 1) * spread
-      if (isPaths) across += (random() + random() - 1) * scatterWorld * 0.27
-      let depth = (random() + random() - 1) * spread * 0.65
+      let across
+      let depth
+      if (layer.widths) {
+        // 中线模式：散布跟着当前位置的半笔宽走，横向和 Z 向一样宽——旋转到任何角度都是一根圆管
+        const spread = strokeWidthAt(layer, t) * strokeSpread * MathUtils.lerp(0.55, 1, middle) * (0.3 + 0.7 * random())
+        across = (random() + random() - 1) * spread
+        depth = (random() + random() - 1) * spread
+      } else {
+        const envelope = isPaths ? Math.sin(random() * Math.PI) : middle
+        const spread = scatterWorld * MathUtils.lerp(0.3, 1, envelope) * (0.22 + 0.78 * random())
+        across = (random() + random() - 1) * spread
+        if (isPaths) across += (random() + random() - 1) * scatterWorld * 0.27
+        depth = (random() + random() - 1) * spread * 0.65
+      }
       // 体积厚度：只在开了 depth 时才多消耗随机数，星系的逐星序列保持与原站一致
       if (depthWorld > 0) depth += (random() + random() - 1) * depthWorld
       point.addScaledVector(normal, across)
@@ -337,7 +402,7 @@ export function generateStarField(source, userOptions = {}) {
       writeStarColor(
         colors,
         bestIndex * 3,
-        HERO_COLOR_SEEDS[(isPaths ? heroes.length : layerIndex) % HERO_COLOR_SEEDS.length],
+        HERO_COLOR_SEEDS[(isPaths || isStrokes ? heroes.length : layerIndex) % HERO_COLOR_SEEDS.length],
         options.palette,
         options.colorMode,
       )
@@ -484,6 +549,7 @@ export function generateStarField(source, userOptions = {}) {
     layerCount,
     isGalaxy,
     isPaths,
+    isStrokes: !!isStrokes,
     layers: layers.map((layer) => ({
       samples: layer.samples,
       speed: layer.flowSpeed,
@@ -657,6 +723,7 @@ export function createAstraField(source, userOptions = {}) {
     layerCount: data.layerCount,
     isGalaxy: data.isGalaxy,
     isPaths: data.isPaths,
+    isStrokes: data.isStrokes,
     layers: data.layers,
     heroes,
     coreHero,

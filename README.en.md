@@ -125,7 +125,8 @@ parameterized by arc length — `orbitProgress`, that one-dimensional parameter,
 Shape sources
   ├─ galaxy        paths.js   the original's 5 curves → THREE.Curve (with z undulation)
   ├─ paths         paths.js   any set of SVG paths, one layer per sub-path (cursor / knot)
-  └─ text/svg/img  rasterize.js → contours.js   rasterize → marching squares → resample by arc length
+  └─ text/svg/img  rasterize.js → skeleton.js   rasterize → distance transform + Zhang–Suen thinning → stroke centre-lines, stars scattered into a tube (text, stroke icons; how the original does its digits)
+                                 → contours.js   filled icons / images: marching squares outlines → resample by arc length
         ↓
 field.js      stars along the curves (the original's per-star formulas) + background stars per layer + core cluster
               → BufferGeometry + path texture
@@ -211,7 +212,9 @@ overhead. So the strategy is fewer passes, not fewer stars:
 | `scatter` | 0.041 | Band half-width relative to the shape height (original: 0.4 / 9.7) |
 | `densityFalloff` | 0.22 | Density modulation along the path |
 | `rotationDepth` | 1.4 | Z undulation of the curves; depth layering when rotated |
-| `depth` | auto | Volume of the shape: extra Z spread per star as a fraction of the shape height. Text / icons / images default to 0.1 so a rotated shape reads as a tube, not a sheet; galaxy and path shapes default to 0 |
+| `stroke` | `auto` | Star lines for raster shapes: `center` scatters stars into a round tube along the stroke centre-line (how the original does its digits), `outline` follows the contour; `auto` = text and thin stroke icons use centre-lines, filled icons / images use outlines |
+| `strokeSpread` | 1.3 | Centre-line spread as a multiple of the local half stroke width; across and Z are equal, so the shape is a tube from any angle |
+| `depth` | auto | Volume for outline mode: extra Z spread per star as a fraction of the shape height, default 0.1; centre-line mode is already a tube, default 0; galaxy and path shapes default to 0 |
 | `flowInward` | true | Flow toward the core; false flows outward |
 | `size` | 2.05 | Overall star size |
 | `centerCluster` / `clusterCount` | true / 96 | Core cluster (galaxy mode only) |

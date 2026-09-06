@@ -118,7 +118,8 @@ astra.setScroll({
 形状来源
   ├─ galaxy        paths.js   原站 5 条曲线 → THREE.Curve（含 Z 向起伏）
   ├─ paths         paths.js   任意一组 SVG 路径，每条子路径一层（光标 / OpenAI 结）
-  └─ text/svg/img  rasterize.js → contours.js   光栅化 → marching squares 抠闭合轮廓 → 等距重采样
+  └─ text/svg/img  rasterize.js → skeleton.js   光栅化 → 距离变换 + Zhang–Suen 细化取笔画中线，星星沿中线撒成管子（文字、描边图标；原站数字的做法）
+                                 → contours.js   实心图标 / 图片：marching squares 抠闭合轮廓 → 等距重采样
         ↓
 field.js      沿曲线撒星（原站逐星公式）+ 每层背景星 + 星系核 → BufferGeometry + 路径贴图
 shaders.js    顶点着色器：路径位置 → 星轨 → 路径形状 → 入场汇聚；片元：圆盘 + 十字衍射 + 亚像素解析覆盖
@@ -192,7 +193,9 @@ astra.dispose()
 | `scatter` | 0.041 | 星带半宽，相对形状高度（原站 0.4 / 9.7） |
 | `densityFalloff` | 0.22 | 沿路径的疏密调制 |
 | `rotationDepth` | 1.4 | 曲线的 Z 向起伏，旋转时星臂的前后层次 |
-| `depth` | 自动 | 形状体积：每颗星沿 Z 向再撒开的半宽（相对形状高度）。文字 / 图标 / 图片默认 0.1，拖动旋转时是一根管子而不是一张纸；星系与路径形状默认 0 |
+| `stroke` | `auto` | 光栅形状的星线：`center` 沿笔画中线撒成圆管（原站数字的做法），`outline` 沿轮廓；`auto` = 文字和细描边图标走中线，实心图标 / 图片走轮廓 |
+| `strokeSpread` | 1.3 | 中线模式的散布，相对当前位置半笔宽的倍率；横向和 Z 向一样宽，旋转到任何角度都是一根管子 |
+| `depth` | 自动 | 轮廓模式的体积：每颗星沿 Z 向再撒开的半宽（相对形状高度），默认 0.1；中线模式本身是圆管，默认 0；星系与路径形状默认 0 |
 | `flowInward` | true | 流向星系核；false 向外 |
 | `size` | 2.05 | 星星整体大小 |
 | `centerCluster` / `clusterCount` | true / 96 | 星系核（仅星系模式） |

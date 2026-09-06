@@ -55,7 +55,22 @@ export const PATH_PRESETS = {
   },
 }
 
-/** 星系 / 文字模式用的默认值，切回来时恢复。 */
+/**
+ * 文字模式：和原站的数字一样按「路径形状」的规矩来——星星沿笔画中线撒成管子，
+ * 暗星缩小、一半亮星压暗、只占六成视口高、氛围色几乎关掉，剩下的是黑底上几十颗大而软的亮星。
+ */
+export const TEXT_SHAPE_SETTINGS = {
+  starCount: 4000,
+  scatter: 0.041,
+  brightRetention: 0.5,
+  dimSizeScale: 0.8,
+  flowSpeed: 0.8,
+  fillX: 0.7,
+  fillY: 0.64,
+  ambient: 0.12,
+}
+
+/** 星系 / 轮廓图标模式用的默认值，切回来时恢复。 */
 export const DEFAULT_SHAPE_SETTINGS = {
   starCount: 4000,
   scatter: 0.041,

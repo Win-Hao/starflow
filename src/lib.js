@@ -24,6 +24,7 @@ export {
   createGalaxyLayers,
   rasterize,
   extractContours,
+  extractStrokes,
 } from './astra/index.js'
 
 export {
@@ -33,6 +34,6 @@ export {
   SHAPE_SAMPLE_COUNT,
 } from './astra/paths.js'
 
-export { PATH_PRESETS, DEFAULT_SHAPE_SETTINGS, ICON_PRESETS, TEXT_PRESETS } from './presets.js'
+export { PATH_PRESETS, DEFAULT_SHAPE_SETTINGS, TEXT_SHAPE_SETTINGS, ICON_PRESETS, TEXT_PRESETS } from './presets.js'
 
 export const VERSION = '0.2.4'
