@@ -95,8 +95,9 @@
       .site-header .nav-actions { display: flex; align-items: center; gap: var(--space-2); }
       .site-header .search { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--muted); cursor: pointer; transition: background-color 200ms linear; }
       .site-header .search:hover { background: var(--astra-glass); }
-      .site-header .btn { height: 40px; gap: 0.3em; }
-      .site-header .btn svg { width: 16px; height: 16px; }
+      /* 原站 header 胶囊：!h-9 !px-5，图标 size-3 */
+      .site-header .btn { height: 36px; min-height: 0; padding: 0 20px; gap: 0.3em; }
+      .site-header .btn svg { width: 12px; height: 12px; }
       @media (max-width: 720px) { .site-header nav, .site-header .btn-glass { display: none; } }
 
       /* ── 宽栏：图表、引言、对比这些超出 676px 文案栏的组件 ── */
@@ -408,7 +409,7 @@
         throw new Error('static fallback')
       }
 
-      const astra = createAstraScene(canvas, { ambientColor: '#23435f', ambientOpacity: 0.55, reducedMotion: false })
+      const astra = createAstraScene(canvas, { ambientColor: '#23435f', ambientOpacity: 0.3, ambientFloor: 0.4, vignette: 0, reducedMotion: false })
       window.__astra = astra
       astra.setSource({ type: 'galaxy' }, { starCount: 4000, size: 2.05, scatter: 0.041, backgroundRatio: 0.14, rotationDepth: 1.4, palette: 'astra' })
 
@@ -467,7 +468,7 @@
         root.style.setProperty('--astra-copy-opacity', chromeOpacity.toFixed(3))
         chrome.style.visibility = chromeOpacity <= 0 ? 'hidden' : 'visible'
         if (title) root.style.setProperty('--astra-title-parallax-y', `${((1 - Math.min(1, progress)) * TITLE_PARALLAX).toFixed(1)}px`)
-        astra.config.ambientOpacity = 0.12 + 0.43 * (1 - Math.min(1, progress))
+        astra.config.ambientOpacity = 0.1 + 0.2 * (1 - Math.min(1, progress))
         astra.setScroll({ progress, tiltProgress, scatterProgress, contentBounds, shape })
       }
       function schedule() { if (scheduled) return; scheduled = true; requestAnimationFrame(update) }

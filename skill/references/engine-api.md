@@ -80,6 +80,7 @@ Most-used keys. Everything else is documented inline in the engine source.
 | `center` | `[0, 0]` | Shape offset in half-viewports; use to clear a copy column (`[0.25, 0]`). |
 | `lensFlare` | `{ enabled: true, intensity: 0.28, … }` | Flare on the core. |
 | `ambientColor` / `ambientOpacity` / `vignette` | `#23435f` / 0.55 / 1 | Glow and vignette are rendered in post, not CSS. |
+| `ambientFloor` | 0 | Share of the glow spread evenly over the whole canvas (0 = pure radial). The launch-page skeletons use `ambientOpacity 0.3, ambientFloor 0.4, vignette 0`, which matches the page's measured background (a near-uniform blue-black, corners slightly brighter, no dark vignette). |
 | `scrollEffects` | true | Enables the scroll choreography. |
 | `scrollStarDriftSpeed` | 3 | Rail parallax speed. |
 | `shapeAutoRotate` / `shapeAutoRotateAmount` | true / 0.42 | Swing on shape formation (radians). |

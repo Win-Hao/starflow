@@ -1,6 +1,6 @@
 {
   "name": "starflow",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "type": "module",
   "description": "星流 Starflow：一片会流动的星空，基于 three.js 的星星粒子系统 / A flowing starfield particle engine built on three.js",
   "license": "MIT",

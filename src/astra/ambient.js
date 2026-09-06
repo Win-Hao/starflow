@@ -13,6 +13,7 @@ import { Color, Uniform, Vector2 } from 'three'
 const FRAGMENT_SHADER = /* glsl */ `
   uniform vec3  uAmbientColor;
   uniform float uAmbientOpacity;
+  uniform float uAmbientFloor;
   uniform float uVignette;
   uniform vec2  uAspect;
 
@@ -29,7 +30,8 @@ const FRAGMENT_SHADER = /* glsl */ `
     float ellipse = length(offset * 2.0);
     float circle = length(offset * uAspect) / (0.5 * length(uAspect));
     vec3 srgb = astraToSrgb(inputColor.rgb);
-    srgb += uAmbientColor * (ellipse * ellipse) * uAmbientOpacity;
+    // floor：把一部分氛围色铺满整屏（原站截图里的底色几乎是均匀的深蓝黑，径向部分只在四角略亮）
+    srgb += uAmbientColor * mix(ellipse * ellipse, 1.0, uAmbientFloor) * uAmbientOpacity;
     float vignette = smoothstep(0.47, 0.72, circle) * 0.18
       + smoothstep(0.72, 1.0, circle) * 0.60;
     srgb *= 1.0 - vignette * uVignette;
@@ -38,24 +40,26 @@ const FRAGMENT_SHADER = /* glsl */ `
 `
 
 export class AstraAmbientEffect extends Effect {
-  constructor({ color = '#23435f', opacity = 0.55, vignette = 1 } = {}) {
+  constructor({ color = '#23435f', opacity = 0.55, vignette = 1, floor = 0 } = {}) {
     super('AstraAmbient', FRAGMENT_SHADER, {
       blendFunction: BlendFunction.NORMAL,
       uniforms: new Map([
         ['uAmbientColor', new Uniform(new Color(color))],
         ['uAmbientOpacity', new Uniform(opacity)],
         ['uVignette', new Uniform(vignette)],
+        ['uAmbientFloor', new Uniform(floor)],
         ['uAspect', new Uniform(new Vector2(1, 1))],
       ]),
     })
   }
 
-  setAmbient(color, opacity, vignette) {
+  setAmbient(color, opacity, vignette, floor = 0) {
     // CSS 里的颜色是 sRGB 值，直接用，不走 three 的色彩管理
     const c = new Color().setStyle(color, 'srgb')
     this.uniforms.get('uAmbientColor').value.set(c.r, c.g, c.b)
     this.uniforms.get('uAmbientOpacity').value = opacity
     this.uniforms.get('uVignette').value = vignette
+    this.uniforms.get('uAmbientFloor').value = floor
   }
 
   /** 滚动页每帧改氛围强度，只动一个 uniform。 */

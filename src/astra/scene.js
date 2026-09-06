@@ -86,6 +86,8 @@ export const DEFAULT_CONFIG = {
   // 氛围色和暗角（原本是两层 CSS，现在在后处理里做）
   ambientColor: '#23435f',
   ambientOpacity: 0.55,
+  // 氛围色里铺满整屏的比例（0 = 纯径向渐变，1 = 均匀底色）。发布页骨架用 0.4 配 vignette 0，对应原站截图的底色
+  ambientFloor: 0,
   vignette: 1,
   // --- 滚动编排（原站 converge-tilt 预设）---
   scrollEffects: true,
@@ -446,7 +448,7 @@ export function createAstraScene(canvas, initialConfig = {}) {
     bloom.luminanceMaterial.threshold = config.bloomThreshold
     if (bloom.mipmapBlurPass) bloom.mipmapBlurPass.radius = config.bloomRadius
     flare.setConfig(config.lensFlare)
-    ambient.setAmbient(config.ambientColor, config.ambientOpacity, config.vignette)
+    ambient.setAmbient(config.ambientColor, config.ambientOpacity, config.vignette, MathUtils.clamp(config.ambientFloor ?? 0, 0, 1))
     if (!field) return
     const u = field.material.uniforms
     u.uTwinkleSpeed.value = config.twinkleSpeed

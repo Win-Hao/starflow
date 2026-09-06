@@ -195,6 +195,7 @@ overhead. So the strategy is fewer passes, not fewer stars:
 | `center` | `[0, 0]` | Shape offset in half-viewport units |
 | `lensFlare` | original defaults | `intensity .28 / halo .12 / streaks .18 / secondary .55 / ghosts .1` |
 | `ambientColor` / `ambientOpacity` / `vignette` | `#23435f` / 0.55 / 1 | Ambient tint and vignette |
+| `ambientFloor` | 0 | Share of the ambient glow spread evenly over the canvas; 0 = pure radial. The launch-page skeletons use 0.4 with `vignette: 0` and `ambientOpacity: 0.3`, matching the page's near-uniform blue-black background |
 | `scrollEffects` / `scrollStarDriftSpeed` | true / 3 | Scroll choreography switch and rail parallax speed |
 | `shapeAutoRotate` / `shapeScatter` / `shapeBrightRetention` | true / 1 / 0.5 | Path-shape swing, band width, bright-star retention |
 | `quality` | `full` | `full` (bloom + flare) / `lite` (bloom only) / `none` (ACES only) |

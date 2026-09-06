@@ -65,7 +65,9 @@
           dimSizeScale: settings.dimSizeScale,
           fillX: settings.fillX,
           fillY: settings.fillY,
-          ambientOpacity: settings.ambient,
+          ambientOpacity: settings.ambient * 0.55,
+          ambientFloor: 0.4,
+          vignette: 0,
           // Shift the galaxy right by a quarter viewport so the copy column stays clear. Units: half-viewports.
           center: [0.25, 0],
         })

@@ -176,6 +176,7 @@ astra.dispose()
 | `center` | `[0, 0]` | 形状偏移，单位是半个视口 |
 | `lensFlare` | 原站默认 | `intensity .28 / halo .12 / streaks .18 / secondary .55 / ghosts .1` |
 | `ambientColor` / `ambientOpacity` / `vignette` | `#23435f` / 0.55 / 1 | 氛围色与暗角 |
+| `ambientFloor` | 0 | 氛围色里铺满整屏的比例，0 = 纯径向渐变。发布页骨架用 0.4 配 `vignette: 0`、`ambientOpacity: 0.3`，对应原站截图里近乎均匀的深蓝黑底色 |
 | `scrollEffects` / `scrollStarDriftSpeed` | true / 3 | 滚动编排开关、星轨视差速度 |
 | `shapeAutoRotate` / `shapeScatter` / `shapeBrightRetention` | true / 1 / 0.5 | 路径形状的摆动、星带宽度、亮星保留 |
 | `quality` | `full` | `full`（bloom + 光晕）/ `lite`（只 bloom）/ `none`（只 ACES） |
