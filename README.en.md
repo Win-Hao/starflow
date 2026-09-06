@@ -10,6 +10,47 @@ adaptive performance, and bilingual copy.
 
 ![Home page: a spiral galaxy of four thousand stars](docs/screenshots/01-hero.jpeg)
 
+## Quick start
+
+Three ways in, pick the one that matches what you want:
+
+**1. Have a coding agent build a whole page (recommended)**
+
+```bash
+# Open Design
+od plugin install github:Win-Hao/starflow@main/skill
+# Claude Code / Codex / Cursor: copy skill/ into the skills folder
+git clone https://github.com/Win-Hao/starflow && cp -r starflow/skill ~/.claude/skills/starflow-launch
+```
+
+Then give the agent one sentence, e.g. "Make a launch page for our new model Nova 2 in the Astra style: galaxy hero, three story sections, the stars form a cursor and then our logo, plus a benchmark chart." It copies the engine and hero skeleton, fills in your copy and builds the components from the design system. Details in [Skill and design system](#skill-and-design-system).
+
+**2. Only embed the starfield in your own page**
+
+Copy [`lib/starflow.js`](lib/starflow.js) next to the page (one file, three bundled):
+
+```html
+<canvas id="sky"></canvas>
+<script type="module">
+  import { createAstraScene } from './starflow.js'
+  const astra = createAstraScene(document.querySelector('#sky'), { autoRotate: true })
+  astra.setSource({ type: 'galaxy' })   // or { type: 'text', text: '6' }, { type: 'paths', … }
+</script>
+```
+
+No code at all: `<iframe src="embed.html?shape=cursor">`. API in [Use as a library](#use-as-a-library).
+
+**3. Run it locally to see the effect or hack the engine**
+
+```bash
+git clone https://github.com/Win-Hao/starflow && cd starflow
+npm install
+npm run dev      # http://127.0.0.1:5173  home / lab.html / embed.html
+                 # http://127.0.0.1:5173/examples/launch-page/  the finished page built with the skill
+```
+
+Just want the design spec: drop [`design-systems/openai-astra/DESIGN.md`](design-systems/openai-astra/DESIGN.md) into any project root.
+
 ## Pages
 
 | Path | What it is |

@@ -8,6 +8,47 @@ OpenAI GPT-6 Astra 发布页的实现（下文简称「原站」），并在此�
 
 ![主页首屏：四千颗星组成的螺旋星系](docs/screenshots/01-hero.jpeg)
 
+## 快速开始
+
+三种用法，按你要的东西选一个：
+
+**1. 让 coding agent 做一整页（推荐）**
+
+```bash
+# Open Design
+od plugin install github:Win-Hao/starflow@main/skill
+# Claude Code / Codex / Cursor：把 skill/ 拷进 skills 目录
+git clone https://github.com/Win-Hao/starflow && cp -r starflow/skill ~/.claude/skills/starflow-launch
+```
+
+然后对 agent 说一句需求，例如「用 Astra 风格给我们的新模型 Nova 2 做一个发布页：星系首屏、三段故事，星星先聚成光标、再聚成我们的 logo，加一张跑分图表」。它会照抄引擎和首屏骨架、填入你的文案、按设计系统拼出组件。细节见 [Skill 与设计系统](#skill-与设计系统)。
+
+**2. 只把星空效果嵌进自己的页面**
+
+把 [`lib/starflow.js`](lib/starflow.js) 复制到页面旁边（单文件，已打包 three）：
+
+```html
+<canvas id="sky"></canvas>
+<script type="module">
+  import { createAstraScene } from './starflow.js'
+  const astra = createAstraScene(document.querySelector('#sky'), { autoRotate: true })
+  astra.setSource({ type: 'galaxy' })   // 或 { type: 'text', text: '6' }、{ type: 'paths', … }
+</script>
+```
+
+不想写代码就 `<iframe src="embed.html?shape=cursor">`。API 见 [作为库使用](#作为库使用)。
+
+**3. 本地跑起来看效果、改引擎**
+
+```bash
+git clone https://github.com/Win-Hao/starflow && cd starflow
+npm install
+npm run dev      # http://127.0.0.1:5173  主页 / lab.html 实验室 / embed.html 纯效果
+                 # http://127.0.0.1:5173/examples/launch-page/  用 skill 做出来的成品发布页
+```
+
+只想拿一份设计规范：把 [`design-systems/openai-astra/DESIGN.md`](design-systems/openai-astra/DESIGN.md) 放进任何项目根目录即可。
+
 ## 页面
 
 | 路径 | 内容 |
