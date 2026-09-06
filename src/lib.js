@@ -35,4 +35,4 @@ export {
 
 export { PATH_PRESETS, DEFAULT_SHAPE_SETTINGS, ICON_PRESETS, TEXT_PRESETS } from './presets.js'
 
-export const VERSION = '0.2.3'
+export const VERSION = '0.2.4'

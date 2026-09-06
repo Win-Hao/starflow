@@ -211,6 +211,7 @@ overhead. So the strategy is fewer passes, not fewer stars:
 | `scatter` | 0.041 | Band half-width relative to the shape height (original: 0.4 / 9.7) |
 | `densityFalloff` | 0.22 | Density modulation along the path |
 | `rotationDepth` | 1.4 | Z undulation of the curves; depth layering when rotated |
+| `depth` | auto | Volume of the shape: extra Z spread per star as a fraction of the shape height. Text / icons / images default to 0.1 so a rotated shape reads as a tube, not a sheet; galaxy and path shapes default to 0 |
 | `flowInward` | true | Flow toward the core; false flows outward |
 | `size` | 2.05 | Overall star size |
 | `centerCluster` / `clusterCount` | true / 96 | Core cluster (galaxy mode only) |

@@ -48,6 +48,9 @@ const BLENDING = {
   blendDstAlpha: OneMinusSrcAlphaFactor,
 }
 
+/** 光栅形状（文字 / 图标 / 图片）默认的体积半宽，原站的数字在拖动时就是这么厚的一根管子 */
+export const RASTER_DEPTH = 0.1
+
 export const DEFAULT_FIELD_OPTIONS = {
   // 原站：5 层 × (强 220 / 弱 170) × density 4 = 4000
   starCount: 4000,
@@ -61,6 +64,9 @@ export const DEFAULT_FIELD_OPTIONS = {
   densityFalloff: 0.22,
   // 曲线的 Z 向起伏幅度，旋转时星臂才有前后层次
   rotationDepth: 1.4,
+  // 形状的体积：每颗星再沿 Z 向撒开的半宽（相对形状高度，三角分布），旋转时形状是一根管子而不是一张纸。
+  // null = 自动：文字 / 图标 / 图片取 RASTER_DEPTH，星系与路径形状取 0（与原站逐星一致）
+  depth: null,
   // 星星沿星臂朝星系核流动（false 则向外）
   flowInward: true,
   // 星星整体大小。原站 2.05——这是"大而软的亮星"观感的来源
@@ -245,6 +251,7 @@ export function generateStarField(source, userOptions = {}) {
 
   const sizeFactor = MathUtils.clamp(options.size, 0.25, 3)
   const scatterWorld = MathUtils.clamp(options.scatter, 0, 0.14) * shapeHeight
+  const depthWorld = MathUtils.clamp(options.depth ?? (raster ? RASTER_DEPTH : 0), 0, 0.5) * shapeHeight
   const falloff = MathUtils.clamp(options.densityFalloff, 0, 1)
   const seedMix = options.seed >>> 0
   const tangent = new Vector3()
@@ -278,7 +285,9 @@ export function generateStarField(source, userOptions = {}) {
       const spread = scatterWorld * MathUtils.lerp(0.3, 1, envelope) * (0.22 + 0.78 * random())
       let across = (random() + random() - 1) * spread
       if (isPaths) across += (random() + random() - 1) * scatterWorld * 0.27
-      const depth = (random() + random() - 1) * spread * 0.65
+      let depth = (random() + random() - 1) * spread * 0.65
+      // 体积厚度：只在开了 depth 时才多消耗随机数，星系的逐星序列保持与原站一致
+      if (depthWorld > 0) depth += (random() + random() - 1) * depthWorld
       point.addScaledVector(normal, across)
       point.z += depth
       const starSpeed = isPaths
@@ -376,7 +385,7 @@ export function generateStarField(source, userOptions = {}) {
       const index = cursor
       positions[index * 3] = wx
       positions[index * 3 + 1] = wy
-      positions[index * 3 + 2] = (random() + random() + random() - 1.5) * 0.3
+      positions[index * 3 + 2] = (random() + random() + random() - 1.5) * 0.3 + (depthWorld > 0 ? (random() + random() - 1) * depthWorld : 0)
       orbitProgress[index] = random()
       const isBright = random() < 0.03
       brightness[index] = isBright ? 1.5 + 1.1 * random() : 0.5 + 0.8 * random()

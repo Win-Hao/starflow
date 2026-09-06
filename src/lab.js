@@ -24,6 +24,8 @@ const fieldOptions = {
   backgroundRatio: 0.14,
   scatter: 0.041,
   rotationDepth: 1.4,
+  // 形状体积：只对文字 / 图标 / 路径生效，星系模式传 0 保持原站的逐星序列
+  depth: 0.1,
   size: 2.05,
   palette: 'astra',
 }
@@ -53,14 +55,16 @@ function applyShapeSettings(settings) {
   astra?.setConfig({ dimSizeScale: merged.dimSizeScale, fillX: merged.fillX, fillY: merged.fillY, ambientOpacity: merged.ambient })
 }
 
+const shapeOptions = () => ({ ...fieldOptions, depth: source.type === 'galaxy' ? 0 : fieldOptions.depth })
+
 function rebuild() {
   try {
     if (!astra) {
-      renderStaticFallback(canvas, source, fieldOptions)
+      renderStaticFallback(canvas, source, shapeOptions())
       $('stats').textContent = t('lab.fallback')
       return
     }
-    lastStats = astra.setSource(source, fieldOptions)
+    lastStats = astra.setSource(source, shapeOptions())
     renderStats()
   } catch (error) {
     $('stats').textContent = `⚠︎ ${error.message}`
@@ -81,7 +85,7 @@ modeSelect.addEventListener('change', () => {
     block.hidden = block.dataset.mode !== modeSelect.value
   }
   // 填充星尘只对"有内部"的光栅形状有意义
-  for (const block of document.querySelectorAll('[data-raster-only]')) {
+  for (const block of document.querySelectorAll('[data-raster-only], [data-shape-only]')) {
     block.hidden = modeSelect.value === 'galaxy'
   }
   if (modeSelect.value === 'galaxy') {
@@ -192,6 +196,7 @@ bindRange('fillRatio', 'field', 'fillRatio')
 bindRange('backgroundRatio', 'field', 'backgroundRatio')
 bindRange('scatter', 'field', 'scatter', (v) => v.toFixed(3))
 bindRange('rotationDepth', 'field', 'rotationDepth')
+bindRange('depth', 'field', 'depth', (v) => v.toFixed(3))
 bindRange('size', 'field', 'size')
 bindRange('sizeFalloff', 'config', 'sizeFalloff')
 bindRange('bloomIntensity', 'config', 'bloomIntensity')

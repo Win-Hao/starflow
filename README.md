@@ -192,6 +192,7 @@ astra.dispose()
 | `scatter` | 0.041 | 星带半宽，相对形状高度（原站 0.4 / 9.7） |
 | `densityFalloff` | 0.22 | 沿路径的疏密调制 |
 | `rotationDepth` | 1.4 | 曲线的 Z 向起伏，旋转时星臂的前后层次 |
+| `depth` | 自动 | 形状体积：每颗星沿 Z 向再撒开的半宽（相对形状高度）。文字 / 图标 / 图片默认 0.1，拖动旋转时是一根管子而不是一张纸；星系与路径形状默认 0 |
 | `flowInward` | true | 流向星系核；false 向外 |
 | `size` | 2.05 | 星星整体大小 |
 | `centerCluster` / `clusterCount` | true / 96 | 星系核（仅星系模式） |
