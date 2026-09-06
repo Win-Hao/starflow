@@ -611,6 +611,7 @@ export function generateStarField(source, userOptions = {}) {
     isGalaxy,
     isPaths,
     isStrokes: !!isStrokes,
+    isGalaxyText: source.type === 'galaxy-text',
     layers: layers.map((layer) => ({
       samples: layer.samples,
       speed: layer.flowSpeed,
@@ -712,6 +713,7 @@ export function createAstraField(source, userOptions = {}) {
       uShapeTexture: { value: null },
       uSizeFalloff: { value: 0.45 },
       uSizeScale: { value: 1 },
+      uFitScale: { value: 1 },
       uTextBounds: { value: new Vector2(-3, 3) },
       uTime: { value: 0 },
       uTrailBrightness: { value: 0.9 },
@@ -785,6 +787,8 @@ export function createAstraField(source, userOptions = {}) {
     isGalaxy: data.isGalaxy,
     isPaths: data.isPaths,
     isStrokes: data.isStrokes,
+    // 星系体数字：一位撑满高度时星点原大，多位排开整体缩小时星点等比缩小
+    sizeFollowsFit: data.isGalaxyText,
     layers: data.layers,
     heroes,
     coreHero,

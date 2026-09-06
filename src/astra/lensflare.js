@@ -67,6 +67,8 @@ const FRAGMENT_SHADER = /* glsl */ `
   uniform float uGhosts;
   uniform float uGrain;
   uniform float uHalo;
+  // 光晕整体缩放：多位星系体数字整体缩小时，光晕跟着缩
+  uniform float uSpread;
   uniform float uIntensity;
   uniform vec2  uSecondaryCenters[${MAX_SECONDARY}];
   uniform float uSecondaryIntensity;
@@ -102,7 +104,7 @@ const FRAGMENT_SHADER = /* glsl */ `
   // 副源只给柔和的光晕和克制的条纹：锐利的核心已经由那颗星本身和 bloom 提供了，
   // 再画一次会因为亚像素误差被看成"第二颗星"。
   float secondaryFlare(vec2 center, vec2 uv) {
-    vec2 point = aspectCorrect(uv - center);
+    vec2 point = aspectCorrect(uv - center) / uSpread;
     float d = length(point);
     // 0.4 之外各项指数衰减都已低于千分之一，直接跳过。
     // 这个分支在屏幕上是大块连续的，GPU 不会为它分叉。
@@ -128,7 +130,7 @@ const FRAGMENT_SHADER = /* glsl */ `
     vec3 base = inputColor.rgb;
     // 被指针推开时，光晕跟着那颗星一起走
     vec2 movingCenter = uCenter + vPrimaryMotion;
-    vec2 source = aspectCorrect(uv - movingCenter);
+    vec2 source = aspectCorrect(uv - movingCenter) / uSpread;
     float d = length(source);
 
     // 主光源的核心 / 光晕 / 条纹在 1.0 之外都已衰减到不可见，只有鬼影会落在远处。
@@ -154,9 +156,9 @@ const FRAGMENT_SHADER = /* glsl */ `
     // 鬼影沿"光源 → 画面中心"这条光轴排列，这是真实镜头内反射的几何。
     vec2 axis = vec2(0.5) - movingCenter;
     float ghosts = 0.0;
-    ghosts += softDisc(aspectCorrect(uv - (movingCenter + axis * 0.82)), 0.016, 0.014) * 0.18;
-    ghosts += softRing(aspectCorrect(uv - (movingCenter + axis * 1.38)), 0.046, 0.006) * 0.11;
-    ghosts += softDisc(aspectCorrect(uv - (movingCenter + axis * 1.82)), 0.025, 0.02) * 0.08;
+    ghosts += softDisc(aspectCorrect(uv - (movingCenter + axis * 0.82)) / uSpread, 0.016, 0.014) * 0.18;
+    ghosts += softRing(aspectCorrect(uv - (movingCenter + axis * 1.38)) / uSpread, 0.046, 0.006) * 0.11;
+    ghosts += softDisc(aspectCorrect(uv - (movingCenter + axis * 1.82)) / uSpread, 0.025, 0.02) * 0.08;
     ghosts *= uGhosts;
 
     float flare = (core + halo + streak + ghosts) * uIntensity;
@@ -208,6 +210,7 @@ export class AstraLensFlare extends Effect {
       ['uGhosts', new Uniform(config.ghosts)],
       ['uGrain', new Uniform(config.grain)],
       ['uHalo', new Uniform(config.halo)],
+      ['uSpread', new Uniform(1)],
       ['uIntensity', new Uniform(config.intensity)],
       ['uSecondaryCenters', new Uniform(Array.from({ length: MAX_SECONDARY }, () => new Vector2(-2, -2)))],
       ['uSecondaryIntensity', new Uniform(config.secondary)],
@@ -243,6 +246,11 @@ export class AstraLensFlare extends Effect {
     this.get('uStreakLength').value = config.streakLength
     this.get('uStreaks').value = config.streaks
     this.get('uVerticalStreaks').value = config.verticalStreaks
+  }
+
+  /** 光晕整体缩放（1 = 原大）。 */
+  setSpread(spread) {
+    this.get('uSpread').value = Math.max(spread, 0.05)
   }
 
   setViewport(width, height) {

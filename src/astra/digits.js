@@ -1,14 +1,16 @@
 /**
  * 星系体数字：把 0–9 写成原站那个「6」的样子。
  *
- * 原站的 6 不是字形，是 5 条手绘的开放螺旋臂：一条主臂（钩 + 竖笔 + 卷进圈里的一段）、
- * 一条贴着主臂走的伴臂、圈本身作为绕核心的一圈、再加两条从核心旋出来的内臂，核心放在圈心。
- * 这里每个数字都按同一套写法手排：主臂走字形笔画，伴臂平行短跑，有圈的数字核心放圈心、
- * 内臂往圈心旋进，没圈的数字（1 4 7）核心放在交叉 / 转折处。
+ * 原站的 6 不是字形，是 5 条手绘的对数螺旋臂绕着一个核心：每条臂都从外圈一路卷到核心附近
+ * （半径缩到起点的 1/10 上下），扫过 230–275°，全部逆时针向内流；臂的起点集中在核心的上方和右侧，
+ * 半径各不相同，所以看上去是一层套一层的星系，而不是「一个圈 + 几笔」。
+ *
+ * 这里把这套臂谱（半径比例、起始角、扫角）抽成 GRAMMAR，其它数字的圈都用它生成；
+ * 6 直接用原站的路径数据，9 是 6 转 180°；直笔画（1 4 7 的竖、2 的斜、5 的横）作为径向流向核心的臂。
  *
  * 坐标：每个数字一个 100 × 140 的格子，y 向下；角度 0 = 右、90 = 下（屏幕上顺时针递增）。
  */
-import { GALAXY_HEIGHT, GALAXY_LAYERS, PolylineCurve } from './paths.js'
+import { GALAXY_CENTER, GALAXY_HEIGHT, GALAXY_LAYERS, GALAXY_PATHS, PolylineCurve, parseSvgPath } from './paths.js'
 
 const DIGIT_ADVANCE = 100
 const DIGIT_HEIGHT = 140
@@ -26,18 +28,6 @@ function S(cx, cy, r0, r1, a0, a1, ry = 1) {
     points.push([cx + r * Math.cos(a), cy + r * ry * Math.sin(a)])
   }
   return points
-}
-
-/** 把几段折线接成一条，去掉接缝处的重复点。 */
-function J(...segments) {
-  const out = []
-  for (const segment of segments) {
-    for (const p of segment) {
-      const last = out[out.length - 1]
-      if (!last || Math.hypot(p[0] - last[0], p[1] - last[1]) > 0.5) out.push(p)
-    }
-  }
-  return out
 }
 
 /** Chaikin 细分：把折线的拐角磨圆，端点不动。 */
@@ -75,128 +65,143 @@ function resample(points, spacing) {
   return { points: out, length: total }
 }
 
+// ── 原站的 6：5 条臂从 231 × 325 的 viewBox 换到 100 × 140 的格子 ──
+const ORIGINAL_SCALE = DIGIT_HEIGHT / 325
+const ORIGINAL_OFFSET_X = (DIGIT_ADVANCE - 231 * ORIGINAL_SCALE) / 2
+const ORIGINAL_CORE = [GALAXY_CENTER[0] * ORIGINAL_SCALE + ORIGINAL_OFFSET_X, GALAXY_CENTER[1] * ORIGINAL_SCALE]
+
+function originalSix() {
+  return GALAXY_PATHS.map((d, index) => {
+    const curve = parseSvgPath(d)
+    const points = []
+    for (let i = 0; i <= 160; i += 1) {
+      const p = curve.getPointAt(i / 160)
+      points.push([p.x * ORIGINAL_SCALE + ORIGINAL_OFFSET_X, p.y * ORIGINAL_SCALE])
+    }
+    return { points, core: ORIGINAL_CORE, preset: index, raw: true }
+  })
+}
+
+const flip = ([x, y]) => [DIGIT_ADVANCE - x, DIGIT_HEIGHT - y]
+
 /**
- * 每个数字：核心位置、旋向、几条臂。
- * spin：星星向核心流动时在屏幕上的转向，+1 顺时针、-1 逆时针（原站的 6 是逆时针）。
- * 同一个数字里所有弧都按这个旋向卷进核心，直笔画径向流向核心，整体才是一个漩涡而不是几股乱流。
- * 臂的顺序对应原站分层：强、弱、强、弱、强……
+ * 原站 6 的臂谱：半径相对最外圈（原站 210px）、向内流动方向上的起始角（核心为原点，y 向下）、扫角。
+ * 五条臂逆时针向内，起点都在核心的上方 / 右侧，半径从 1.0 一直缩到 0.01。
+ */
+const GRAMMAR = [
+  { r0: 1.0, r1: 0.11, start: -86, sweep: 250 },
+  { r0: 1.0, r1: 0.19, start: -58, sweep: 230 },
+  { r0: 0.33, r1: 0.06, start: -76, sweep: 265 },
+  { r0: 0.55, r1: 0.13, start: 7, sweep: 260 },
+  { r0: 0.3, r1: 0.012, start: 19, sweep: 275 },
+]
+
+/**
+ * 按臂谱生成一个星系。spin −1 = 逆时针（原站），+1 = 顺时针（起始角做水平镜像）；
+ * rotate 整体转向，ry 压椭圆，pick 选用哪几条臂，sweeps 按臂号覆盖扫角（圈要闭合时用），
+ * radii 按臂号覆盖 [起始半径, 终止半径] 比例：数字的圈要读得出来，外面两条臂得贴着圈走、不能一头扎进核心。
+ */
+function galaxy(cx, cy, R, { spin = -1, rotate = 0, ry = 1, pick = [0, 1, 2, 3, 4], sweeps = [], radii = [] } = {}) {
+  return pick.map((index) => {
+    const arm = GRAMMAR[index]
+    const start = (spin < 0 ? arm.start : 180 - arm.start) + rotate
+    const sweep = sweeps[index] ?? arm.sweep
+    const [r0, r1] = radii[index] ?? [arm.r0, arm.r1]
+    return { points: S(cx, cy, R * r0, Math.max(R * r1, 0.6), start, start + spin * sweep, ry), core: [cx, cy], preset: index }
+  })
+}
+
+/** 直笔画：作为一条臂，preset 按强弱交替给。 */
+const stroke = (points, preset, core = null) => ({ points, core, preset })
+
+/**
+ * 每个数字：核心（可以多个，第一个是主核心）、旋向、臂。
+ * spin：星星向核心流动时在屏幕上的转向，+1 顺时针、-1 逆时针（原站的 6 是逆时针）；
+ * 同一个数字里所有弧都按这个旋向卷进核心，直笔画径向流向核心，整体才是一个漩涡。
  */
 export const GALAXY_DIGITS = {
   0: {
-    core: [50, 70],
+    cores: [[50, 70]],
     spin: -1,
-    arms: () => [
-      S(50, 70, 34, 30, 270, -130, 1.6),
-      S(50, 70, 38, 36, 120, -80, 1.6),
-      S(50, 70, 24, 7, 200, -100, 1.5),
-      S(50, 70, 18, 5, 20, -260, 1.4),
-      S(50, 70, 37, 34, 330, 170, 1.6),
-    ],
+    arms: () => galaxy(50, 70, 36, { ry: 1.62, sweeps: [400, 340, 300, 320, 290], radii: [[1.0, 0.74], [1.06, 0.82], [0.55, 0.06], [0.75, 0.13]] }),
   },
   1: {
-    core: [46, 36],
+    cores: [[46, 38]],
     spin: -1,
     arms: () => [
-      [[50, 132], [51, 120], [52, 90], [52, 60], [50, 44], [47, 37]],
-      [[14, 58], [24, 48], [34, 41], [45, 37]],
-      S(46, 36, 14, 5, 300, -20),
-      S(46, 36, 10, 3, 120, -180),
-      [[58, 126], [59, 100], [59, 72], [57, 52]],
+      stroke([[50, 134], [51, 118], [52, 90], [52, 62], [50, 46], [47, 39]], 0),
+      stroke([[12, 60], [22, 50], [33, 43], [45, 39]], 1),
+      ...galaxy(46, 38, 32, { pick: [2, 3, 4], rotate: 20 }),
+      stroke([[58, 128], [59, 104], [59, 76], [57, 56]], 1),
     ],
   },
   2: {
-    core: [50, 42],
+    cores: [[50, 42]],
     spin: 1,
     arms: () => [
-      S(50, 42, 34, 26, 200, 520),
-      [[68, 67], [56, 86], [38, 106], [18, 124], [16, 128], [30, 129], [60, 129], [88, 128]],
-      S(50, 42, 18, 6, 100, 400),
-      S(50, 42, 13, 4, 280, 560),
-      S(50, 42, 25, 22, 230, 430),
-      [[82, 121], [56, 120], [32, 121]],
+      ...galaxy(50, 42, 32, { spin: 1, radii: [[1.0, 0.5], [1.06, 0.58]] }),
+      stroke([[73, 64], [60, 84], [40, 105], [18, 124], [15, 129], [30, 130], [60, 130], [90, 129]], 0, [50, 42]),
+      stroke([[84, 122], [58, 121], [34, 122]], 1, [50, 42]),
     ],
   },
   3: {
-    core: [52, 92],
+    cores: [[52, 92], [50, 40]],
     spin: 1,
     arms: () => [
-      J(S(50, 40, 30, 30, 195, 420), [[60, 64]], S(52, 92, 34, 33, 285, 535)),
-      S(50, 40, 36, 34, 205, 355),
-      S(52, 92, 24, 7, 300, 600),
-      S(52, 92, 17, 4, 120, 400),
-      S(52, 92, 39, 37, 300, 480),
+      ...galaxy(52, 92, 34, { spin: 1, rotate: -66, radii: [[1.0, 0.5], [1.06, 0.58]] }),
+      ...galaxy(50, 40, 27, { spin: 1, rotate: -66, pick: [0, 2, 4], radii: [[1.0, 0.5]] }),
     ],
   },
   4: {
-    core: [64, 96],
+    cores: [[64, 96]],
     spin: 1,
     arms: () => [
-      [[66, 8], [50, 34], [30, 64], [12, 92], [10, 96]],
-      [[10, 96], [30, 97], [62, 97]],
-      S(64, 96, 20, 6, 200, 510),
-      S(64, 96, 14, 4, 30, 310),
-      [[66, 132], [66, 116], [66, 98]],
-      [[92, 96], [80, 97], [66, 97]],
-      [[66, 26], [66, 60], [66, 94]],
+      stroke([[66, 6], [50, 34], [30, 64], [12, 92], [10, 97]], 0),
+      stroke([[8, 98], [30, 98], [62, 98]], 1),
+      ...galaxy(64, 96, 30, { spin: 1, pick: [2, 3, 4] }),
+      stroke([[66, 134], [66, 116], [66, 99]], 1),
+      stroke([[94, 96], [82, 97], [66, 97]], 0),
+      stroke([[66, 26], [66, 60], [66, 94]], 1),
     ],
   },
   5: {
-    core: [52, 90],
+    cores: [[52, 90]],
     spin: 1,
     arms: () => [
-      J([[84, 12], [60, 12], [28, 13], [24, 20], [23, 44], [22, 60], [21, 68]], S(52, 90, 35, 33, 205, 515)),
-      [[78, 21], [56, 21], [34, 22]],
-      S(52, 90, 24, 7, 60, 360),
-      S(52, 90, 17, 4, 250, 530),
-      S(52, 90, 40, 38, 300, 470),
+      ...galaxy(52, 90, 34, { spin: 1, rotate: -60, radii: [[1.0, 0.5], [1.06, 0.58]] }),
+      stroke([[86, 12], [60, 12], [30, 13], [24, 18]], 0, [52, 90]),
+      stroke([[24, 20], [23, 40], [22, 62]], 1, [52, 90]),
+      stroke([[80, 21], [56, 21], [34, 22]], 1, [52, 90]),
     ],
   },
   6: {
-    core: [54, 92],
+    cores: [ORIGINAL_CORE],
     spin: -1,
-    arms: () => [
-      J([[80, 10], [62, 16], [44, 30], [30, 50], [22, 72], [19, 90]], S(54, 92, 36, 31, 180, -150, 0.95)),
-      [[72, 22], [56, 30], [40, 46], [30, 66], [26, 84]],
-      S(54, 92, 26, 9, 250, -50),
-      S(54, 92, 20, 5, 60, -220),
-      S(54, 92, 40, 38, 90, -110),
-    ],
+    arms: () => originalSix(),
   },
   7: {
-    core: [78, 22],
+    cores: [[78, 22]],
     spin: 1,
     arms: () => [
-      [[12, 14], [40, 13], [70, 13], [84, 16]],
-      [[36, 130], [40, 116], [52, 90], [66, 60], [80, 32]],
-      S(78, 22, 18, 6, 150, 470),
-      S(78, 22, 12, 4, 330, 610),
-      [[46, 98], [58, 70], [70, 44]],
-      [[20, 22], [44, 21], [66, 22]],
+      stroke([[10, 14], [40, 13], [70, 13], [84, 17]], 0),
+      stroke([[34, 132], [40, 116], [52, 90], [66, 60], [80, 32]], 0),
+      ...galaxy(78, 22, 28, { spin: 1, pick: [2, 3, 4], rotate: 140 }),
+      stroke([[46, 100], [58, 72], [70, 46]], 1),
+      stroke([[18, 22], [44, 21], [66, 22]], 1),
     ],
   },
   8: {
-    core: [50, 96],
-    spin: 1,
+    cores: [[50, 96], [50, 42]],
+    spin: -1,
     arms: () => [
-      S(50, 96, 33, 30, 250, 590),
-      S(50, 42, 28, 24, -60, 260),
-      S(50, 96, 23, 7, 300, 600),
-      S(50, 96, 16, 4, 100, 380),
-      S(50, 42, 32, 30, -20, 160),
-      S(50, 42, 18, 6, 200, 480),
+      ...galaxy(50, 96, 31, { sweeps: [335, 300, 265, 285, 275], radii: [[1.0, 0.72], [1.06, 0.8]] }),
+      ...galaxy(50, 42, 25, { pick: [0, 1, 2, 4], sweeps: [335, 300, 265, 285, 275], radii: [[1.0, 0.72], [1.06, 0.8]] }),
     ],
   },
   9: {
-    core: [50, 48],
+    cores: [flip(ORIGINAL_CORE)],
     spin: -1,
-    arms: () => [
-      S(50, 48, 36, 30, 30, -310),
-      [[24, 132], [52, 126], [70, 108], [80, 86], [82, 66]],
-      S(50, 48, 24, 7, -60, -360),
-      S(50, 48, 17, 4, 120, -160),
-      S(50, 48, 40, 38, -30, -210),
-      [[50, 118], [64, 100], [72, 80]],
-    ],
+    arms: () => originalSix().map((arm) => ({ ...arm, points: arm.points.map(flip), core: flip(ORIGINAL_CORE) })),
   },
 }
 
@@ -226,7 +231,7 @@ function flowSignFor(points, core, spin) {
 
 /**
  * 把一串数字排成星系体：每位一个格子横向排开，整串居中在原点，y 向上；
- * 返回星臂层（和星系臂同一套 depth / phase / 流速档位）和每一位的核心位置（世界单位）。
+ * 返回星臂层（和星系臂同一套 depth / phase / 流速档位）和每个核心的位置（世界单位）。
  */
 export function createGalaxyTextLayers(value, rotationDepth = 1.4) {
   const chars = Array.from(String(value ?? '')).filter((c) => GALAXY_DIGITS[c])
@@ -240,13 +245,14 @@ export function createGalaxyTextLayers(value, rotationDepth = 1.4) {
   chars.forEach((char, digitIndex) => {
     const digit = GALAXY_DIGITS[char]
     const offset = digitIndex * DIGIT_ADVANCE
-    const core = toWorld(digit.core[0], digit.core[1], offset)
-    cores.push({ position: core, layer: layers.length })
+    const firstLayer = layers.length
+    for (const core of digit.cores) cores.push({ position: toWorld(core[0], core[1], offset), layer: firstLayer })
     digit.arms().forEach((arm, armIndex) => {
-      const preset = GALAXY_LAYERS[armIndex % GALAXY_LAYERS.length]
-      const { points, length } = resample(chaikin(arm, 3), 2)
+      const gridCore = arm.core ?? digit.cores[0]
+      const preset = GALAXY_LAYERS[(arm.preset ?? armIndex) % GALAXY_LAYERS.length]
+      // 原站的路径已经是平滑曲线，不再磨角
+      const { points, length } = resample(arm.raw ? arm.points : chaikin(arm.points, 3), 2)
       const world = points.map(([x, y]) => toWorld(x, y, offset))
-      const flowSign = flowSignFor(points, digit.core, digit.spin)
       layers.push({
         curve: new PolylineCurve(world, { closed: false, depth: preset.depth, rotationDepth, depthPhase: 0.82 * armIndex }),
         closed: false,
@@ -255,8 +261,8 @@ export function createGalaxyTextLayers(value, rotationDepth = 1.4) {
         speed: preset.speed,
         phase: preset.phase,
         weight: length * unit * (preset.strong ? 1 : 0.77),
-        flowCenter: core,
-        flowSign,
+        flowCenter: toWorld(gridCore[0], gridCore[1], offset),
+        flowSign: flowSignFor(points, gridCore, digit.spin),
       })
     })
   })

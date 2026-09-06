@@ -243,6 +243,8 @@ export const STAR_VERTEX_SHADER = /* glsl */ `
   uniform sampler2D uShapeTexture;
   uniform float uSizeFalloff;
   uniform float uSizeScale;
+  // 多位星系体数字整体缩小时，星点也按同样比例缩，单个数字 = 1
+  uniform float uFitScale;
   uniform vec2  uTextBounds;
   uniform float uTime;
   uniform float uTrailBrightness;
@@ -518,7 +520,7 @@ export const STAR_VERTEX_SHADER = /* glsl */ `
     float scrollSizeScale = mix(uScrollSizeScale, 1.0, shapeProgress * brightStarWeight * shapeBrightKeep);
     scrollSizeScale = mix(scrollSizeScale, 1.0, backgroundPresence);
 
-    gl_PointSize = uPixelRatio * uSizeScale
+    gl_PointSize = uPixelRatio * uSizeScale * uFitScale
       * (0.35 + starScale * sizeEnvelope * endpointVisibility * 3.8)
       * (0.97 + twinkle * 0.03)
       * (1.0 + trail * 0.45)

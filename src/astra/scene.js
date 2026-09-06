@@ -26,6 +26,7 @@ import { prefersReducedMotion } from './fallback.js'
 import { AstraLensFlare, DEFAULT_FLARE } from './lensflare.js'
 import { ParticleMotion, supportsParticleMotion } from './motion.js'
 import { MAX_SPIN_LAYERS, SHAPE_SAMPLE_COUNT } from './shaders.js'
+import { GALAXY_HEIGHT } from './paths.js'
 
 // 世界坐标以"视口高度 = 10 单位"为基准，星星大小则是纯像素单位，
 // 两者解耦之后改窗口大小不会让星星忽大忽小。
@@ -299,6 +300,7 @@ export function createAstraScene(canvas, initialConfig = {}) {
   let motion = null
   let viewWidth = VIEW_HEIGHT
   let viewHeight = VIEW_HEIGHT
+  let fitScale = 1
   let viewportWidth = 1
   let fieldScale = 1
   let elapsed = 0
@@ -372,6 +374,10 @@ export function createAstraScene(canvas, initialConfig = {}) {
     // 形状按可用区域等比缩放，几何本身不用重建。
     fieldScale = Math.min((viewWidth * config.fillX) / field.size[0], (viewHeight * config.fillY) / field.size[1])
     field.group.scale.setScalar(fieldScale)
+    // 星系体数字：以「一位数字撑满 fillY 高度」为基准，多位排开缩小多少，星点和光晕就缩多少
+    fitScale = field.sizeFollowsFit ? Math.min(1, fieldScale / ((viewHeight * config.fillY) / GALAXY_HEIGHT)) : 1
+    field.material.uniforms.uFitScale.value = fitScale
+    flare.setSpread(fitScale)
     // 包围盒中心对齐到视口中心（加上 center 偏移）。旋转轴仍在形状自己的原点上——
     // 星系模式下那就是星系核，和原站一致。
     animationRoot.position.set(

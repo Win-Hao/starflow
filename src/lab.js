@@ -119,7 +119,7 @@ function applyText() {
     source = { type: 'galaxy-text', value }
     // 每位数字自己就是一个星系：星数按位数加，其余沿用星系模式的参数
     const kind = `galaxy${value.length}`
-    if (textKind !== kind) applyShapeSettings({ starCount: Math.min(12000, 4000 * value.length) })
+    if (textKind !== kind) applyShapeSettings({ starCount: Math.min(16000, 4000 * value.length) })
     textKind = kind
   } else {
     source = { type: 'text', value, fontWeight: Number($('weight').value) }
