@@ -122,6 +122,7 @@ the page only measures the DOM. `assets/template.html` contains the reference `u
   `settings` are the hero-only field/config values that make each shape read well.
 - `ICON_PRESETS`: `cursor`, `heart`, `star`, `bolt`, `ring` as `{ markup }` for `type: 'svg'`.
 - `TEXT_PRESETS`: sample strings for `type: 'text'`.
+- `createShapeSamplesFromPolylines(polylines, bbox?)`: shape samples from traced polylines (`rasterize` → `extractStrokes` / `extractContours`), so any icon can be fed to `setScroll({ shape })` and formed by the galaxy's own stars, exactly like the page's cursor and heart cues.
 - `GALAXY_DIGITS` / `GALAXY_DIGIT_CHARS` / `createGalaxyTextLayers(value)`: the galaxy-digit arm layouts (100 × 140 grid per digit) if you want to draw your own.
 - Custom logo: export outlines from Figma as SVG, take the `d` of each `<path>`, pass them as
   `paths` with the SVG `viewBox`. Keep to a handful of paths; stars follow stroke centre-lines.

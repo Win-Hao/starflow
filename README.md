@@ -56,7 +56,7 @@ npm run dev      # http://127.0.0.1:5173  主页 / lab.html 实验室 / embed.ht
 | 路径 | 内容 |
 |---|---|
 | `/` | 主页：原站首页的滚动编排。右上角可切换中 / 英文，「调节粒子」打开调节面板 |
-| `/lab.html` | 实验室：把星星摆成任意文字、内置图标、粘贴的 SVG 或上传的图片，所有参数可调 |
+| `/lab.html` | 实验室：把星星摆成任意文字、内置图标、粘贴的 SVG 或上传的图片，所有参数可调。图标默认走「原站 icon」模式：星场保持星系，用发布页那条滚动形状管线把星汇聚成图标，和发布页里的光标 / 心形完全同一套代码 |
 | `/embed.html` | 无 UI 的纯效果页，可直接 `<iframe>` 嵌入。`?shape=cursor` / `?shape=openai-knot` / `?digits=2026` / `?text=6` / `?icon=heart` 切换形状 |
 
 ```bash
@@ -119,6 +119,7 @@ astra.setScroll({
   ├─ galaxy        paths.js   原站 5 条曲线 → THREE.Curve（含 Z 向起伏）
   ├─ paths         paths.js   任意一组 SVG 路径，每条子路径一层（光标 / OpenAI 结）
   ├─ galaxy-text   digits.js      0–9 每位 5 条手排的螺旋臂 + 核心，写法同原站的 6；多位横向排开
+  ├─ icon 汇聚     paths.js   createShapeSamplesFromPolylines：图标抠出的轮廓 / 中线 → 1024 个形状采样点 → setScroll({ shape })，星系的星汇聚成形（发布页光标 / 心形的管线）
   └─ text/svg/img  rasterize.js → skeleton.js   光栅化 → 距离变换 + Zhang–Suen 细化取笔画中线，星星沿中线撒成管子（文字、描边图标；原站数字的做法）
                                  → contours.js   实心图标 / 图片：marching squares 抠闭合轮廓 → 等距重采样
         ↓

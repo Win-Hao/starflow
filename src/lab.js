@@ -1,5 +1,9 @@
 import { detectWebGL, renderStaticFallback } from './astra/fallback.js'
 import { createAstraScene } from './astra/scene.js'
+import { rasterize } from './astra/rasterize.js'
+import { extractStrokes } from './astra/skeleton.js'
+import { extractContours, resampleClosed, signedArea, smoothClosed } from './astra/contours.js'
+import { createShapeSamples, createShapeSamplesFromPolylines } from './astra/paths.js'
 import { DEFAULT_SHAPE_SETTINGS, ICON_PRESETS, PATH_PRESETS, TEXT_PRESETS, TEXT_SHAPE_SETTINGS, PATH_SHAPE_SETTINGS } from './presets.js'
 import { applyLocale, detectLocale, getLocale, t } from './i18n.js'
 
@@ -28,8 +32,9 @@ const fieldOptions = {
   depth: 0.1,
   stroke: 'auto',
   strokeSpread: 1.3,
-  // 图标 / SVG / 图片默认按原站路径形状撒星：厚实的星团、五颗主星，和发布页里的光标、心形一样
-  pathShape: true,
+  // 图标 / SVG / 图片：'converge' = 原站 icon 效果（星系的星汇聚成形状，发布页那条管线），'paths' = 路径形状撒星，'plain' = 普通轮廓
+  rasterStyle: 'converge',
+  pathShape: false,
   size: 2.05,
   palette: 'astra',
 }
@@ -38,12 +43,104 @@ let source = { type: 'galaxy' }
 let rebuildTimer = 0
 let lastStats = null
 
+// ── 原站 icon 效果：星场保持星系，用发布页的滚动形状管线把星汇聚成图标 ──
+let converged = false
+let shapeId = 0
+let lastShape = null
+
+/** 光栅图标抠成折线：文字和细描边走中线，实心图标走轮廓（和引擎里 stroke:'auto' 的规则一致） */
+function traceIcon(iconSource) {
+  const { mask, width, height } = rasterize(iconSource)
+  const result = extractStrokes(mask, width, height, { threshold: 0.5 })
+  const thin = result.maxHalfWidth / height < 0.15
+  const useStrokes = result.strokes.length > 0 && (fieldOptions.stroke === 'center' || (fieldOptions.stroke !== 'outline' && (iconSource.type === 'text' || thin)))
+  if (useStrokes) return result.strokes.map((s) => ({ points: s.points, closed: s.closed }))
+  return extractContours(mask, width, height, { threshold: 0.5 })
+    .map((points) => smoothClosed(points, 2))
+    .filter((points) => Math.abs(signedArea(points)) >= 24)
+    .map((points) => resampleClosed(points, 1.6))
+    .filter((entry) => entry.points.length >= 8)
+    .map((entry) => {
+      // 从最低点起算：形状两端渐隐、Z 向起伏归零的地方落在尖端，和原站的心形一致
+      let best = 0
+      for (let i = 1; i < entry.points.length; i += 1) if (entry.points[i][1] > entry.points[best][1]) best = i
+      return { points: entry.points.slice(best).concat(entry.points.slice(0, best)), closed: true }
+    })
+}
+
+function shapeAspect(polylines) {
+  let minX = Infinity
+  let minY = Infinity
+  let maxX = -Infinity
+  let maxY = -Infinity
+  for (const { points } of polylines) {
+    for (const [x, y] of points) {
+      if (x < minX) minX = x
+      if (x > maxX) maxX = x
+      if (y < minY) minY = y
+      if (y > maxY) maxY = y
+    }
+  }
+  return Math.max(maxX - minX, 1e-6) / Math.max(maxY - minY, 1e-6)
+}
+
+/** 形状框：像发布页的 cue 一样占视口高度的 64%，宽度按形状比例，最多占 70% 宽 */
+function shapeBox(aspect) {
+  const vw = canvas.clientWidth || 1
+  const vh = canvas.clientHeight || 1
+  let heightNdc = 1.28
+  let widthNdc = heightNdc * aspect * (vh / vw)
+  if (widthNdc > 1.4) {
+    widthNdc = 1.4
+    heightNdc = widthNdc / (aspect * (vh / vw))
+  }
+  return [widthNdc, heightNdc]
+}
+
+function showShape(samples, aspect) {
+  if (!astra) return
+  lastShape = { samples, aspect }
+  astra.setConfig({ scrollEffects: true })
+  astra.setScroll({ progress: 1.25, shape: { id: ++shapeId, samples, strength: 1, centerNdc: [0, 0], sizeNdc: shapeBox(aspect) } })
+  converged = true
+  renderStats()
+}
+
+function clearShape() {
+  if (!converged || !astra) return
+  astra.setScroll({ progress: 0, shape: { strength: 0 } })
+  converged = false
+  lastShape = null
+}
+
+window.addEventListener('resize', () => {
+  if (converged && lastShape) astra?.setScroll({ shape: { sizeNdc: shapeBox(lastShape.aspect) } })
+})
+
+/** 汇聚模式：星场必须是星系；不是就切过去（沿用星系参数） */
+function ensureGalaxy() {
+  if (source.type === 'galaxy') return
+  source = { type: 'galaxy' }
+  applyShapeSettings({})
+  scheduleRebuild()
+}
+
 function renderStats() {
   if (!lastStats) return
+  const iconMode = ['icon', 'svg', 'file'].includes(modeSelect.value)
+  const rasterField = ['text', 'svg', 'image'].includes(source.type)
+  for (const block of document.querySelectorAll('[data-icon-only]')) block.hidden = !iconMode
+  for (const block of document.querySelectorAll('[data-trace]')) block.hidden = !(rasterField || (iconMode && converged))
+  if (converged) {
+    for (const block of document.querySelectorAll('[data-raster-only]')) block.hidden = true
+    for (const block of document.querySelectorAll('[data-stroke-center], [data-shape-only]')) block.hidden = true
+    for (const block of document.querySelectorAll('[data-stroke-outline]')) block.hidden = false
+    $('stats').textContent = t('lab.statsConverge', lastStats.count)
+    return
+  }
   const kind = t(source.type === 'galaxy' ? 'lab.kind.galaxy' : source.type === 'galaxy-text' ? 'lab.kind.galaxyText' : source.type === 'paths' ? 'lab.kind.paths' : lastStats.strokes ? 'lab.kind.strokes' : 'lab.kind.contours')
-  // 只有光栅形状才有星线 / 填充这些选项
-  const raster = ['text', 'svg', 'image'].includes(source.type)
-  for (const block of document.querySelectorAll('[data-raster-only]')) block.hidden = !raster
+  // 只有光栅形状才有填充 / 星带这些选项
+  for (const block of document.querySelectorAll('[data-raster-only]')) block.hidden = !rasterField
   // 中线模式下星带宽度由笔画宽度决定，只剩散布倍率可调
   const center = source.type !== 'galaxy' && source.type !== 'paths' && !!lastStats.strokes
   for (const block of document.querySelectorAll('[data-stroke-center]')) block.hidden = !center
@@ -69,6 +166,7 @@ function applyShapeSettings(settings) {
 
 const shapeOptions = () => ({
   ...fieldOptions,
+  rasterStyle: undefined,
   depth: source.type === 'galaxy' || source.type === 'galaxy-text' ? 0 : fieldOptions.depth,
   pathShape: fieldOptions.pathShape && (source.type === 'svg' || source.type === 'image'),
 })
@@ -104,6 +202,7 @@ modeSelect.addEventListener('change', () => {
   for (const block of document.querySelectorAll('[data-raster-only], [data-shape-only]')) {
     block.hidden = modeSelect.value === 'galaxy'
   }
+  if (modeSelect.value === 'galaxy' || modeSelect.value === 'text') clearShape()
   if (modeSelect.value === 'galaxy') {
     source = { type: 'galaxy' }
     textKind = ''
@@ -164,8 +263,22 @@ $('lang').addEventListener('click', () => {
   $('lang').textContent = getLocale() === 'zh' ? 'EN' : '中文'
   renderStats()
 })
+let pendingIcon = null
 function applyIcon() {
+  pendingIcon = null
   const pathPreset = PATH_PRESETS[iconSelect.value]
+  if (fieldOptions.rasterStyle === 'converge') {
+    ensureGalaxy()
+    if (pathPreset) {
+      const [, , vw, vh] = pathPreset.viewBox
+      showShape(createShapeSamples(pathPreset.paths, pathPreset.viewBox), vw / vh)
+    } else {
+      const polylines = traceIcon({ type: 'svg', markup: ICON_PRESETS[iconSelect.value].markup })
+      showShape(createShapeSamplesFromPolylines(polylines), shapeAspect(polylines))
+    }
+    return
+  }
+  clearShape()
   if (pathPreset) {
     source = { type: 'paths', paths: pathPreset.paths, viewBox: pathPreset.viewBox }
     applyShapeSettings(pathPreset.settings)
@@ -175,31 +288,40 @@ function applyIcon() {
   }
   scheduleRebuild()
 }
+
+/** 粘贴的 SVG / 上传的文件：汇聚模式走原站管线，否则建星场 */
+function applyRaster(rasterSource) {
+  pendingIcon = rasterSource
+  if (fieldOptions.rasterStyle === 'converge') {
+    ensureGalaxy()
+    const polylines = traceIcon(rasterSource)
+    showShape(createShapeSamplesFromPolylines(polylines), shapeAspect(polylines))
+    return
+  }
+  clearShape()
+  source = rasterSource
+  applyShapeSettings(fieldOptions.pathShape ? PATH_SHAPE_SETTINGS : {})
+  rebuild()
+}
 iconSelect.addEventListener('change', applyIcon)
 
 $('applySvg').addEventListener('click', () => {
   const markup = $('svg').value.trim()
   if (!markup) return
-  source = { type: 'svg', markup }
-  applyShapeSettings(fieldOptions.pathShape ? PATH_SHAPE_SETTINGS : {})
-  rebuild()
+  applyRaster({ type: 'svg', markup })
 })
 
 $('file').addEventListener('change', async (event) => {
   const file = event.target.files?.[0]
   if (!file) return
   if (file.type.includes('svg')) {
-    source = { type: 'svg', markup: await file.text() }
-    applyShapeSettings(fieldOptions.pathShape ? PATH_SHAPE_SETTINGS : {})
-    rebuild()
+    applyRaster({ type: 'svg', markup: await file.text() })
     return
   }
   const image = new Image()
   image.src = URL.createObjectURL(file)
   await image.decode()
-  source = { type: 'image', image, useLuminance: true }
-  applyShapeSettings(fieldOptions.pathShape ? PATH_SHAPE_SETTINGS : {})
-  rebuild()
+  applyRaster({ type: 'image', image, useLuminance: true })
 })
 
 // --- 滑块绑定 ---
@@ -229,12 +351,19 @@ bindRange('rotationDepth', 'field', 'rotationDepth')
 bindRange('strokeSpread', 'field', 'strokeSpread')
 $('stroke').addEventListener('change', () => {
   fieldOptions.stroke = $('stroke').value
+  if (converged) {
+    if (modeSelect.value === 'icon') applyIcon()
+    else if (pendingIcon) applyRaster(pendingIcon)
+    return
+  }
   scheduleRebuild()
 })
 $('rasterStyle').addEventListener('change', () => {
-  fieldOptions.pathShape = $('rasterStyle').value === 'paths'
-  applyShapeSettings(fieldOptions.pathShape ? PATH_SHAPE_SETTINGS : {})
-  scheduleRebuild()
+  fieldOptions.rasterStyle = $('rasterStyle').value
+  fieldOptions.pathShape = fieldOptions.rasterStyle === 'paths'
+  if (fieldOptions.rasterStyle !== 'converge') clearShape()
+  if (modeSelect.value === 'icon') applyIcon()
+  else if (pendingIcon) applyRaster(pendingIcon)
 })
 bindRange('depth', 'field', 'depth', (v) => v.toFixed(3))
 bindRange('size', 'field', 'size')

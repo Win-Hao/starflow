@@ -234,6 +234,74 @@ export function flowDirection(curve, speed, inward, center = null) {
  */
 export const SHAPE_SAMPLE_COUNT = 1024
 
+/**
+ * 同上，但输入是折线（光栅图标 / 文字抠出来的轮廓或中线，坐标 y 向下）：
+ * 这样任何图标都能走原站的「星系汇聚成形状」管线，效果和发布页里的光标、心形完全一样。
+ * @param {Array<{points:[number,number][], closed?:boolean}>} polylines
+ * @param {[number, number, number, number]} bbox [x, y, w, h]，缺省取所有点的包围盒
+ */
+export function createShapeSamplesFromPolylines(polylines, bbox = null) {
+  const entries = polylines
+    .map(({ points, closed = false }) => {
+      const n = points.length
+      const segments = closed ? n : n - 1
+      const lengths = new Float32Array(segments + 1)
+      for (let i = 0; i < segments; i += 1) {
+        const a = points[i]
+        const b = points[(i + 1) % n]
+        lengths[i + 1] = lengths[i] + Math.hypot(b[0] - a[0], b[1] - a[1])
+      }
+      return { points, closed, lengths, length: lengths[segments] }
+    })
+    .filter((entry) => entry.points.length >= 2 && entry.length > 0)
+  const samples = new Float32Array(SHAPE_SAMPLE_COUNT * 4)
+  const total = entries.reduce((sum, entry) => sum + entry.length, 0)
+  if (total <= 0) return samples
+  let [vx, vy, vw, vh] = bbox ?? [0, 0, 0, 0]
+  if (!bbox) {
+    let minX = Infinity
+    let minY = Infinity
+    let maxX = -Infinity
+    let maxY = -Infinity
+    for (const entry of entries) {
+      for (const [x, y] of entry.points) {
+        if (x < minX) minX = x
+        if (x > maxX) maxX = x
+        if (y < minY) minY = y
+        if (y > maxY) maxY = y
+      }
+    }
+    vx = minX
+    vy = minY
+    vw = Math.max(maxX - minX, 1e-6)
+    vh = Math.max(maxY - minY, 1e-6)
+  }
+  let cursor = 0
+  let consumed = 0
+  for (let i = 0; i < SHAPE_SAMPLE_COUNT; i += 1) {
+    const distance = ((i + 0.5) / SHAPE_SAMPLE_COUNT) * total
+    while (cursor < entries.length - 1 && distance > consumed + entries[cursor].length) {
+      consumed += entries[cursor].length
+      cursor += 1
+    }
+    const entry = entries[cursor]
+    const local = MathUtils.clamp(distance - consumed, 0, entry.length)
+    let seg = 0
+    while (seg < entry.lengths.length - 2 && entry.lengths[seg + 1] < local) seg += 1
+    const span = entry.lengths[seg + 1] - entry.lengths[seg]
+    const t = span > 1e-9 ? (local - entry.lengths[seg]) / span : 0
+    const a = entry.points[seg]
+    const b = entry.points[(seg + 1) % entry.points.length]
+    const x = a[0] + (b[0] - a[0]) * t
+    const y = a[1] + (b[1] - a[1]) * t
+    samples[i * 4] = (x - vx) / vw - 0.5
+    samples[i * 4 + 1] = 0.5 - (y - vy) / vh
+    samples[i * 4 + 2] = consumed / total
+    samples[i * 4 + 3] = (consumed + entry.length) / total
+  }
+  return samples
+}
+
 export function createShapeSamples(paths, viewBox = [0, 0, 100, 100]) {
   const [vx, vy, vw, vh] = viewBox
   const curves = paths.map((d) => parseSvgPath(d)).map((curve) => ({ curve, length: curve.getLength() }))

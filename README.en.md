@@ -58,7 +58,7 @@ Just want the design spec: drop [`design-systems/openai-astra/DESIGN.md`](design
 | Path | What it is |
 |---|---|
 | `/` | Home: the scroll choreography of the original landing page. Language switch (中 / EN) and a "Tune particles" panel in the top-right corner |
-| `/lab.html` | Lab: arrange the stars into any text, a built-in icon, pasted SVG, or an uploaded image, with every parameter exposed |
+| `/lab.html` | Lab: arrange the stars into any text, built-in icons, pasted SVG or an uploaded image, every parameter adjustable. Icons default to the “original icon” mode: the field stays a galaxy and the launch page's scroll-shape pipeline converges its stars into the icon, the very code behind the page's cursor and heart cues |
 | `/embed.html` | Bare effect page for `<iframe>` embedding. `?shape=cursor` / `?shape=openai-knot` / `?digits=2026` / `?text=6` / `?icon=heart` switch the shape |
 
 ```bash
@@ -126,6 +126,7 @@ Shape sources
   ├─ galaxy        paths.js   the original's 5 curves → THREE.Curve (with z undulation)
   ├─ paths         paths.js   any set of SVG paths, one layer per sub-path (cursor / knot)
   ├─ galaxy-text   digits.js      0–9, each digit five hand-laid spiral arms + a core, the original's 6 written out; strings lay out left to right
+  ├─ icon converge paths.js   createShapeSamplesFromPolylines: traced outline / centre-lines → 1024 shape samples → setScroll({ shape }); the galaxy's stars converge into the icon (the launch page's cursor / heart pipeline)
   └─ text/svg/img  rasterize.js → skeleton.js   rasterize → distance transform + Zhang–Suen thinning → stroke centre-lines, stars scattered into a tube (text, stroke icons; how the original does its digits)
                                  → contours.js   filled icons / images: marching squares outlines → resample by arc length
         ↓

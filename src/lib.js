@@ -32,6 +32,7 @@ export {
 
 export {
   createShapeSamples,
+  createShapeSamplesFromPolylines,
   createPathLayers,
   parseSvgPath,
   SHAPE_SAMPLE_COUNT,
