@@ -1,5 +1,5 @@
 {
-  "name": "starflow",
+  "name": "@win-hao/starflow",
   "version": "0.2.3",
   "type": "module",
   "description": "星流 Starflow：一片会流动的星空，基于 three.js 的星星粒子系统 / A flowing starfield particle engine built on three.js",
@@ -7,9 +7,13 @@
   "author": "Winhao",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Win-Hao/starflow.git"
+    "url": "git+https://github.com/Win-Hao/starflow.git"
   },
   "homepage": "https://github.com/Win-Hao/starflow#readme",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
   "keywords": [
     "three.js",
     "particles",

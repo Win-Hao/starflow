@@ -64,12 +64,14 @@ git commit -m "Add openai-astra DESIGN.md"
 gh pr create --title "Add openai-astra DESIGN.md" --body "Closes #<issue>. Dark launch-page system from the GPT-6 Astra page. See DESIGN.md for the 10 sections and preview.html for the catalogue page."
 ```
 
-## 3. 发布 starflow 到 npm（可选，让 skill 之外的人也能 `npm i starflow`）
+## 3. 发布到 npm（可选，让 skill 之外的人也能 `npm i @win-hao/starflow`）
+
+npm 上的 `starflow` 是别人 2016 年发的无关包，所以本项目用 scope 名 `@win-hao/starflow`；`package.json` 的 `publishConfig` 已固定 registry.npmjs.org 和 public。
 
 ```bash
 cd starflow
-npm login
-npm publish --access public
+npm login --registry https://registry.npmjs.org
+npm publish
 ```
 
 发布前 `prepublishOnly` 会自动跑 `build:lib`。

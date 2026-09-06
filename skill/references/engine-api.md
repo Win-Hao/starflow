@@ -10,7 +10,7 @@ import {
 } from './starflow.js'
 ```
 
-The same API is on npm as `starflow` (`import … from 'starflow'`, three as a dependency) and as a
+The same API is on npm as `@win-hao/starflow` (`import … from '@win-hao/starflow'`, three as a dependency) and as a
 global for non-module pages (`assets/starflow.iife.js` → `window.Starflow`).
 
 ## createAstraScene(canvas, config?) → astra
