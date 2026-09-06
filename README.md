@@ -230,6 +230,24 @@ if (detectWebGL()) {
 | [`design-systems/openai-astra/`](design-systems/openai-astra/) | 从 GPT-6 Astra 发布页公开 CSS 提炼的暗色设计系统（DESIGN.md、tokens.css、组件页、preview），按 Open Design 项目规范打包，已投 [nexu-io/open-design#7806](https://github.com/nexu-io/open-design/pull/7806) | 单独把 `DESIGN.md` 丢进任何项目根目录，agent 就会按这套风格生成界面 |
 | [`docs/upstream-prs.md`](docs/upstream-prs.md) | 往上游目录投稿的步骤与 PR 文案 | |
 
+### skill 用起来是什么样
+
+一句话需求就够，例如：
+
+```
+用 Astra 风格给我们的新模型 Nova 2 做一个发布页：星系首屏、三段故事，星星先聚成光标、再聚成我们的 logo，加一张跑分图表。
+```
+
+agent 读完 `SKILL.md` 后分三层干活：
+
+| 层 | 内容 | 谁定 |
+|---|---|---|
+| 照抄 | 引擎单文件、首屏骨架、header / footer 尺寸、黑底白字胶囊控件（规则禁止重写引擎、改首屏几何） | skill |
+| 填空 | 首屏两个标签、标题、导语、2–4 段故事、每个形状的说明、结尾；logo 的 SVG 路径、配色 | 用户需求 |
+| 按配方生成 | 页面里需要的组件：站点头部、分段控件（6s 自动轮播、联动图表）、图表卡、下拉选择、下载菜单、引用轮播、媒体框与两栏对比、对比表、幻灯片、chip / 脚注 / logo 条 / 媒体条、footer；尺寸、颜色、动效来自 `DESIGN.md` §4 / §7，现成标记在 `design-systems/openai-astra/components.html` | agent 按规则拼 |
+
+最后按 `SKILL.md` 第 8 步在 1440 / 390 宽度下过一遍检查清单。[`examples/launch-page/`](examples/launch-page/) 就是这样做出来的一页，中文，包含上面全部组件。
+
 `npm run build:lib` 会把引擎产物同时写进 `lib/` 和 `skill/assets/`；改了 `tokens.css` 或 DESIGN.md 后跑 `scripts/sync-skill.sh` 同步组件页和副本。
 
 

@@ -249,6 +249,24 @@ The repository also ships a skill for coding agents and a DESIGN.md design syste
 | [`design-systems/openai-astra/`](design-systems/openai-astra/) | The dark design system distilled from the public CSS of the GPT-6 Astra launch page (DESIGN.md, tokens.css, component fixture, previews), packaged in the Open Design project shape; submitted as [nexu-io/open-design#7806](https://github.com/nexu-io/open-design/pull/7806) | Drop `DESIGN.md` alone into any project root and agents generate UI in this register |
 | [`docs/upstream-prs.md`](docs/upstream-prs.md) | Steps and PR copy for contributing to upstream catalogues | |
 
+### What using the skill looks like
+
+One sentence is enough, for example:
+
+```
+Make a launch page for our new model Nova 2 in the Astra style: galaxy hero, three story sections, the stars form a cursor and then our logo, plus a benchmark chart.
+```
+
+After reading `SKILL.md` the agent works in three layers:
+
+| Layer | What | Decided by |
+|---|---|---|
+| Copied verbatim | The engine bundle, the hero skeleton, header / footer geometry, black canvas with white pill controls (the rules forbid rewriting the engine or resizing the hero) | the skill |
+| Filled in | Two hero labels, title, lede, 2–4 story sections, one caption per shape, the closing line; the logo's SVG path and palette | the user's brief |
+| Built from recipes | Whatever components the page needs: site header, segmented control (6s autoplay linked to charts), chart card, select, download menu, quote carousel, media frame and two-up, comparison table, slide deck, chips / footnotes / logo strip / media bar, footer; sizes, colours and motion come from `DESIGN.md` §4 / §7, working markup from `design-systems/openai-astra/components.html` | the agent, under the rules |
+
+It ends with the step-8 checklist at 1440 / 390 wide. [`examples/launch-page/`](examples/launch-page/) is a page produced this way, in Chinese, with every component above.
+
 `npm run build:lib` writes the engine bundle to both `lib/` and `skill/assets/`; after editing `tokens.css` or DESIGN.md run `scripts/sync-skill.sh` to rebuild the fixture and the copies.
 
 

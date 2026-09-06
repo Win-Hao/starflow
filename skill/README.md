@@ -14,6 +14,10 @@
 | Claude Code / Codex / Cursor | 把本目录拷到 agent 的 skills 目录（例如 `~/.claude/skills/starflow-launch/`），对 agent 说「用 starflow 做一个发布页」。 |
 | 只要效果 | 打开 `assets/template.html` 或 `assets/hero.html`，把 `assets/starflow.js` 一起拷走。 |
 
+## 用起来是什么样
+
+一句话需求，例如「用 Astra 风格给我们的新模型 Nova 2 做一个发布页：星系首屏、三段故事，星星先聚成光标、再聚成我们的 logo，加一张跑分图表」。agent 会照抄引擎和首屏骨架，把标签、标题、导语、故事段、形状说明和 logo 路径填进去，再按 `references/DESIGN.md` §4 的配方拼出需要的组件（站点头部、自动轮播的分段控件、图表卡、下拉、下载菜单、引用轮播、媒体框、对比表、幻灯片、脚注、footer），最后在 1440 / 390 宽度下过一遍检查清单。成品示例见仓库的 [`examples/launch-page/`](../examples/launch-page/)。
+
 ## 文件
 
 ```
@@ -42,3 +46,7 @@ This folder is self-contained: `assets/starflow.js` is written by `npm run build
 | Open Design | "Install skill" with `github:Win-Hao/starflow@main/skill`, or `od plugin install github:Win-Hao/starflow@main/skill`. Pick `openai-astra` in the design-system dropdown after dropping `design-systems/openai-astra/` into its `data/design-systems/`. |
 | Claude Code / Codex / Cursor | Copy this folder into the agent's skills directory (e.g. `~/.claude/skills/starflow-launch/`) and ask for "a launch page with starflow". |
 | Effect only | Open `assets/template.html` or `assets/hero.html` and take `assets/starflow.js` with it. |
+
+### What using it looks like
+
+One sentence, e.g. "Make a launch page for our new model Nova 2 in the Astra style: galaxy hero, three story sections, the stars form a cursor and then our logo, plus a benchmark chart." The agent copies the engine and hero skeleton verbatim, fills in the labels, title, lede, story sections, shape captions and logo path, then builds the components the page needs from the recipes in `references/DESIGN.md` §4 (site header, autoplaying segmented control, chart card, select, download menu, quote carousel, media frame, comparison table, slide deck, footnotes, footer) and runs the checklist at 1440 / 390 wide. See [`examples/launch-page/`](../examples/launch-page/) for a finished page.
