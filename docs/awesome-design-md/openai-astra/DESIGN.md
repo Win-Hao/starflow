@@ -87,7 +87,7 @@ The site scale is fluid between 375px and 1440px; the values below are the deskt
 | nav-header | 13px | 19.7px | 0 | 500 |
 
 ### Principles
-- Weight 500 is the loudest the page gets. No 600, no 700, no italics.
+- Weight 500 is the loudest the page gets. No 700 anywhere; no 600 and no italics in running copy. The two measured exceptions live inside components (§4): comparison-table header cells are `600`, and chart captions are italic.
 - Headings use `text-wrap: balance`; body uses `text-wrap: pretty`.
 - Only the page title is h2-size (`48px`); every section heading after it is h3-size (`30px / 39.6px`, `-0.01em`, `500`), capped at `max-width: 1000px`. Body copy sits in a `669px` column (6 of 12 grid columns, starting at column 4) so the star rails have room; paragraphs are `17px / 28px` with `24px` below; inline links are white with a `1px` underline offset `4px`; inline code is `0.875em` mono on `#ffffff33`, `4px` radius, `0 4px` padding; footnote references are `<sup>` links at `12px`.
 - Hero labels are split: "GPT" pinned left at 50% height, "Astra" pinned right, each letter revealing with a stagger.
@@ -204,7 +204,7 @@ The site scale is fluid between 375px and 1440px; the values below are the deskt
 ### Hero Entrance
 - Ambient glow fades in over 5.5s to 55% while the galaxy plays its intro (same 5.5s).
 - Split labels reveal letter by letter: 1s, `cubic-bezier(0.22, 1, 0.36, 1)`, delays 0.85s to 1.25s, each letter sliding 44px in from its edge.
-- The section title lags scroll by up to 120px (`--astra-title-parallax-y`).
+- The section title is the one piece of copy that moves with scroll: it lags by up to 120px (`--astra-title-parallax-y`) and settles as the intro completes. No other copy responds to scroll.
 
 ### Scroll Stages (800px of scroll = progress 1)
 1. **Tilt**: the galaxy rotates to -52° about X, peaking at 75% of the intro block's travel and flattening at 100%.
@@ -221,7 +221,7 @@ The site scale is fluid between 375px and 1440px; the values below are the deskt
 - Media play overlay: `500ms ease-in-out` opacity. Media frame background: `300ms cubic-bezier(0.6, 0, 0.4, 1)`. Slide deck: slides crossfade `250ms`, thumbnails sidebar width `200ms cubic-bezier(0.33, 1, 0.68, 1)`.
 
 ### Rules
-- Only the stars respond to scroll. Copy, buttons and images never parallax, pin, or fade on scroll.
+- Only the stars respond to scroll, with the single exception above: the section title's 120px lag. Every other piece of copy, and every button and image, never parallaxes, pins, or fades on scroll.
 - No scroll-jacking. Native scroll, passive listeners, one `requestAnimationFrame` per scroll event.
 - Pointer: hover repels nearby stars; drag rotates the galaxy with per-layer lag (0.68). Never animate the cursor itself.
 
@@ -229,7 +229,7 @@ The site scale is fluid between 375px and 1440px; the values below are the deskt
 
 ### Do
 - Keep the canvas `#000000` and let the ambient glow supply the softness.
-- Keep the copy column at 669px and empty on both sides.
+- Keep the copy column at 669px (`max-width` on `.copy`) and empty on both sides. The engine measures the empty strip itself at runtime (`contentBounds`); never hard-code a second width for it.
 - Use one white pill CTA per screen; every other control is glass.
 - Use weight 500 for every heading and 400 for body; keep display tracking at -0.03em.
 - Reserve the shape frames (576px × 80vh) even before the engine is wired, so layout does not shift.
@@ -239,8 +239,8 @@ The site scale is fluid between 375px and 1440px; the values below are the deskt
 ### Don't
 - Don't add gradients, coloured buttons, tinted cards, or a coloured link colour.
 - Don't lift the background to charcoal, add noise, or add a vignette; the page has none. The only tint is the ambient glow, which reads as a near-uniform blue-black with slightly brighter corners.
-- Don't use a serif, a second sans, weight 600+, or italics.
-- Don't animate copy on scroll, pin sections, or add scroll-snap.
+- Don't use a serif, a second sans, or weight 700. Weight 600 and italics have exactly two homes, comparison-table header cells and chart captions; keep them out of everything else.
+- Don't animate copy on scroll (the section title's 120px lag is the only exception), pin sections, or add scroll-snap.
 - Don't put cards, illustrations, or screenshots in the star rails.
 - Don't use `backdrop-filter` over the canvas or box-shadows for depth.
 - Don't imply affiliation: this is a distillation of public CSS, not an OpenAI asset.
@@ -279,7 +279,7 @@ Motion: 300ms cubic-bezier(.6,0,.4,1) · reveals 1s cubic-bezier(.22,1,.36,1) ·
 - "A 669px copy block with an h2 at 48px and two p1 paragraphs in #ffffff99, 26vh padding, nothing on either side."
 - "A shape cue: a 576px × 80vh frame reserving a cursor path, caption 'It takes action' at 14px 500 tracking 0.08em, note in #ffffff70."
 - "A benchmark table: h5 labels, tabular figures, our model in white and three comparisons in #ffffff99, hairlines between rows, no colour bars."
-- "A 54px transparent site header: wordmark left, five 13px nav links, a search icon, a glass 'Log in ▾' pill and a white 'Try Nova ↗' pill."
+- "A 64px transparent site header (54px below 1020px): wordmark left, five 13px nav links, a search icon, a glass 'Log in ▾' pill and a white 'Try Nova ↗' pill."
 - "A chart card: 16px radius and hairline border, title, glass 'API Cost ▾' select, legend with star/circle/diamond markers, dashed reference line, italic centred caption."
 - "A quote card on #1f1f1f: 32px logo row, quote at 18px / 500, attribution in #ffffff99."
 - "A five-column footer at 13px / 500: group headings in #ffffff99, links 20px apart, outward arrows on external links, bottom bar with social glyphs, copyright and a language pill."

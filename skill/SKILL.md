@@ -101,7 +101,7 @@ references/choreography.md         the four scroll stages, thresholds, cue geome
    - `[data-astra-shape]` sections are the reveals. The frame is 576px × 80vh; do not resize it.
    - The last cue holds its shape for the rest of the page. Put the strongest shape last.
    - Story sections between cues are plain `.copy` blocks: an `h2` and one or two paragraphs.
-   - The page keeps the site chrome from `template.html`: a fixed 54px transparent header (wordmark,
+   - The page keeps the site chrome from `template.html`: a fixed 64px transparent header, 54px below 1020px (wordmark,
      13px nav links, search, glass "Log in" pill, one white CTA) and a footer of link groups at 13px / 500
      with a bottom bar. Edit the words, not the geometry. Do not add a blur behind the header.
    - For benchmarks, quotes, screenshots and comparison tables use the recipes in `references/DESIGN.md`

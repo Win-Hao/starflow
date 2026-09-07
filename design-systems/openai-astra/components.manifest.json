@@ -9,8 +9,8 @@
     "title": "openai-astra — reference components",
     "description": "Reference fixture for design-systems/openai-astra. Every visible value comes from tokens.css. The Astra launch page's signature moves: pure black canvas under a particle galaxy, white text with white-at-alpha secondaries, OpenAI Sans at 500/400, monochrome pill chrome, a single #23435f ambient glow, no shadows, no gradients.",
     "styleBlockCount": 1,
-    "selectorCount": 267,
-    "classCount": 118,
+    "selectorCount": 268,
+    "classCount": 119,
     "elementCount": 49
   },
   "tokens": {
@@ -270,6 +270,7 @@
     ".hero .scroll-hint",
     ".hero .star",
     ".icon-btn",
+    ".icon-btn:focus-visible",
     ".icon-btn:hover",
     ".icon-btn.plain",
     ".icon-btn.plain svg",
@@ -356,7 +357,7 @@
     ".site-header .bar",
     ".site-header .btn",
     ".site-header .btn svg",
-    ".site-header .search",
+    ".site-header .search-btn",
     ".site-header .wordmark",
     ".site-header nav",
     ".site-header nav a",
@@ -505,6 +506,7 @@
     "scroll-hint",
     "scrolled",
     "search",
+    "search-btn",
     "segmented",
     "select",
     "select-menu",
@@ -842,6 +844,7 @@
         ".chart-card .chart-head .icon-btn",
         ".deck-stage > .slide[aria-hidden=\"true\"]",
         ".icon-btn",
+        ".icon-btn:focus-visible",
         ".icon-btn:hover",
         ".icon-btn.plain",
         ".icon-btn.plain svg",
@@ -955,7 +958,7 @@
   ],
   "literals": {
     "colorExpressions": 57,
-    "pixelValues": 173,
+    "pixelValues": 175,
     "hardcodedFontFamilies": 0
   }
 }

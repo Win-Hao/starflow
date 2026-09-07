@@ -71,8 +71,10 @@ scripts from the page are included.
 - Grid: `grid-cols-12 gap-x-(--grid-gap) [--grid-gap:8px] md:[--grid-gap:16px] lg:[--grid-gap:24px]`.
 - Labels inset `clamp(1.25rem, 4vw, 3.5rem)`; `--spacing: .25rem`.
 - Shape cue: `max-width 576px; height calc(0.8 * var(--astra-viewport-height, 100vh))`.
-- Copy column between the star rails: 676px (Starflow measurement of the
-  page's `contentBounds`).
+- Copy column: `max-width 669px` (6 of 12 grid columns), the number this
+  package uses everywhere. Starflow's runtime `contentBounds` reading of the
+  same strip on the source page came out at 676px; that is an engine
+  measurement, not a second CSS width, and the recipes do not repeat it.
 
 ### Motion
 

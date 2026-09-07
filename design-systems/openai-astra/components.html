@@ -93,7 +93,7 @@
 
       /* ── Buttons ── */
       .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-1); min-height: 40px; padding: var(--space-3) var(--space-4); border: 0; border-radius: var(--radius-pill); font: 500 var(--text-sm) / 1 var(--font-body); letter-spacing: 0; white-space: nowrap; cursor: pointer; transition: background-color var(--motion-base) var(--ease-standard), color var(--motion-base) var(--ease-standard); }
-      .btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+      .btn:focus-visible, .icon-btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
       .btn-primary { background: var(--accent); color: var(--accent-on); }
       .btn-primary:hover { background: var(--accent-hover); }
       .btn-primary:active { background: var(--accent-active); }
@@ -273,8 +273,9 @@
       @media (prefers-reduced-motion: reduce) { .deck-thumbs { transition: none; } .deck-stage > .slide { transition: none; } }
       kbd { display: inline-block; min-width: 22px; padding: 2px 6px; border-radius: var(--radius-sm); box-shadow: var(--elev-ring); font: 500 var(--text-xs) / 1.4 var(--font-mono); letter-spacing: 0; color: var(--muted); text-align: center; }
 
-      /* ── Site header (page: fixed, 54px, transparent over the canvas; masked brightness backdrop, no blur) ── */
+      /* ── Site header (page: fixed, 64px on desktop and 54px below 1020px, transparent over the canvas; masked brightness backdrop, no blur) ── */
       .site-header { height: 64px; border-radius: var(--radius-md); background: #ffffff0a; }
+      @media (max-width: 1019.98px) { .site-header { height: 54px; } }
       .site-header.scrolled { background: #000000; box-shadow: var(--elev-ring); }
       .site-header .bar { display: flex; align-items: center; gap: var(--space-5); height: 100%; max-width: 1440px; margin: 0 auto; padding: 0 var(--space-8); }
       .site-header .wordmark { display: inline-flex; align-items: center; height: 17px; font: 500 var(--text-lg) / 1 var(--font-display); letter-spacing: -0.02em; color: var(--fg); text-decoration: none; }
@@ -282,7 +283,7 @@
       .site-header nav a { display: inline-flex; align-items: center; height: 100%; padding: 0 var(--space-4); font: 500 var(--text-xs) / 1.5 var(--font-body); letter-spacing: 0; color: var(--fg); text-decoration: none; transition: color var(--motion-fast); }
       .site-header nav a:hover { color: var(--muted); }
       .site-header .actions { display: flex; align-items: center; gap: var(--space-2); }
-      .site-header .search { width: 40px; height: 40px; color: var(--muted); }
+      .site-header .search-btn { width: 40px; height: 40px; color: var(--muted); }
       .site-header .btn { height: 36px; min-height: 0; padding: 0 20px; gap: 0.3em; }
       .site-header .btn svg { width: 12px; height: 12px; }
 
@@ -400,7 +401,7 @@
             <a class="wordmark" href="#">Astra</a>
             <nav aria-label="Primary">
               <a href="#">Research</a><a href="#">Products</a><a href="#">Business</a><a href="#">Developers</a><a href="#">Company</a>
-              <button class="icon-btn search" type="button" aria-label="Search"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg></button>
+              <button class="icon-btn search-btn" type="button" aria-label="Search"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg></button>
             </nav>
             <div class="actions">
               <button class="btn btn-glass" type="button">Log in <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m4 6 4 4 4-4"/></svg></button>
@@ -413,7 +414,7 @@
             <a class="wordmark" href="#">Astra</a>
             <nav aria-label="Primary (scrolled)">
               <a href="#">Research</a><a href="#">Products</a><a href="#">Business</a><a href="#">Developers</a><a href="#">Company</a>
-              <button class="icon-btn search" type="button" aria-label="Search"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg></button>
+              <button class="icon-btn search-btn" type="button" aria-label="Search"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg></button>
             </nav>
             <div class="actions">
               <button class="btn btn-glass" type="button">Log in <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m4 6 4 4 4-4"/></svg></button>
@@ -530,7 +531,7 @@
           <p class="lede">Long documents, screenshots, code that runs, a follow-up question asked at the right moment.</p>
           <p>These are not features bolted together; they are the same stars standing in different shapes at different times.</p>
         </div>
-        <p class="note">676px column, h2 48px / 500, p1 17px / 28px in #ffffff99. Nothing on either side: the star rails live there.</p>
+        <p class="note">669px column, h2 48px / 500, p1 17px / 28px in #ffffff99. Nothing on either side: the star rails live there.</p>
       </section>
 
       <section id="cue">
